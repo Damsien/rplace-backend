@@ -12,3 +12,17 @@ We have 3 main parts :
 Tech stack :
 * Database - [Redis](https://redis.io/): for temporary and persistent database
 * Back - [NestJS](https://nestjs.com/): to manage data and handle requests
+
+## Server
+
+### Prerequisites
+
+- yarn installed
+- nodeJS installed (>=16.10.0, use nvm to manage node versions)
+
+### Run server
+
+```bash
+# development
+$ yarn run start:dev
+```
