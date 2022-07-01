@@ -17,10 +17,10 @@ Tech stack :
 
 ### Prerequisites
 
-* NestJS
+#### NestJS
 - yarn installed
 - nodeJS installed (>=16.10.0, use nvm to manage node versions)
-* Database
+#### Database
 - redis installed
 
 ### Run server
