@@ -4130,7 +4130,16 @@ rechoir@^0.6.2:
   dependencies:
     resolve "^1.1.6"
 
-redis@^4.1.1:
+redis-om@^0.3.5:
+  version "0.3.5"
+  resolved "https://registry.yarnpkg.com/redis-om/-/redis-om-0.3.5.tgz#2f071bff3ee03185bdd7dfa1c20a58c4c9006ab5"
+  integrity sha512-Me35cF6aRmgqrmInLMnk11GQRON8I5uGCfO19MW6+6nf1Sx/Dh3Uf1vFp/K71GrtDCYJg2NZrGDlkYnRB/gjDQ==
+  dependencies:
+    redis "^4.0.4"
+    tslib "^2.4.0"
+    ulid "^2.3.0"
+
+redis@^4.0.4, redis@^4.1.1:
   version "4.1.1"
   resolved "https://registry.yarnpkg.com/redis/-/redis-4.1.1.tgz#a366a15d47819e11f7cdd35dd9860e1839bc2b35"
   integrity sha512-vVLYD0RMiDH4YQ1dtmtNU0RX5MAsvEA35Wj+4ZhrSNZXtGK87ktQ0lmI3O3Qn/omoIW456wfOUanqI/RNxagLw==
@@ -4754,7 +4763,7 @@ tsconfig-paths@4.0.0:
     minimist "^1.2.6"
     strip-bom "^3.0.0"
 
-tslib@2.4.0, tslib@^2.1.0:
+tslib@2.4.0, tslib@^2.1.0, tslib@^2.4.0:
   version "2.4.0"
   resolved "https://registry.npmjs.org/tslib/-/tslib-2.4.0.tgz"
   integrity sha512-d6xOpEDfsi2CZVlPQzGeux8XMwLT9hssAsaPYExaQMuYskwb+x1x7J371tWlbBdWHroy99KnVB6qIkUbs5X3UQ==
@@ -4810,6 +4819,11 @@ typescript@4.7.4, typescript@^4.3.5:
   version "4.7.4"
   resolved "https://registry.npmjs.org/typescript/-/typescript-4.7.4.tgz"
   integrity sha512-C0WQT0gezHuw6AdY1M2jxUO83Rjf0HP7Sk1DtXj6j1EwkQNZrHAg2XPWlq62oqEhYvONq5pkC2Y9oPljWToLmQ==
+
+ulid@^2.3.0:
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/ulid/-/ulid-2.3.0.tgz#93063522771a9774121a84d126ecd3eb9804071f"
+  integrity sha512-keqHubrlpvT6G2wH0OEfSW4mquYRcbe/J8NMmveoQOjUqmo+hXtO+ORCpWhdbZ7k72UtY61BL7haGxW6enBnjw==
 
 universalify@^2.0.0:
   version "2.0.0"

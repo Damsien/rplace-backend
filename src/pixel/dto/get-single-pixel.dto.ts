@@ -1,6 +1,7 @@
 export class GetSinglePixel {
 
-    coord_x: string;
-    coord_y: string;
+    coord_x: number;
+
+    coord_y: number;
     
 }

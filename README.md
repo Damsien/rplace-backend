@@ -25,12 +25,13 @@ Tech stack :
 
 ### Run server
 
-Run database first in a terminal.
-Keep it open during your codding session.
+Run Redis-stack database first in a terminal.
+Redis-stack implements RedisJSON and RediSearch that's modules we use.
 ```bash
-# run database (and manage data with the cli)
-$ redis-cli    # or redis.cli on arch linux
+# run database
+$ docker run -d --name redis-stack -p 6379:6379 -p 8001:8001 redis/redis-stack:latest
 ```
+Got to `localhost:8001` to manage data with Redis Insight.
 
 Run NestJS server (you need to be placed in this folder).
 ```bash

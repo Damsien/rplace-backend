@@ -1,7 +1,7 @@
 import { Controller, Get, HttpException, HttpStatus, Param, Query } from '@nestjs/common';
 import { logger } from 'src/main';
 import { GetSinglePixel } from './dto/get-single-pixel.dto';
-import { Pixel } from './interfaces/pixel.interface';
+import { Pixel } from './entity/pixel.entity';
 import { PixelService } from './pixel.service';
 
 @Controller('pixel')
