@@ -1,4 +1,4 @@
-import { Logger } from '@nestjs/common';
+import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import {
   FastifyAdapter,
@@ -15,6 +15,9 @@ async function bootstrap() {
     new FastifyAdapter({logger: true})
   );
   app.setGlobalPrefix('/api/'+VERSION);
+  app.useGlobalPipes(new ValidationPipe({
+    transform: true,
+  }));
   await app.listen(3000, '0.0.0.0');
 }
 bootstrap();

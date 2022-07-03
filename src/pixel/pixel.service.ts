@@ -1,19 +1,21 @@
-import { HttpCode, HttpException, Inject, Injectable, Query } from '@nestjs/common';
-import { createClient, RedisClientType } from 'redis';
-import { Client, Repository, Schema } from 'redis-om';
-import { logger } from 'src/main';
+import { Injectable } from '@nestjs/common';
+import { Repository } from 'redis-om';
+import { client } from 'src/app.service';
+import { PixelHistoryService } from 'src/pixel-history/pixel-history.service';
+import { UserPixelHistoryService } from 'src/user-pixel-history/user-pixel-history.service';
 import { GetSinglePixel } from './dto/get-single-pixel.dto';
+import { PlaceSinglePixel } from './dto/place-single-pixel.dto';
 import { Pixel, schema } from './entity/pixel.entity';
-
-export const client = new Client();
 
 @Injectable()
 export class PixelService {
 
     private repo: Repository<Pixel>;
 
-    constructor() {
-      client.open('redis://localhost:6379');
+    constructor(
+      private readonly pixelHistoryService: PixelHistoryService,
+      private readonly userPixelHistoryService: UserPixelHistoryService
+    ) {
       this.repo = client.fetchRepository(schema);
     }
 
@@ -21,27 +23,34 @@ export class PixelService {
       return await this.repo.search().return.all();
     }
 
-    async getSinglePixel(searchPxl: GetSinglePixel): Promise<Pixel> {      
+    async getSinglePixel(pxl: GetSinglePixel): Promise<Pixel> {
+      return await this.repo.search().where('coord_x').eq(pxl.coord_x).and('coord_y').eq(pxl.coord_y).return.first();
+    }
+
+    async placeSinglePixel(pxl: PlaceSinglePixel): Promise<Pixel> {
+
+      // Create index for the Pixel entity if it's not existing
+      // It's useful for RediSearch
       await this.repo.createIndex();
 
-      // let pixel = this.repo.createEntity({entityId: `${searchPxl.coord_x}-${searchPxl.coord_y}`});
-      let pixel = await this.repo.fetch(`${searchPxl.coord_x}-${searchPxl.coord_y}`);
-      pixel.coord_x = Number(searchPxl.coord_x);
-      pixel.coord_y = Number(searchPxl.coord_y);
-      pixel.color = 'red';
-      pixel.username = 'dassied';
-      pixel.date = new Date();
+      let globalId = `${pxl.coord_x}-${pxl.coord_y}`;
 
-      // let id = await this.repo.save(pixel);
+      /*    Pushing pixel in Pixel section   */
+      let pixel = await this.repo.fetch(globalId);
+      pixel.coord_x = pxl.coord_x;
+      pixel.coord_y = pxl.coord_y;
+      pixel.color = pxl.color;
+      pixel.username = pxl.username;
+      pixel.date = pxl.date;
 
-      pixel.color = 'yellow';
+      this.repo.save(pixel);
 
-      let keyname = `Pixel:2-4`;
-      
-      client.execute(['XADD', `${keyname}`, '*',
-        'username', 'dassied',
-        'color', `${pixel.color}`
-      ]);
+
+      /*    Pushing pixel in PixelHistory section   */
+      this.pixelHistoryService.placeSinglePixel(pxl);
+
+      /*    Pushing pixel in UserHistory section   */
+      this.userPixelHistoryService.placeSinglePixel(pxl);
 
       return pixel;
     }

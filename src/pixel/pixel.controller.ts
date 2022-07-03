@@ -1,6 +1,7 @@
-import { Controller, Get, HttpException, HttpStatus, Param, Query } from '@nestjs/common';
+import { Controller, Get, HttpException, HttpStatus, Param, Post, Query } from '@nestjs/common';
 import { logger } from 'src/main';
 import { GetSinglePixel } from './dto/get-single-pixel.dto';
+import { PlaceSinglePixel } from './dto/place-single-pixel.dto';
 import { Pixel } from './entity/pixel.entity';
 import { PixelService } from './pixel.service';
 
@@ -20,10 +21,19 @@ export class PixelController {
     }
 
     @Get()
-    async getPixel(@Query() query: GetSinglePixel) {
+    async getPixel(@Query() query: GetSinglePixel): Promise<Pixel> {
         let pixel = await this.pixelService.getSinglePixel(query);
         if(pixel == null) {
             throw new HttpException('Not found', HttpStatus.NOT_FOUND);
+        }
+        return pixel;
+    }
+
+    @Post()
+    async placePixel(@Query() query: PlaceSinglePixel): Promise<Pixel> {
+        let pixel = await this.pixelService.placeSinglePixel(query);
+        if(pixel == null) {
+            throw new HttpException('Error', HttpStatus.INTERNAL_SERVER_ERROR);
         }
         return pixel;
     }
