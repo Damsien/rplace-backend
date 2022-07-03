@@ -21,7 +21,7 @@ Tech stack :
 - yarn installed
 - nodeJS installed (>=16.10.0, use nvm to manage node versions)
 #### Database
-- redis installed
+- docker installed
 
 ### Run server
 
@@ -38,3 +38,7 @@ Run NestJS server (you need to be placed in this folder).
 # development
 $ yarn run start:dev
 ```
+
+## Data structure
+
+![rplace data structure](rplace-backend.png)
