@@ -41,4 +41,10 @@ $ yarn run start:dev
 
 ## Data structure
 
-![rplace data structure](rplace-backend.png)
+### Redis structure
+
+![rplace data structure redis side](rplace-backend-redis.png)
+
+### Global structure (redis and mysql)
+
+![rplace data structure global](rplace-backend-redis-mysql.png)
