@@ -11,7 +11,7 @@ We have 3 main parts :
 
 Tech stack :
 * Back - [NestJS](https://nestjs.com/): to manage data and handle requests
-* Database - [Redis](https://redis.io/): for temporary and persistent database
+* Database - [Redis](https://redis.io/) for the temporary database and [MariaDB](https://mariadb.org/) : for the persistent database
 
 ## Server
 
@@ -28,16 +28,23 @@ Tech stack :
 Run Redis-stack database first in a terminal.
 Redis-stack implements RedisJSON and RediSearch that's modules we use.
 ```bash
-# run database
+# run redis database
 $ docker run -d --name redis-stack -p 6379:6379 -p 8001:8001 redis/redis-stack:latest
 ```
 Got to `localhost:8001` to manage data with Redis Insight.
 
-Run NestJS server (you need to be placed in this folder).
+Then run MariaDB database
+```bash
+# run mariadb database
+$ docker run --env MARIADB_ROOT_PASSWORD=password -p 3306:3306 mariadb:10.7.4-focal
+```
+
+Finally, run NestJS server (you need to be placed in this folder).
 ```bash
 # development
 $ yarn run start:dev
 ```
+Make call on api with `localhost:3000`.
 
 ## Data structure
 
@@ -45,6 +52,6 @@ $ yarn run start:dev
 
 ![rplace data structure redis side](rplace-backend-redis.png)
 
-### Global structure (redis and mysql)
+### Global structure (redis and mariadb)
 
-![rplace data structure global](rplace-backend-redis-mysql.png)
+![rplace data structure global](rplace-backend-redis-mariadb.png)

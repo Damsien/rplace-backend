@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { Repository } from 'redis-om';
 import { client } from 'src/app.service';
 import { PixelHistoryService } from 'src/pixel-history/pixel-history.service';
-import { UserPixelHistoryService } from 'src/user-pixel-history/user-pixel-history.service';
 import { GetSinglePixel } from './dto/get-single-pixel.dto';
 import { PlaceSinglePixel } from './dto/place-single-pixel.dto';
 import { Pixel, schema } from './entity/pixel.entity';
@@ -13,8 +12,7 @@ export class PixelService {
     private repo: Repository<Pixel>;
 
     constructor(
-      private readonly pixelHistoryService: PixelHistoryService,
-      private readonly userPixelHistoryService: UserPixelHistoryService
+      private readonly pixelHistoryService: PixelHistoryService
     ) {
       this.repo = client.fetchRepository(schema);
     }
@@ -47,10 +45,7 @@ export class PixelService {
 
 
       /*    Pushing pixel in PixelHistory section   */
-      this.pixelHistoryService.placeSinglePixel(pxl);
-
-      /*    Pushing pixel in UserHistory section   */
-      this.userPixelHistoryService.placeSinglePixel(pxl);
+      this.pixelHistoryService.addSinglePixel(pxl);
 
       return pixel;
     }
