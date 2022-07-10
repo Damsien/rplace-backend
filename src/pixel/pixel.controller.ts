@@ -38,4 +38,9 @@ export class PixelController {
         return pixel;
     }
 
+    @Post('create-map')
+    async createMap() {
+        return await this.pixelService.createMap();
+    }
+
 }

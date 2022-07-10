@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Repository } from 'redis-om';
 import { client } from 'src/app.service';
+import { logger } from 'src/main';
 import { PixelHistoryService } from 'src/pixel-history/pixel-history.service';
 import { GetSinglePixel } from './dto/get-single-pixel.dto';
 import { PlaceSinglePixel } from './dto/place-single-pixel.dto';
@@ -48,6 +49,10 @@ export class PixelService {
       this.pixelHistoryService.addSinglePixel(pxl);
 
       return pixel;
+    }
+
+    async createMap() {
+      return await this.pixelHistoryService.createMap();
     }
 
 }

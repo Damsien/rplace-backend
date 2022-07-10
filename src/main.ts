@@ -7,7 +7,7 @@ import {
 import { AppModule } from './app.module';
 
 const VERSION = 'v1';
-export const logger = new Logger('r/place-redis');
+export const logger = new Logger('r/place');
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(

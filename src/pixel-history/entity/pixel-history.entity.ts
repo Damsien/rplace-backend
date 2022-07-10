@@ -1,19 +1,24 @@
-import { PixelSQL } from "src/pixel/entity/pixel-sql.entity";
-import { Entity, JoinColumn, OneToOne, PrimaryColumn } from "typeorm";
+import { PixelSQL } from "../../pixel/entity/pixel-sql.entity";
+import { Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
 export class PixelHistory {
 
+    // @PrimaryGeneratedColumn('increment')
+    // id: number
+
     @PrimaryColumn()
-    @OneToOne(() => PixelSQL)
+    @ManyToOne(() => PixelSQL)
     @JoinColumn({ name: "pixelId" })
     pixelId: number;
 
     @PrimaryColumn()
     date: Date;
 
+    @Column()
     color: string;
 
+    @Column()
     username: string;
 
 }

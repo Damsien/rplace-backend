@@ -1,11 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { HttpCode, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { Interval } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
 import { client } from 'src/app.service';
 import { logger } from 'src/main';
 import { PlaceSinglePixel } from 'src/pixel/dto/place-single-pixel.dto';
-import { Stream } from 'stream';
-import { DataSource, Repository } from 'typeorm';
+import { PixelSQL } from 'src/pixel/entity/pixel-sql.entity';
+import { DataSource, EntityManager, Repository } from 'typeorm';
 import { PixelHistory } from './entity/pixel-history.entity';
 
 @Injectable()
@@ -13,7 +13,8 @@ export class PixelHistoryService {
   
   constructor(
     private dataSoucre: DataSource,
-    @InjectRepository(PixelHistory) private repo: Repository<PixelHistory>
+    @InjectRepository(PixelHistory) private pixelHistoRepo: Repository<PixelHistory>,
+    @InjectRepository(PixelSQL) private pixelRepo: Repository<PixelSQL>
   ) {}
 
   addSinglePixel(pxl: PlaceSinglePixel) {
@@ -26,44 +27,60 @@ export class PixelHistoryService {
       'coord_y', pxl.coord_y,
       'color', pxl.color,
       'username', pxl.username,
-      'date', pxl.date.getDate().toString()
+      'date', pxl.date.toString()
     ]);
   }
 
+
+
+  private async delStreams() {
+    let streams;
+    streams = await client.execute([
+      'KEYS', 'PixelHistory:*'
+    ]);
+
+    for(let stream of streams) {
+      await client.execute([
+        'DEL', stream
+      ]);
+    }
+  }
+  
   private async getSinglePixelStream(pixelStream): Promise<Array<PixelHistory>> {
-    let stream: Array<string>;
+    let stream;
     stream = await client.execute([
       'XRANGE', pixelStream,
       '-', '+'
-    ]) as Array<string>;
+    ]);
 
     let history = new Array<PixelHistory>();
-    stream.forEach((pixelHistoryRedis) => {
+
+    for(let i=0; i<stream.length; i++) {
+      let pixelHistoryRedis = stream[i][1];
       let pixelHistory = new PixelHistory();
-      pixelHistory.pixelId = pixelHistoryRedis['pixelId'];
-      pixelHistory.date = pixelHistoryRedis['date'];
-      pixelHistory.username = pixelHistoryRedis['username'];
-      pixelHistory.color = pixelHistoryRedis['color'];
+      pixelHistory.pixelId = (await this.pixelRepo.findOne({where: {coord_x: pixelHistoryRedis[1], coord_y: pixelHistoryRedis[3]}})).pixelId;
+      pixelHistory.date = new Date(pixelHistoryRedis[9]);
+      pixelHistory.username = pixelHistoryRedis[7];
+      pixelHistory.color = pixelHistoryRedis[5];
       history.push(pixelHistory);
-    });
+    }
 
     return history;
   }
 
-  private async getPixels(): Promise<Map<String, Array<PixelHistory>>> {
+  private async getPixels(): Promise<Array<PixelHistory[]>> {
 
-    let pixelHistory = new Map<String, Array<PixelHistory>>();
+    let pixelHistory = new Array<PixelHistory[]>();
 
-    let streams: Array<string>;
+    let streams;
     streams = await client.execute([
       'SCAN', '0',
       'TYPE', 'stream',
-      'MATCH', 'PixelHistory'
-    ]) as Array<string>;
-    logger.debug(streams);
+      //'MATCH', 'PixelHistory'
+    ]);
 
-    for(let i=0; i<streams.length; i++) {
-      pixelHistory[streams[i]] = await this.getSinglePixelStream(streams[i]);
+    for(let i=0; i<streams[1].length; i++) {
+      pixelHistory.push(await this.getSinglePixelStream(streams[1][i]));
     }
 
     return pixelHistory;
@@ -71,6 +88,7 @@ export class PixelHistoryService {
 
   @Interval('pushOnMySQL', 30000)
   async pushOnMySQL() {
+
     const qRunner = this.dataSoucre.createQueryRunner();
     await qRunner.connect();
     await qRunner.startTransaction();
@@ -78,13 +96,52 @@ export class PixelHistoryService {
     let pixels = await this.getPixels();
 
     try {
-      await qRunner.manager.save(async manager => {
-        for(let [, val] of pixels) {
-          for(let pixel of val) {
-            await manager.save(pixel);
-          }
+
+      for(let i=0; i<pixels.length; i++) {
+        for(let j=0; j<pixels[i].length; j++) {
+          let pixel: PixelHistory = pixels[i][j];
+
+          await qRunner.manager.save(pixel);
         }
-      });
+      }
+  
+      await qRunner.commitTransaction();
+
+      await this.delStreams();
+    } catch (err) {
+      logger.debug(err);
+      // since we have errors lets rollback the changes we made
+      await qRunner.rollbackTransaction();
+    } finally {
+      // you need to release a queryRunner which was manually instantiated
+      await qRunner.release();
+    }
+    
+    return HttpStatus.OK;
+  }
+
+  /*
+
+    mysql --user=root --password=password
+    CREATE DATABASE rplace;
+
+  */
+
+
+  async createMap() {
+    const qRunner = this.dataSoucre.createQueryRunner();
+    await qRunner.connect();
+    await qRunner.startTransaction();
+      
+    try {
+      for(let i=1; i<20; i++) {
+        for(let j=1; j<20; j++) {
+          let pixel = new PixelSQL();
+          pixel.coord_x = i;
+          pixel.coord_y = j;
+          await qRunner.manager.save(pixel);
+        }
+      }
   
       await qRunner.commitTransaction();
     } catch (err) {
@@ -94,7 +151,8 @@ export class PixelHistoryService {
       // you need to release a queryRunner which was manually instantiated
       await qRunner.release();
     }
-    
+
+    return HttpStatus.CREATED;
   }
 
 }
