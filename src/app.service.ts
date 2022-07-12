@@ -7,7 +7,7 @@ export const client = new Client();
 export class AppService {
 
   constructor() {
-    client.open('redis://localhost:6379');
+    // client.open('redis://localhost:6379');
   }
 
   getHello(): string {

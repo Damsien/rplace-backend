@@ -8,38 +8,26 @@ import { PixelHistory } from './pixel-history/entity/pixel-history.entity';
 import { PixelSQL } from './pixel/entity/pixel-sql.entity';
 import { PixelHistoryModule } from './pixel-history/pixel-history.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { UserModule } from './user/user.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
-    PixelModule,
-    // TypeOrmModule.forRootAsync({
-    //   imports: [PixelHistoryModule],
-    //   inject: [PixelHistoryService],
-    //   useFactory: () => {
-    //     return {
-    //       type: 'mariadb',
-    //       host: 'localhost',
-    //       port: 3306,
-    //       username: 'root',
-    //       password: 'password',
-    //       database: 'rplace',
-    //       entities: [PixelSQL, PixelHistory],
-    //       synchronize: true
-    //     }
-    //   }
+    // PixelModule,
+    // TypeOrmModule.forRoot({
+    //   type: 'mariadb',
+    //   host: 'localhost',
+    //   port: 3306,
+    //   username: 'root',
+    //   password: 'password',
+    //   database: 'rplace',
+    //   entities: [PixelSQL, PixelHistory],
+    //   synchronize: true
     // }),
-    TypeOrmModule.forRoot({
-      type: 'mariadb',
-      host: 'localhost',
-      port: 3306,
-      username: 'root',
-      password: 'password',
-      database: 'rplace',
-      entities: [PixelSQL, PixelHistory],
-      synchronize: true
-    }),
-    PixelHistoryModule,
-    ScheduleModule.forRoot()
+    // PixelHistoryModule,
+    // ScheduleModule.forRoot(),
+    UserModule,
+    AuthModule
   ],
   controllers: [AppController],
   providers: [AppService],
