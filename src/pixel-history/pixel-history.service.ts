@@ -1,10 +1,10 @@
-import { HttpCode, HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { ConflictException, HttpCode, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { Interval } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
 import { client } from 'src/app.service';
 import { logger } from 'src/main';
-import { PlaceSinglePixel } from 'src/pixel/dto/place-single-pixel.dto';
 import { PixelSQL } from 'src/pixel/entity/pixel-sql.entity';
+import { Pixel } from 'src/pixel/entity/pixel.entity';
 import { DataSource, EntityManager, Repository } from 'typeorm';
 import { PixelHistory } from './entity/pixel-history.entity';
 
@@ -17,7 +17,7 @@ export class PixelHistoryService {
     @InjectRepository(PixelSQL) private pixelRepo: Repository<PixelSQL>
   ) {}
 
-  addSinglePixel(pxl: PlaceSinglePixel) {
+  addSinglePixel(pxl: Pixel) {
     let globalId = `${pxl.coord_x}-${pxl.coord_y}`;
     
     let pixelHistoryId = `PixelHistory:${globalId}`;
@@ -116,22 +116,17 @@ export class PixelHistoryService {
       // you need to release a queryRunner which was manually instantiated
       await qRunner.release();
     }
-    
-    return HttpStatus.OK;
   }
-
-  /*
-
-    mysql --user=root --password=password
-    CREATE DATABASE rplace;
-
-  */
 
 
   async createMap() {
     const qRunner = this.dataSoucre.createQueryRunner();
     await qRunner.connect();
     await qRunner.startTransaction();
+
+    if((await this.pixelRepo.count({})) <= 361) {
+      throw new ConflictException();
+    }
       
     try {
       for(let i=1; i<20; i++) {
@@ -145,6 +140,7 @@ export class PixelHistoryService {
   
       await qRunner.commitTransaction();
     } catch (err) {
+      throw new ConflictException();
       // since we have errors lets rollback the changes we made
       await qRunner.rollbackTransaction();
     } finally {
@@ -152,7 +148,7 @@ export class PixelHistoryService {
       await qRunner.release();
     }
 
-    return HttpStatus.CREATED;
+    return 'Map created';
   }
 
 }

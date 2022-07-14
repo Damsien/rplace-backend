@@ -13,9 +13,15 @@ export class AuthService {
     constructor(private userService: UserService, private jwtService: JwtService) {}
 
     /* USED BY LOCAL GUARD */
-
     async validateUser(username: string, password: string, pscope: string): Promise<UserPayload> {
         return await this.userService.checkUser(username, password, pscope);
+    }
+
+    /* USED BY WS GUARD */
+    async validateToken(token: string) {
+        return await this.jwtService.verify(token, {
+            secret: 'AT-SECRET'
+        });
     }
 
 

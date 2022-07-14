@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Repository } from 'redis-om';
 import { client } from 'src/app.service';
-import { logger } from 'src/main';
+import { UserPayload } from 'src/auth/type/userpayload.type';
 import { PixelHistoryService } from 'src/pixel-history/pixel-history.service';
 import { GetSinglePixel } from './dto/get-single-pixel.dto';
 import { PlaceSinglePixel } from './dto/place-single-pixel.dto';
@@ -26,7 +26,7 @@ export class PixelService {
       return await this.repo.search().where('coord_x').eq(pxl.coord_x).and('coord_y').eq(pxl.coord_y).return.first();
     }
 
-    async placeSinglePixel(pxl: PlaceSinglePixel): Promise<Pixel> {
+    async placeSinglePixel(pxl: PlaceSinglePixel, user: UserPayload): Promise<Pixel> {
 
       // Create index for the Pixel entity if it's not existing
       // It's useful for RediSearch
@@ -39,14 +39,14 @@ export class PixelService {
       pixel.coord_x = pxl.coord_x;
       pixel.coord_y = pxl.coord_y;
       pixel.color = pxl.color;
-      pixel.username = pxl.username;
-      pixel.date = pxl.date;
+      pixel.username = user.username;
+      pixel.date = new Date();
 
       this.repo.save(pixel);
 
 
       /*    Pushing pixel in PixelHistory section   */
-      this.pixelHistoryService.addSinglePixel(pxl);
+      this.pixelHistoryService.addSinglePixel(pixel);
 
       return pixel;
     }

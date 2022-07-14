@@ -12,11 +12,5 @@ export class PlaceSinglePixel {
     coord_y: number;
 
     color: string;
-
-    username: string;
-
-    @IsDate()
-    @Type(() => Date)
-    date: Date;
     
 }

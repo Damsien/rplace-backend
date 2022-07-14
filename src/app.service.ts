@@ -5,9 +5,9 @@ export const client = new Client();
 
 @Injectable()
 export class AppService {
-
-  constructor() {
-    // client.open('redis://localhost:6379');
-  }
   
+    constructor() {
+        client.open('redis://localhost:6379');
+    }
+
 }
