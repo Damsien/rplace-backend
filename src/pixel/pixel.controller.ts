@@ -5,6 +5,9 @@ import { GetSinglePixel } from './dto/get-single-pixel.dto';
 import { PlaceSinglePixel } from './dto/place-single-pixel.dto';
 import { Pixel } from './entity/pixel.entity';
 import { PixelService } from './pixel.service';
+import { Roles } from '../user/decorator/roles.decorator';
+import { Role } from 'src/user/type/role.enum';
+import { RolesGuard } from 'src/user/guard/roles.guard';
 
 @Controller('pixel')
 export class PixelController {
@@ -35,13 +38,6 @@ export class PixelController {
             throw new HttpException('Error', HttpStatus.INTERNAL_SERVER_ERROR);
         }
         return pixel;
-    }
-
-    @UseGuards(AtAuthGuard)
-    @HttpCode(201)
-    @Post('create-map')
-    async createMap() {
-        return await this.pixelService.createMap();
     }
 
 }

@@ -51,8 +51,4 @@ export class PixelService {
       return pixel;
     }
 
-    async createMap() {
-      return await this.pixelHistoryService.createMap();
-    }
-
 }

@@ -1,7 +1,8 @@
-import { ConflictException, HttpCode, HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { ConflictException, HttpCode, HttpStatus, Inject, Injectable, NotAcceptableException } from '@nestjs/common';
 import { Interval } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
 import { client } from 'src/app.service';
+import { SizeMap } from 'src/game/dto/size-map.dto';
 import { logger } from 'src/main';
 import { PixelSQL } from 'src/pixel/entity/pixel-sql.entity';
 import { Pixel } from 'src/pixel/entity/pixel.entity';
@@ -119,18 +120,19 @@ export class PixelHistoryService {
   }
 
 
-  async createMap() {
+  async createMap(map: SizeMap) {
     const qRunner = this.dataSoucre.createQueryRunner();
     await qRunner.connect();
     await qRunner.startTransaction();
 
-    if((await this.pixelRepo.count({})) <= 361) {
+    const count = await this.pixelRepo.count({});
+    if(count != 0) {
       throw new ConflictException();
     }
       
     try {
-      for(let i=1; i<20; i++) {
-        for(let j=1; j<20; j++) {
+      for(let i=1; i<map.width+1; i++) {
+        for(let j=1; j<map.width+1; j++) {
           let pixel = new PixelSQL();
           pixel.coord_x = i;
           pixel.coord_y = j;
@@ -147,8 +149,52 @@ export class PixelHistoryService {
       // you need to release a queryRunner which was manually instantiated
       await qRunner.release();
     }
+  }
 
-    return 'Map created';
+  async increaseMapSize(newMap: SizeMap) {
+    const qRunner = this.dataSoucre.createQueryRunner();
+    await qRunner.connect();
+    await qRunner.startTransaction();
+
+    let pixelArr = [];
+
+    const count = await this.pixelRepo.count({});
+    if(newMap.width**2 <= count) {
+      throw new ConflictException("The size of the map must be greater than the previous one");
+    }
+    if(count == 0) {
+      throw new NotAcceptableException("You first need to create the map");
+    }
+      
+    try {
+      for(let i=Math.sqrt(count)+1; i<newMap.width+1; i++) {
+        for(let j=1; j<newMap.width+1; j++) {
+          if(!pixelArr.includes(`${i} ${j}`)) {
+            let pixel1 = new PixelSQL();
+            pixel1.coord_x = i;
+            pixel1.coord_y = j;
+            await qRunner.manager.save(pixel1);
+            pixelArr.push(`${i} ${j}`);
+          }
+          if(!pixelArr.includes(`${j} ${i}`)) {
+            let pixel2 = new PixelSQL();
+            pixel2.coord_x = j;
+            pixel2.coord_y = i;
+            await qRunner.manager.save(pixel2);
+            pixelArr.push(`${j} ${i}`);
+          }
+        }
+      }
+  
+      await qRunner.commitTransaction();
+    } catch (err) {
+      // since we have errors lets rollback the changes we made
+      await qRunner.rollbackTransaction();
+      throw new ConflictException();
+    } finally {
+      // you need to release a queryRunner which was manually instantiated
+      await qRunner.release();
+    }
   }
 
 }

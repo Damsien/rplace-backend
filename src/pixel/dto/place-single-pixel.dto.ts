@@ -1,5 +1,5 @@
 import { Type } from "class-transformer";
-import { IsDate, IsInt } from "class-validator";
+import { IsInt } from "class-validator";
 
 export class PlaceSinglePixel {
 

@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PixelModule } from './pixel/pixel.module';
-import { PixelHistoryService } from './pixel-history/pixel-history.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PixelHistory } from './pixel-history/entity/pixel-history.entity';
 import { PixelSQL } from './pixel/entity/pixel-sql.entity';
@@ -11,6 +10,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
+import { GameModule } from './game/game.module';
 
 const ENV = process.env.NODE_ENV;
 
@@ -34,7 +34,8 @@ const ENV = process.env.NODE_ENV;
     PixelHistoryModule,
     ScheduleModule.forRoot(),
     UserModule,
-    AuthModule
+    AuthModule,
+    GameModule
   ],
   controllers: [AppController],
   providers: [AppService],
