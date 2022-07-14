@@ -1,4 +1,5 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { logger } from 'src/main';
 import { User } from 'src/user/type/user.type';
@@ -10,7 +11,7 @@ import { UserPayload } from './type/userpayload.type';
 @Injectable()
 export class AuthService {
 
-    constructor(private userService: UserService, private jwtService: JwtService) {}
+    constructor(private userService: UserService, private jwtService: JwtService, private configService: ConfigService) {}
 
     /* USED BY LOCAL GUARD */
     async validateUser(username: string, password: string, pscope: string): Promise<UserPayload> {
@@ -20,7 +21,7 @@ export class AuthService {
     /* USED BY WS GUARD */
     async validateToken(token: string) {
         return await this.jwtService.verify(token, {
-            secret: 'AT-SECRET'
+            secret: this.configService.get<string>('AT_SECRET')
         });
     }
 
@@ -34,12 +35,12 @@ export class AuthService {
     private async getTokens(payload: UserPayload): Promise<Tokens> {
         const [at, rt] = await Promise.all([
             this.jwtService.signAsync(payload, {
-                secret: 'AT-SECRET',
+                secret: this.configService.get<string>('AT_SECRET'),
                 expiresIn: '30m',
             }),
             this.jwtService.signAsync(payload, {
-                secret: 'RT-SECRET',
-                expiresIn: '1d'
+                secret: this.configService.get<string>('RT_SECRET'),
+                expiresIn: '2h'
             })
         ]);
 

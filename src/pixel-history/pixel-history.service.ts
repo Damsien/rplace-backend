@@ -140,9 +140,9 @@ export class PixelHistoryService {
   
       await qRunner.commitTransaction();
     } catch (err) {
-      throw new ConflictException();
       // since we have errors lets rollback the changes we made
       await qRunner.rollbackTransaction();
+      throw new ConflictException();
     } finally {
       // you need to release a queryRunner which was manually instantiated
       await qRunner.release();

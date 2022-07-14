@@ -11,18 +11,13 @@ export class PixelController {
 
     constructor(private readonly pixelService: PixelService) {}
 
-    @UseGuards(AtAuthGuard)
-    @Get(':map')
-    async getPixels(@Param('map') map: string): Promise<Pixel[]> {
-        if (map != "map") {
-            throw new HttpException('Bad Request Error', HttpStatus.BAD_REQUEST);
-        }
+    @Get('map')
+    async getPixels(): Promise<Pixel[]> {
         let pixels = await this.pixelService.getMap();
         
         return pixels;
     }
 
-    @UseGuards(AtAuthGuard)
     @Get()
     async getPixel(@Query() query: GetSinglePixel): Promise<Pixel> {
         let pixel = await this.pixelService.getSinglePixel(query);

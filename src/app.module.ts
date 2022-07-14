@@ -10,19 +10,26 @@ import { PixelHistoryModule } from './pixel-history/pixel-history.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
+import { ConfigModule } from '@nestjs/config';
+
+const ENV = process.env.NODE_ENV;
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      envFilePath: ENV == 'prod' ? '.env' : `.dev.env`,
+      isGlobal: true
+    }),
     PixelModule,
     TypeOrmModule.forRoot({
       type: 'mariadb',
-      host: 'localhost',
-      port: 3306,
-      username: 'root',
-      password: 'password',
-      database: 'rplace',
+      host: process.env.MARIADB_HOST,
+      port: parseInt(process.env.DATABASE_PORT),
+      username: process.env.MARIADB_USER,
+      password: process.env.MARIADB_PASSWORD,
+      database: process.env.MARIADB_DATABASE,
       entities: [PixelSQL, PixelHistory],
-      synchronize: true
+      synchronize: (/true/i).test(process.env.MARIADB_DEV)
     }),
     PixelHistoryModule,
     ScheduleModule.forRoot(),
