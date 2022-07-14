@@ -3,8 +3,6 @@ import { HttpService } from '@nestjs/axios';
 import { Browser } from 'puppeteer';
 import { InjectBrowser } from 'nest-puppeteer';
 import { UserPayload } from 'src/auth/type/userpayload.type';
-import { logger } from 'src/main';
-import { AxiosError } from 'axios';
 
 @Injectable()
 export class UserService {
