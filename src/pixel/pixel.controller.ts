@@ -1,4 +1,5 @@
-import { Controller, Get, HttpException, HttpStatus, Param, Post, Query } from '@nestjs/common';
+import { Controller, Get, HttpException, HttpStatus, Param, Post, Query, UseGuards } from '@nestjs/common';
+import { AtAuthGuard } from 'src/auth/guard/at-auth.guard';
 import { logger } from 'src/main';
 import { GetSinglePixel } from './dto/get-single-pixel.dto';
 import { PlaceSinglePixel } from './dto/place-single-pixel.dto';
@@ -10,6 +11,7 @@ export class PixelController {
 
     constructor(private readonly pixelService: PixelService) {}
 
+    @UseGuards(AtAuthGuard)
     @Get(':map')
     async getPixels(@Param('map') map: string): Promise<Pixel[]> {
         if (map != "map") {
@@ -20,6 +22,7 @@ export class PixelController {
         return pixels;
     }
 
+    @UseGuards(AtAuthGuard)
     @Get()
     async getPixel(@Query() query: GetSinglePixel): Promise<Pixel> {
         let pixel = await this.pixelService.getSinglePixel(query);
@@ -29,6 +32,7 @@ export class PixelController {
         return pixel;
     }
 
+    @UseGuards(AtAuthGuard)
     @Post()
     async placePixel(@Query() query: PlaceSinglePixel): Promise<Pixel> {
         let pixel = await this.pixelService.placeSinglePixel(query);
@@ -38,6 +42,7 @@ export class PixelController {
         return pixel;
     }
 
+    @UseGuards(AtAuthGuard)
     @Post('create-map')
     async createMap() {
         return await this.pixelService.createMap();

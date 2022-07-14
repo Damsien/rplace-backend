@@ -1,7 +1,9 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { logger } from 'src/main';
 import { User } from 'src/user/type/user.type';
 import { UserService } from 'src/user/user.service';
+import { JwtPayload } from './type/jwtpayload.type';
 import { Tokens } from './type/tokens.type';
 import { UserPayload } from './type/userpayload.type';
 
@@ -11,39 +13,16 @@ export class AuthService {
     constructor(private userService: UserService, private jwtService: JwtService) {}
 
     /* USED BY LOCAL GUARD */
-    async validateUser(username: string, password: string): Promise<UserPayload> {
-        const user = await this.userService.findOne(username);
 
-        if (!user || user.password !== password) {
-            return null;
-        }
-
-        const payload: UserPayload = { username: user.username, pscope: user.pscope };
-        
-        return payload;
-    }
-
-    async validateRefreshToken(rt: string): Promise<UserPayload> {
-        this.jwtService.decode(rt, {
-            c
-        });
-
-        
+    async validateUser(username: string, password: string, pscope: string): Promise<UserPayload> {
+        return await this.userService.checkUser(username, password, pscope);
     }
 
 
     /* USED HAS URLS */
 
-    async login(user): Promise<Tokens> {
-        const payload: UserPayload = { username: user.username, pscope: user.pscope };
-
-        return this.getTokens(payload);
-    }
-
-    async refreshToken(user): Promise<Tokens> {
-        const payload: UserPayload = { username: user.username, pscope: user.pscope };
-
-        return this.getTokens(payload);
+    async loginOrRefresh(user: UserPayload): Promise<Tokens> {
+        return await this.getTokens(user);
     }
 
     private async getTokens(payload: UserPayload): Promise<Tokens> {

@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { PassportStrategy } from "@nestjs/passport";
 import { ExtractJwt, Strategy } from "passport-jwt";
 import { UserPayload } from "../type/userpayload.type";
@@ -14,15 +14,14 @@ export class AtStrategy extends PassportStrategy(Strategy, 'jwt-access') {
         });
     }
 
-    validate(req: Request, payload: UserPayload): UserPayload {
-        const accessToken = req.headers
-          ?.get('authorization')
-          ?.replace('Bearer', '')
-          .trim();
-    
-        if (!accessToken) throw new ForbiddenException('Access token malformed');
+    async validate(payload: UserPayload): Promise<UserPayload> {
 
-        return payload;
+        const user = {
+            username: payload.username,
+            pscope: payload.pscope
+        };
+
+        return user;
     }
 
 }

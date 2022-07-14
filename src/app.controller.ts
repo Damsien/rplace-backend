@@ -4,6 +4,8 @@ import { AuthService } from './auth/auth.service';
 import { AtAuthGuard } from './auth/guard/at-auth.guard';
 import { LocalAuthGuard } from './auth/guard/local-auth.guard';
 import { RtAuthGuard } from './auth/guard/rt-auth.guard';
+import { Tokens } from './auth/type/tokens.type';
+import { logger } from './main';
 
 @Controller()
 export class AppController {
@@ -11,19 +13,19 @@ export class AppController {
 
   @UseGuards(LocalAuthGuard)
   @Post('login')
-  login(@Request() req): any {
-    return this.authService.login(req.user);
+  async login(@Request() req): Promise<Tokens> {
+    return await this.authService.loginOrRefresh(req.user);
   }
 
   @UseGuards(AtAuthGuard)
   @Get('protected')
-  getHello(@Request() req): string {
-    return req.user;
+  async getHello(@Request() req): Promise<string> {
+    return await req.user;
   }
 
   @UseGuards(RtAuthGuard)
-  @Get('refresh')
-  refresh(@Request() req): string {
-    return req.user;
+  @Post('refresh')
+  async refresh(@Request() req): Promise<Tokens> {
+    return await this.authService.loginOrRefresh(req.user);
   }
 }
