@@ -2,7 +2,8 @@ import { ConflictException, HttpCode, HttpStatus, Inject, Injectable, NotAccepta
 import { Interval } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
 import { client } from 'src/app.service';
-import { SizeMap } from 'src/game/dto/size-map.dto';
+import { StartGame } from 'src/game/dto/start-game.dto';
+import { UpdateGameMap } from 'src/game/dto/update-game-map.dto';
 import { logger } from 'src/main';
 import { PixelSQL } from 'src/pixel/entity/pixel-sql.entity';
 import { Pixel } from 'src/pixel/entity/pixel.entity';
@@ -18,12 +19,12 @@ export class PixelHistoryService {
     @InjectRepository(PixelSQL) private pixelRepo: Repository<PixelSQL>
   ) {}
 
-  addSinglePixel(pxl: Pixel) {
+  async addSinglePixel(pxl: Pixel) {
     let globalId = `${pxl.coord_x}-${pxl.coord_y}`;
     
     let pixelHistoryId = `PixelHistory:${globalId}`;
     
-    client.execute(['XADD', `${pixelHistoryId}`, '*',
+    await client.execute(['XADD', `${pixelHistoryId}`, '*',
       'coord_x', pxl.coord_x,
       'coord_y', pxl.coord_y,
       'color', pxl.color,
@@ -120,7 +121,7 @@ export class PixelHistoryService {
   }
 
 
-  async createMap(map: SizeMap) {
+  async createMap(size: number): Promise<number> {
     const qRunner = this.dataSoucre.createQueryRunner();
     await qRunner.connect();
     await qRunner.startTransaction();
@@ -131,8 +132,8 @@ export class PixelHistoryService {
     }
       
     try {
-      for(let i=1; i<map.width+1; i++) {
-        for(let j=1; j<map.width+1; j++) {
+      for(let i=1; i<size+1; i++) {
+        for(let j=1; j<size+1; j++) {
           let pixel = new PixelSQL();
           pixel.coord_x = i;
           pixel.coord_y = j;
@@ -149,9 +150,11 @@ export class PixelHistoryService {
       // you need to release a queryRunner which was manually instantiated
       await qRunner.release();
     }
+
+    return await this.pixelRepo.count({});
   }
 
-  async increaseMapSize(newMap: SizeMap) {
+  async increaseMapSize(newMap: UpdateGameMap): Promise<number> {
     const qRunner = this.dataSoucre.createQueryRunner();
     await qRunner.connect();
     await qRunner.startTransaction();
@@ -170,14 +173,14 @@ export class PixelHistoryService {
       for(let i=Math.sqrt(count)+1; i<newMap.width+1; i++) {
         for(let j=1; j<newMap.width+1; j++) {
           if(!pixelArr.includes(`${i} ${j}`)) {
-            let pixel1 = new PixelSQL();
+            const pixel1 = new PixelSQL();
             pixel1.coord_x = i;
             pixel1.coord_y = j;
             await qRunner.manager.save(pixel1);
             pixelArr.push(`${i} ${j}`);
           }
           if(!pixelArr.includes(`${j} ${i}`)) {
-            let pixel2 = new PixelSQL();
+            const pixel2 = new PixelSQL();
             pixel2.coord_x = j;
             pixel2.coord_y = i;
             await qRunner.manager.save(pixel2);
@@ -195,6 +198,8 @@ export class PixelHistoryService {
       // you need to release a queryRunner which was manually instantiated
       await qRunner.release();
     }
+
+    return await this.pixelRepo.count({});
   }
 
 }

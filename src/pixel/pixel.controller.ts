@@ -30,14 +30,4 @@ export class PixelController {
         return pixel;
     }
 
-    @UseGuards(AtAuthGuard)
-    @Post()
-    async placePixel(@Request() req, @Body() query: PlaceSinglePixel): Promise<Pixel> {
-        let pixel = await this.pixelService.placeSinglePixel(query, req.user);
-        if(pixel == null) {
-            throw new HttpException('Error', HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-        return pixel;
-    }
-
 }

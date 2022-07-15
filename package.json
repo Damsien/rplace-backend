@@ -1,8 +1,8 @@
 {
   "name": "rplace-backend",
   "version": "0.0.1",
-  "description": "",
-  "author": "",
+  "description": "rplace game for Toulouse schools",
+  "author": "Damien Dassieu",
   "private": true,
   "license": "UNLICENSED",
   "scripts": {

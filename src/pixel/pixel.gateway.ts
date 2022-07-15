@@ -21,7 +21,7 @@ export class PixelGateway {
 
     @UseGuards(WsGuard)
     @SubscribeMessage('placePixel')
-    async create(@MessageBody() placePixelDto: PlaceSinglePixel, @ConnectedSocket() client: Socket) {
+    async placeSinglePixel(@MessageBody() placePixelDto: PlaceSinglePixel, @ConnectedSocket() client: Socket) {
         const pixelUser: any = placePixelDto;
         const user = {
             username: pixelUser.username,
@@ -36,7 +36,7 @@ export class PixelGateway {
     @SubscribeMessage('getMap')
     async getMap(@ConnectedSocket() client: Socket) {
         const map = await this.pixelService.getMap();
-        client.emit('map', map);
+        client.emit('game', map);
         return map;
     }
 

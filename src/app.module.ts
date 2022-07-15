@@ -11,6 +11,8 @@ import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { GameModule } from './game/game.module';
+import { APP_GUARD } from '@nestjs/core';
+import { GameGuard } from './game/guard/game.guard';
 
 const ENV = process.env.NODE_ENV;
 
@@ -38,6 +40,11 @@ const ENV = process.env.NODE_ENV;
     GameModule
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService,
+    {
+      provide: APP_GUARD,
+      useClass: GameGuard
+    }
+  ],
 })
 export class AppModule {}
