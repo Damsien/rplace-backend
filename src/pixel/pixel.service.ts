@@ -4,6 +4,7 @@ import { client } from 'src/app.service';
 import { UserPayload } from 'src/auth/type/userpayload.type';
 import { StartGame } from 'src/game/dto/start-game.dto';
 import { UpdateGameMap } from 'src/game/dto/update-game-map.dto';
+import { logger } from 'src/main';
 import { PixelHistoryService } from 'src/pixel-history/pixel-history.service';
 import { GetSinglePixel } from './dto/get-single-pixel.dto';
 import { PlaceSinglePixel } from './dto/place-single-pixel.dto';
@@ -55,19 +56,24 @@ export class PixelService {
     
 
     async startGame(game: StartGame) {
-      const size = await this.pixelHistoryService.createMap(game.mapWidth);
 
-      for (let i=1; i<Math.sqrt(size)+1; i++) {
-        for(let j=1; j<Math.sqrt(size)+1; j++) {
-          const pixel = new PlaceSinglePixel();
-          pixel.color = "white";
-          pixel.coord_x = i;
-          pixel.coord_y = j;
-          this.placeSinglePixel(pixel, {username: game.gameMasterUsername, pscope: 'all'});
+      try {
+        const size = await this.pixelHistoryService.createMap(game.mapWidth);
+  
+        for (let i=1; i<Math.sqrt(size)+1; i++) {
+          for(let j=1; j<Math.sqrt(size)+1; j++) {
+            const pixel = new PlaceSinglePixel();
+            pixel.color = "white";
+            pixel.coord_x = i;
+            pixel.coord_y = j;
+            await this.placeSinglePixel(pixel, {username: game.gameMasterUsername, pscope: 'all'});
+          }
         }
+  
+        await this.pixelHistoryService.pushOnMySQL();
+      } catch(err) {
+        logger.error(err);
       }
-
-      await this.pixelHistoryService.pushOnMySQL();
     }
 
     async increaseMapSize(newMap: UpdateGameMap) {

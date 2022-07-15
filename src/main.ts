@@ -5,6 +5,7 @@ import {
   NestFastifyApplication,
 } from '@nestjs/platform-fastify';
 import { AppModule } from './app.module';
+import { HttpExceptionFilter } from './http-exception.filter';
 
 const VERSION = 'v1';
 export const logger = new Logger('r/place');
@@ -15,6 +16,7 @@ async function bootstrap() {
     new FastifyAdapter({logger: true})
   );
   app.setGlobalPrefix('/api/'+VERSION);
+  app.useGlobalFilters(new HttpExceptionFilter())
   app.useGlobalPipes(new ValidationPipe({
     transform: true,
   }));

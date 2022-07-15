@@ -1,4 +1,4 @@
-import { ConflictException, HttpCode, HttpStatus, Inject, Injectable, NotAcceptableException } from '@nestjs/common';
+import { ConflictException, HttpCode, HttpException, HttpStatus, Inject, Injectable, NotAcceptableException } from '@nestjs/common';
 import { Interval } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
 import { client } from 'src/app.service';
@@ -76,13 +76,11 @@ export class PixelHistoryService {
 
     let streams;
     streams = await client.execute([
-      'SCAN', '0',
-      'TYPE', 'stream',
-      //'MATCH', 'PixelHistory'
+      'KEYS', 'PixelHistory:*'
     ]);
 
-    for(let i=0; i<streams[1].length; i++) {
-      pixelHistory.push(await this.getSinglePixelStream(streams[1][i]));
+    for(let i=0; i<streams.length; i++) {
+      pixelHistory.push(await this.getSinglePixelStream(streams[i]));
     }
 
     return pixelHistory;
@@ -128,7 +126,7 @@ export class PixelHistoryService {
 
     const count = await this.pixelRepo.count({});
     if(count != 0) {
-      throw new ConflictException();
+      throw new HttpException('Conflict : map already exists', HttpStatus.CONFLICT);
     }
       
     try {
@@ -145,7 +143,7 @@ export class PixelHistoryService {
     } catch (err) {
       // since we have errors lets rollback the changes we made
       await qRunner.rollbackTransaction();
-      throw new ConflictException();
+      throw new HttpException('Conflict : map already exists', HttpStatus.CONFLICT);
     } finally {
       // you need to release a queryRunner which was manually instantiated
       await qRunner.release();
@@ -163,10 +161,10 @@ export class PixelHistoryService {
 
     const count = await this.pixelRepo.count({});
     if(newMap.width**2 <= count) {
-      throw new ConflictException("The size of the map must be greater than the previous one");
+      throw new HttpException('The size of the map must be greater than the previous one', HttpStatus.CONFLICT);
     }
     if(count == 0) {
-      throw new NotAcceptableException("You first need to create the map");
+      throw new HttpException('You first need to create the map', HttpStatus.NOT_ACCEPTABLE);
     }
       
     try {

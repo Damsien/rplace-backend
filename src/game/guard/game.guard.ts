@@ -11,7 +11,7 @@ export class GameGuard implements CanActivate {
 
         try {
             const startTimeout = this.schedulerRegistry.getTimeout('startGame');
-            
+
             if(startTimeout == undefined || startTimeout == null) {
                 return false;
             }

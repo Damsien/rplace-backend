@@ -7,6 +7,7 @@ export class StartGame {
     gameMasterUsername: string
 
     @IsDate()
+    @Type(() => Date)
     schedule: Date
 
     @IsInt()

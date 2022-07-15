@@ -1,5 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { SchedulerRegistry } from '@nestjs/schedule';
+import { logger } from 'src/main';
 import { PixelService } from 'src/pixel/pixel.service';
 import { StartGame } from './dto/start-game.dto';
 import { StopGame } from './dto/stop-game.dto';
@@ -10,7 +11,7 @@ export class GameService {
 
     constructor(private readonly pixelService: PixelService, private schedulerRegistry: SchedulerRegistry) {}
 
-    private findSecondsDifference(date1, date2) { 
+    private findMsDifference(date1, date2) { 
       var oneSecond_ms = 1000;
   
       // Convert both dates to milliseconds
@@ -21,17 +22,21 @@ export class GameService {
       var difference_ms = date2_ms - date1_ms;
         
       // Convert back to days and return
-      return Math.round(difference_ms/oneSecond_ms); 
+      return Math.round(difference_ms); 
     }
 
     startGame(game: StartGame): number {
-      const milliseconds = this.findSecondsDifference(new Date(), game.schedule);
+      const milliseconds = this.findMsDifference(new Date(), game.schedule);
 
       const timeout = setTimeout(() => {
         this.pixelService.startGame(game);
       }, milliseconds);
 
-      this.schedulerRegistry.addTimeout('startGame', timeout);
+      try {
+        this.schedulerRegistry.addTimeout('startGame', timeout);
+      } catch(e) {
+        throw new HttpException('The start game schedule already exists', HttpStatus.CONFLICT);
+      }
 
       return milliseconds;
     }
@@ -42,7 +47,7 @@ export class GameService {
     }
 
     increaseMapSize(map: UpdateGameMap) {
-      const milliseconds = this.findSecondsDifference(new Date(), map.schedule);
+      const milliseconds = this.findMsDifference(new Date(), map.schedule);
 
       const timeout = setTimeout(() => {
         this.pixelService.increaseMapSize(map);
@@ -60,7 +65,7 @@ export class GameService {
     }
 
     stopGame(game: StopGame) {
-      const milliseconds = this.findSecondsDifference(new Date(), game.schedule);
+      const milliseconds = this.findMsDifference(new Date(), game.schedule);
 
       const timeout = setTimeout(() => {
         this.schedulerRegistry.deleteTimeout('startGame');

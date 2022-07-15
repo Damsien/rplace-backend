@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from 'src/auth/auth.module';
+import { GameGuard } from 'src/game/guard/game.guard';
 import { PixelHistory } from 'src/pixel-history/entity/pixel-history.entity';
 import { PixelHistoryModule } from 'src/pixel-history/pixel-history.module';
 import { PixelHistoryService } from 'src/pixel-history/pixel-history.service';
@@ -12,6 +13,10 @@ import { PixelService } from './pixel.service';
 @Module({
   imports: [PixelHistoryModule, TypeOrmModule.forFeature([PixelSQL, PixelHistory]), AuthModule],
   controllers: [PixelController],
-  providers: [PixelService, PixelHistoryService, PixelGateway]
+  providers: [PixelService, PixelHistoryService, PixelGateway,
+    {
+      provide: 'GameGuard',
+      useClass: GameGuard
+    }]
 })
 export class PixelModule {}
