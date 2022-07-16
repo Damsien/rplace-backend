@@ -35,18 +35,17 @@ export class PixelService {
       // It's useful for RediSearch
       await this.repo.createIndex();
 
-      let globalId = `${pxl.coord_x}-${pxl.coord_y}`;
+      const globalId = `${pxl.coord_x}-${pxl.coord_y}`;
 
       /*    Pushing pixel in Pixel section   */
-      let pixel = await this.repo.fetch(globalId);
+      const pixel = await this.repo.fetch(globalId);
       pixel.coord_x = pxl.coord_x;
       pixel.coord_y = pxl.coord_y;
       pixel.color = pxl.color;
-      pixel.username = user.username;
+      pixel.user = `${user.pscope}.${user.username}`;
       pixel.date = new Date();
 
       this.repo.save(pixel);
-
 
       /*    Pushing pixel in PixelHistory section   */
       this.pixelHistoryService.addSinglePixel(pixel);

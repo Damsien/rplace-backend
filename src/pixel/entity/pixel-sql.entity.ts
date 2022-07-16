@@ -2,7 +2,7 @@ import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 
 
 @Entity()
-export class PixelSQL {
+export class PixelEntity {
 
     @PrimaryGeneratedColumn("increment")
     pixelId: number;

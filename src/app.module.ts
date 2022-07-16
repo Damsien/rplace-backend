@@ -11,6 +11,8 @@ import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { GameModule } from './game/game.module';
+import { Event*Module } from './event*/event*.module';
+import { EventModule } from './event/event.module';
 
 const ENV = process.env.NODE_ENV;
 
@@ -35,7 +37,9 @@ const ENV = process.env.NODE_ENV;
     ScheduleModule.forRoot(),
     UserModule,
     AuthModule,
-    GameModule
+    GameModule,
+    Event*Module,
+    EventModule
   ],
   controllers: [AppController],
   providers: [AppService],

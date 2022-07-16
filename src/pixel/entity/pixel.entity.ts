@@ -7,7 +7,7 @@ export class Pixel extends Entity {
 
     color: string;
 
-    username: string;
+    user: string;
 
     date: Date;
 }
@@ -18,7 +18,7 @@ export const schema = new Schema(Pixel, {
 
     color: {type: 'string'},
 
-    username: {type: 'string'},
+    user: {type: 'string'},
 
     date: {type: 'date'}
 }, {

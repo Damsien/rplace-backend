@@ -8,7 +8,9 @@ import { PixelService } from './pixel.service';
 import { Roles } from '../user/decorator/roles.decorator';
 import { Role } from 'src/user/type/role.enum';
 import { RolesGuard } from 'src/user/guard/roles.guard';
+import { GameGuard } from 'src/game/guard/game.guard';
 
+@UseGuards(GameGuard)
 @Controller('pixel')
 export class PixelController {
 

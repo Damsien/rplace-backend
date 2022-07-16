@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, HttpCode, Post, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, Post, Put, UseGuards, Request } from '@nestjs/common';
 import { AtAuthGuard } from 'src/auth/guard/at-auth.guard';
 import { Roles } from 'src/user/decorator/roles.decorator';
 import { RolesGuard } from 'src/user/guard/roles.guard';
@@ -8,6 +8,7 @@ import { StopGame } from './dto/stop-game.dto';
 import { UpdateGameMap } from './dto/update-game-map.dto';
 import { GameService } from './game.service';
 import { GameGuard } from './guard/game.guard';
+import { GameSpec } from './type/game-spec.type';
 
 @UseGuards(RolesGuard)
 @UseGuards(AtAuthGuard)
@@ -30,19 +31,6 @@ export class GameController {
         return `The game start schedule has been cancelled`;
     }
 
-    @HttpCode(204)
-    @Put('map')
-    updateMap(@Body() query: UpdateGameMap) {
-        const timeout = this.gameService.increaseMapSize(query);
-        return `The map will increase its size to ${query.width}*${query.width} pixels in ${timeout}ms (or ${query.schedule})`;
-    }
-    @HttpCode(202)
-    @Delete('map')
-    cancelMapUpdate() {
-        const timeout = this.gameService.cancelMapUpdate();
-        return `The update map schedule has been cancelled`;
-    }
-
     @HttpCode(201)
     @Post('stop')
     async stopGame(@Body() query: StopGame) {
@@ -54,6 +42,12 @@ export class GameController {
     cancelGameStop() {
         const timeout = this.gameService.cancelGameStop();
         return `The game stop schedule has been cancelled`;
+    }
+
+    @HttpCode(204)
+    @Put()
+    updateGameSpec(@Body() specs: GameSpec) {
+        this.gameService.changeGameSpecs(specs);
     }
 
 }

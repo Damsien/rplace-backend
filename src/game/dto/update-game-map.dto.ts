@@ -4,10 +4,7 @@ import { IsDate, IsInt, IsString } from "class-validator";
 export class UpdateGameMap {
 
     @IsString()
-    gameMasterUsername: string
-
-    @IsDate()
-    schedule: Date
+    gameMasterUsername: string;
 
     @IsInt()
     @Type(() => Number)

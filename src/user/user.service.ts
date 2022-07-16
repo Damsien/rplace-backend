@@ -3,12 +3,72 @@ import { HttpService } from '@nestjs/axios';
 import { Browser } from 'puppeteer';
 import { InjectBrowser } from 'nest-puppeteer';
 import { UserPayload } from 'src/auth/type/userpayload.type';
+import { Repository } from 'typeorm';
+import { UserEntity } from './entity/user.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { PixelHistoryEntity } from 'src/pixel-history/entity/pixel-history.entity';
+import { PlaceSinglePixel } from 'src/pixel/dto/place-single-pixel.dto';
+import { AllGame } from 'src/game/type/all-game.type';
 
 @Injectable()
 export class UserService {
     private static LOGIN_URL="https://authc.univ-toulouse.fr/login";
 
-    constructor(@InjectBrowser() private readonly browser: Browser, private readonly axios: HttpService) {}
+    constructor(
+        @InjectBrowser() private readonly browser: Browser,
+        private readonly axios: HttpService,
+        @InjectRepository(UserEntity) private userRepo: Repository<UserEntity>
+    ) {}
+
+    async createUser(user: UserPayload) {
+        if (await this.userRepo.count({where: {id: `${user.pscope}.${user.username}`}}) == 0) {
+            const userEntity = new UserEntity();
+            userEntity.id = `${user.pscope}.${user.username}`;
+            userEntity.pscope = user.pscope;
+            userEntity.username = user.username;
+    
+            await this.userRepo.insert(userEntity);
+        }
+    }
+
+    async getUserById(id: string): Promise<UserEntity> {
+        return await this.userRepo.findOneBy({id: id});
+    }
+
+
+    async doUserIsRight(
+        userId: string,
+        pixel: PlaceSinglePixel,
+        game: AllGame,
+        date: Date,
+        lastPixel: PixelHistoryEntity
+    ) {
+        const user = await this.getUserById(userId);
+
+        return this.doUserHaveRightColor(user, pixel.color) &&
+            this.doUserHaveRightPlacement(pixel, game) &&
+            this.doUserHaveRightTime(user, date, lastPixel, game.timer);
+    }
+
+    private doUserHaveRightPlacement(pixel: PlaceSinglePixel, game: AllGame): boolean {
+        return game.map
+            .findIndex(pxl => pxl.coord_x == pixel.coord_x && pxl.coord_y == pixel.coord_y) != -1;
+    }
+
+    private doUserHaveRightTime(
+        user: UserEntity,
+        date: Date,
+        pixel: PixelHistoryEntity,
+        offset: number
+    ): boolean {
+        return date.getTime() - pixel.date.getTime() >= (user.timer == null ? offset : user.timer)*1000;
+    }
+
+    private doUserHaveRightColor(user: UserEntity, color: string): boolean {
+        return user.colors.includes(color);
+    }
+
+
 
     async checkUser(username: string, password: string, pscope: string): Promise<UserPayload> {
         const [token, lt] = await this.scrap();

@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { PixelSQL } from 'src/pixel/entity/pixel-sql.entity';
-import { PixelHistory } from './entity/pixel-history.entity';
+import { PixelEntity } from 'src/pixel/entity/pixel-sql.entity';
+import { PixelHistoryEntity } from './entity/pixel-history.entity';
 import { PixelHistoryService } from './pixel-history.service';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([PixelSQL, PixelHistory])],
+    imports: [TypeOrmModule.forFeature([PixelEntity, PixelHistoryEntity])],
     providers: [PixelHistoryService]
 })
 export class PixelHistoryModule {}

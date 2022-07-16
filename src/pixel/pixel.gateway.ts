@@ -2,17 +2,19 @@ import { UseGuards } from '@nestjs/common';
 import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { WsGuard } from 'src/auth/guard/ws.guard';
-import { UserPayload } from 'src/auth/type/userpayload.type';
 import { GameGuard } from 'src/game/guard/game.guard';
 import { PlaceSinglePixel } from './dto/place-single-pixel.dto';
 import { Pixel } from './entity/pixel.entity';
 import { PixelService } from './pixel.service';
+import { PlacePixelGuard } from './guard/place-pixel.guard';
 
 @WebSocketGateway({
   cors: {
     origin: '*'
   }
 })
+@UseGuards(GameGuard)
+@UseGuards(WsGuard)
 export class PixelGateway {
 
     // @WebSocketServer()
@@ -20,10 +22,10 @@ export class PixelGateway {
 
     constructor(private readonly pixelService: PixelService) {}
 
-    @UseGuards(GameGuard)
-    @UseGuards(WsGuard)
+    @UseGuards(PlacePixelGuard)
     @SubscribeMessage('placePixel')
-    async placeSinglePixel(@MessageBody() placePixelDto: PlaceSinglePixel, @ConnectedSocket() client: Socket) {
+    async placeSinglePixel(@MessageBody() placePixelDto: PlaceSinglePixel,
+      @ConnectedSocket() client: Socket): Promise<Pixel> {
         const pixelUser: any = placePixelDto;
         const user = {
             username: pixelUser.username,
@@ -34,12 +36,5 @@ export class PixelGateway {
         client.broadcast.emit('pixel', pixel);
         return pixel;
     }
-
-    // @SubscribeMessage('getMap')
-    // async getMap(@ConnectedSocket() client: Socket) {
-    //     const map = await this.pixelService.getMap();
-    //     client.emit('game', map);
-    //     return map;
-    // }
 
 }

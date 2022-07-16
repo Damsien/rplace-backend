@@ -11,7 +11,11 @@ import { UserPayload } from './type/userpayload.type';
 @Injectable()
 export class AuthService {
 
-    constructor(private userService: UserService, private jwtService: JwtService, private configService: ConfigService) {}
+    constructor(
+        private userService: UserService,
+        private jwtService: JwtService,
+        private configService: ConfigService
+    ) {}
 
     /* USED BY LOCAL GUARD */
     async validateUser(username: string, password: string, pscope: string): Promise<UserPayload> {
