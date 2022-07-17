@@ -1,10 +1,19 @@
 import { Type } from "class-transformer";
-import { IsDate, IsInt, IsString } from "class-validator";
+import { IsArray, IsDate, IsInt, IsNumber, IsString } from "class-validator";
 
 export class StartGame {
 
     @IsString()
-    gameMasterUsername: string
+    name: string;
+
+    @IsString()
+    gameMasterUser: string
+
+    @IsArray()
+    colors: string[];
+
+    @IsNumber()
+    timer: number;
 
     @IsDate()
     @Type(() => Date)

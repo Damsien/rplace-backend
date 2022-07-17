@@ -5,10 +5,11 @@ import { RolesGuard } from 'src/user/guard/roles.guard';
 import { Role } from 'src/user/type/role.enum';
 import { StartGame } from './dto/start-game.dto';
 import { StopGame } from './dto/stop-game.dto';
-import { UpdateGameMap } from './dto/update-game-map.dto';
 import { GameService } from './game.service';
-import { GameGuard } from './guard/game.guard';
-import { GameSpec } from './type/game-spec.type';
+import { UpdateGame } from './dto/update-game.dto';
+import { client } from 'src/app.service';
+import { Game, game_schema } from './entity/game.entity';
+import { Repository } from 'redis-om';
 
 @UseGuards(RolesGuard)
 @UseGuards(AtAuthGuard)
@@ -16,11 +17,23 @@ import { GameSpec } from './type/game-spec.type';
 @Controller('game')
 export class GameController {
 
-    constructor(private readonly gameService: GameService) {}
+    private repo: Repository<Game>;
+
+    constructor(private readonly gameService: GameService) {
+      this.repo = client.fetchRepository(game_schema);
+    }
 
     @HttpCode(201)
     @Post('start')
-    startGame(@Body() query: StartGame) {
+    async startGame(@Body() query: StartGame) {
+        const gameRedis = await this.repo.fetch(query.name);
+        gameRedis.colors = query.colors;
+        gameRedis.name = query.name;
+        gameRedis.user = query.gameMasterUser;
+        gameRedis.startSchedule = query.schedule;
+        gameRedis.timer = query.timer;
+        gameRedis.width = query.mapWidth;
+        this.repo.save(gameRedis);
         const timeout = this.gameService.startGame(query);
         return `The game will start in ${timeout}ms (or ${query.schedule})`;
     }
@@ -34,6 +47,9 @@ export class GameController {
     @HttpCode(201)
     @Post('stop')
     async stopGame(@Body() query: StopGame) {
+        const gameRedis = await this.repo.fetch(query.name);
+        gameRedis.stopSchedule = query.schedule;
+        this.repo.save(gameRedis);
         const timeout = this.gameService.stopGame(query);
         return `The game will stop in ${timeout}ms (or ${query.schedule})`;
     }
@@ -42,12 +58,6 @@ export class GameController {
     cancelGameStop() {
         const timeout = this.gameService.cancelGameStop();
         return `The game stop schedule has been cancelled`;
-    }
-
-    @HttpCode(204)
-    @Put()
-    updateGameSpec(@Body() specs: GameSpec) {
-        this.gameService.changeGameSpecs(specs);
     }
 
 }

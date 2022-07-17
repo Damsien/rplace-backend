@@ -2,8 +2,8 @@ import { ConflictException, HttpCode, HttpException, HttpStatus, Inject, Injecta
 import { Interval } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
 import { client } from 'src/app.service';
+import { UpdateGameMap } from 'src/event/dto/update-game-map.dto';
 import { StartGame } from 'src/game/dto/start-game.dto';
-import { UpdateGameMap } from 'src/game/dto/update-game-map.dto';
 import { logger } from 'src/main';
 import { PixelEntity } from 'src/pixel/entity/pixel-sql.entity';
 import { Pixel } from 'src/pixel/entity/pixel.entity';

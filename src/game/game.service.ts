@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { forwardRef, HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { SchedulerRegistry } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EventService } from 'src/event/event.service';
@@ -13,8 +13,8 @@ import { UserPayload } from 'src/auth/type/userpayload.type';
 import { GameSpec } from './type/game-spec.type';
 import { AllGame } from './type/all-game.type';
 import { UserService } from 'src/user/user.service';
-import { Server, Socket } from 'socket.io';
-import { WebSocketServer } from '@nestjs/websockets';
+import { UserSpec } from './type/user-spec';
+import { UpdateGame } from './dto/update-game.dto';
 
 @Injectable()
 export class GameService {
@@ -32,7 +32,7 @@ export class GameService {
     startGame(game: StartGame): number {
       const milliseconds = EventService.findMsDifference(new Date(), game.schedule);
 
-      const timeout = setTimeout(() => {
+      const timeout = setTimeout(async () => {
         this.pixelService.startGame(game);
       }, milliseconds);
 
@@ -50,7 +50,7 @@ export class GameService {
       this.schedulerRegistry.deleteTimeout('startGame');
     }
 
-    stopGame(game: StopGame) {
+    stopGame(game: StopGame): number {
       const milliseconds = EventService.findMsDifference(new Date(), game.schedule);
 
       const timeout = setTimeout(() => {
@@ -78,28 +78,27 @@ export class GameService {
       return {
         timer: game.timer,
         map: map,
+        width: game.width,
         colors: game.colors
       };
     }
 
-    async getUserGame(user: UserPayload): Promise<GameSpec> {
+    async getGlobalGameSpec(): Promise<GameSpec> {
+      const game: Game = await this.repo.search().return.all()[0];
+      return {
+        timer: game.timer,
+        width: game.width,
+        colors: game.colors
+      }
+    }
+
+    async getUserGame(user: UserPayload): Promise<UserSpec> {
       const userEntity = await this.userService.getUserById(`${user.pscope}.${user.username}`);
       const allGame: Game = await this.repo.search().return.all()[0];
       return {
         timer: userEntity.timer != null ? userEntity.timer : allGame.timer,
         colors: userEntity.colors != null ? userEntity.colors : allGame.colors
       };
-    }
-
-    
-    @WebSocketServer()
-    server: Server;
-    
-    changeGameSpecs(specs: GameSpec) {
-      this.server.emit('game:update_spec', {
-        timer: specs.timer,
-        colors: specs.colors
-      });
     }
 
 

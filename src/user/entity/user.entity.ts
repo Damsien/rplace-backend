@@ -5,7 +5,7 @@ import { Column, Entity, PrimaryColumn } from "typeorm";
 export class UserEntity {
 
     @PrimaryColumn()
-    id: string;     // pcsope.username
+    userId: string;     // pcsope.username
 
     @Column()
     username: string;

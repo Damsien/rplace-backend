@@ -5,9 +5,13 @@ export class Game extends Entity {
 
     name: string;
 
+    user: string;
+
     startSchedule: Date;
 
     stopSchedule: Date;
+
+    width: number;
 
     timer: number;
 
@@ -19,9 +23,13 @@ export const game_schema = new Schema(Game, {
 
     name: {type: 'string'},
 
+    user: {type: 'string'},
+
     startSchedule: {type: 'date'},
 
     stopSchedule: {type: 'date'},
+
+    width: {type: 'number'},
 
     timer: {type: 'number'},
 

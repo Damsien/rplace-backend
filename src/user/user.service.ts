@@ -8,7 +8,7 @@ import { UserEntity } from './entity/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PixelHistoryEntity } from 'src/pixel-history/entity/pixel-history.entity';
 import { PlaceSinglePixel } from 'src/pixel/dto/place-single-pixel.dto';
-import { AllGame } from 'src/game/type/all-game.type';
+import { GameSpec } from 'src/game/type/game-spec.type';
 
 @Injectable()
 export class UserService {
@@ -21,9 +21,9 @@ export class UserService {
     ) {}
 
     async createUser(user: UserPayload) {
-        if (await this.userRepo.count({where: {id: `${user.pscope}.${user.username}`}}) == 0) {
+        if (await this.userRepo.count({where: {userId: `${user.pscope}.${user.username}`}}) == 0) {
             const userEntity = new UserEntity();
-            userEntity.id = `${user.pscope}.${user.username}`;
+            userEntity.userId = `${user.pscope}.${user.username}`;
             userEntity.pscope = user.pscope;
             userEntity.username = user.username;
     
@@ -32,14 +32,14 @@ export class UserService {
     }
 
     async getUserById(id: string): Promise<UserEntity> {
-        return await this.userRepo.findOneBy({id: id});
+        return await this.userRepo.findOneBy({userId: id});
     }
 
 
     async doUserIsRight(
         userId: string,
         pixel: PlaceSinglePixel,
-        game: AllGame,
+        game: GameSpec,
         date: Date,
         lastPixel: PixelHistoryEntity
     ) {
@@ -50,9 +50,8 @@ export class UserService {
             this.doUserHaveRightTime(user, date, lastPixel, game.timer);
     }
 
-    private doUserHaveRightPlacement(pixel: PlaceSinglePixel, game: AllGame): boolean {
-        return game.map
-            .findIndex(pxl => pxl.coord_x == pixel.coord_x && pxl.coord_y == pixel.coord_y) != -1;
+    private doUserHaveRightPlacement(pixel: PlaceSinglePixel, game: GameSpec): boolean {
+        return (pixel.coord_x > 0 && pixel.coord_x <= game.width) && (pixel.coord_y > 0 && pixel.coord_y <= game.width);
     }
 
     private doUserHaveRightTime(

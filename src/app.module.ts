@@ -3,16 +3,22 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PixelModule } from './pixel/pixel.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { PixelHistory } from './pixel-history/entity/pixel-history.entity';
-import { PixelSQL } from './pixel/entity/pixel-sql.entity';
 import { PixelHistoryModule } from './pixel-history/pixel-history.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { GameModule } from './game/game.module';
-import { Event*Module } from './event*/event*.module';
 import { EventModule } from './event/event.module';
+import { PixelHistoryEntity } from './pixel-history/entity/pixel-history.entity';
+import { PixelEntity } from './pixel/entity/pixel-sql.entity';
+import { GameService } from './game/game.service';
+import { EventService } from './event/event.service';
+import { EventEntity } from './event/entity/event.entity';
+import { UserEntity } from './user/entity/user.entity';
+import { PixelService } from './pixel/pixel.service';
+import { EventTriggerService } from './event/event-trigger.service';
+import { PixelHistoryService } from './pixel-history/pixel-history.service';
 
 const ENV = process.env.NODE_ENV;
 
@@ -30,18 +36,18 @@ const ENV = process.env.NODE_ENV;
       username: process.env.MARIADB_USER,
       password: process.env.MARIADB_PASSWORD,
       database: process.env.MARIADB_DATABASE,
-      entities: [PixelSQL, PixelHistory],
+      entities: [PixelEntity, PixelHistoryEntity, EventEntity, UserEntity],
       synchronize: (/true/i).test(process.env.MARIADB_DEV)
     }),
+    TypeOrmModule.forFeature([EventEntity, PixelHistoryEntity, PixelEntity]),
     PixelHistoryModule,
     ScheduleModule.forRoot(),
     UserModule,
     AuthModule,
     GameModule,
-    Event*Module,
     EventModule
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, GameService, EventService, PixelService, EventTriggerService, PixelHistoryService],
 })
 export class AppModule {}

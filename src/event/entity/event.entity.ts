@@ -6,7 +6,7 @@ import { EventType } from "./event.enum";
 export class EventEntity {
 
     @PrimaryGeneratedColumn("increment")
-    id: number;
+    evntId: number;
 
     @Column()
     @ManyToOne(() => UserEntity)
