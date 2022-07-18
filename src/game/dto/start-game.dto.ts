@@ -7,12 +7,13 @@ export class StartGame {
     name: string;
 
     @IsString()
-    gameMasterUser: string
+    gameMasterUser: string;
 
     @IsArray()
     colors: string[];
 
-    @IsNumber()
+    @IsInt()
+    @Type(() => Number)
     timer: number;
 
     @IsDate()

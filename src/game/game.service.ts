@@ -25,14 +25,13 @@ export class GameService {
       private readonly pixelService: PixelService,
       private readonly userService: UserService,
       private readonly schedulerRegistry: SchedulerRegistry
-    ) {
-      this.repo = client.fetchRepository(game_schema);
-    }
+    ) {}
 
     startGame(game: StartGame): number {
       const milliseconds = EventService.findMsDifference(new Date(), game.schedule);
 
       const timeout = setTimeout(async () => {
+        await this.userService.createUser({username: game.gameMasterUser, pscope: 'root'})
         this.pixelService.startGame(game);
       }, milliseconds);
 
@@ -45,9 +44,13 @@ export class GameService {
       return milliseconds;
     }
     cancelGameStart() {
-      const timeout = this.schedulerRegistry.getTimeout('startGame');
-      clearTimeout(timeout);
-      this.schedulerRegistry.deleteTimeout('startGame');
+      try {
+        const timeout = this.schedulerRegistry.getTimeout('startGame');
+        clearTimeout(timeout);
+        this.schedulerRegistry.deleteTimeout('startGame');
+      } catch(e) {
+        throw new HttpException('The game start can\'t be cancelled', HttpStatus.CONFLICT);
+      }
     }
 
     stopGame(game: StopGame): number {
@@ -67,12 +70,17 @@ export class GameService {
       return milliseconds;
     }
     cancelGameStop() {
-      const timeout = this.schedulerRegistry.getTimeout('stopGame');
-      clearTimeout(timeout);
-      this.schedulerRegistry.deleteTimeout('stopGame');
+      try {
+        const timeout = this.schedulerRegistry.getTimeout('stopGame');
+        clearTimeout(timeout);
+        this.schedulerRegistry.deleteTimeout('stopGame');
+      } catch(e) {
+        throw new HttpException('The game stop can\'t be cancelled', HttpStatus.CONFLICT);
+      }
     }
 
     async getGlobalGame(): Promise<AllGame> {
+      this.repo = client.fetchRepository(game_schema);
       const game: Game = await this.repo.search().return.all()[0];
       const map = await this.pixelService.getMap();
       return {
@@ -84,7 +92,10 @@ export class GameService {
     }
 
     async getGlobalGameSpec(): Promise<GameSpec> {
+      this.repo = client.fetchRepository(game_schema);
+      logger.debug(await this.repo.search().return.all());
       const game: Game = await this.repo.search().return.all()[0];
+      logger.debug(game);
       return {
         timer: game.timer,
         width: game.width,
@@ -93,6 +104,7 @@ export class GameService {
     }
 
     async getUserGame(user: UserPayload): Promise<UserSpec> {
+      this.repo = client.fetchRepository(game_schema);
       const userEntity = await this.userService.getUserById(`${user.pscope}.${user.username}`);
       const allGame: Game = await this.repo.search().return.all()[0];
       return {

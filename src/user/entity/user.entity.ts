@@ -1,4 +1,3 @@
-import { IsOptional } from "class-validator";
 import { Column, Entity, PrimaryColumn } from "typeorm";
 
 @Entity()
@@ -13,12 +12,14 @@ export class UserEntity {
     @Column()
     pscope: string;
 
-    @IsOptional()
-    @Column()
+    @Column({
+        nullable: true
+    })
     timer: number = null;
 
-    @IsOptional()
-    @Column("simple-array")
+    @Column("simple-array", {
+        nullable: true
+    })
     colors: string[] = null;
 
 }

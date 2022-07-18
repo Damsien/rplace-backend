@@ -21,7 +21,7 @@ export class PixelHistoryEntity {
 
     @Column()
     @ManyToOne(() => UserEntity)
-    @JoinColumn({ name: "id" })
-    user: string;
+    @JoinColumn({ name: "userId" })
+    userId: string;
 
 }

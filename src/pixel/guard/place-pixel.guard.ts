@@ -18,9 +18,8 @@ export class PlacePixelGuard implements CanActivate {
     async canActivate(context: ExecutionContext): Promise<boolean> {
 
         try {
-            const user: UserPayload = context.switchToHttp().getRequest().user;
-            const userId = `${user.pscope}.${user.username}`;
-            const pixel: PlaceSinglePixel = context.switchToHttp().getRequest().body;
+            const pixel: PlaceSinglePixel = context.getArgs()[1];
+            const userId = `${pixel.pscope}.${pixel.username}`;
             const game = await this.gameService.getGlobalGameSpec();
             const pixelHistory = await this.pixelHistoryService.getLastPixelOfUser(userId);
 

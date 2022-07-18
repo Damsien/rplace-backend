@@ -6,12 +6,12 @@ import { EventType } from "./event.enum";
 export class EventEntity {
 
     @PrimaryGeneratedColumn("increment")
-    evntId: number;
+    eventId: number;
 
     @Column()
     @ManyToOne(() => UserEntity)
-    @JoinColumn({ name: "id" })
-    user: string;
+    @JoinColumn({ name: "userId" })
+    userId: string;
 
     @Column({
         type: 'enum',
@@ -22,9 +22,7 @@ export class EventEntity {
     @Column('simple-array')
     values: string[];
 
-    @Column({
-        default: new Date()
-    })
+    @Column()
     schedule: Date;
 
 }

@@ -67,7 +67,7 @@ export class EventService {
         this.schedulerRegistry.deleteTimeout(scheduleName);
 
         const eventEntity = await this.eventRepo.findOne({
-            where: {type: event.type, user: `${user.pscope}.${user.username}`}
+            where: {type: event.type, userId: `${user.pscope}.${user.username}`}
         });
         await this.eventRepo.remove(eventEntity);
     }

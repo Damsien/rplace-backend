@@ -10,6 +10,7 @@ import { StartGame } from './game/dto/start-game.dto';
 import { StopGame } from './game/dto/stop-game.dto';
 import { Game, game_schema } from './game/entity/game.entity';
 import { GameService } from './game/game.service';
+import { logger } from './main';
 
 export const client = new Client();
 
@@ -30,8 +31,9 @@ export class AppService implements OnModuleInit {
 
 
     private async searchForGame() {
+        await this.gameRepo.createIndex();
         const game: Game = await this.gameRepo.search().return.all()[0];
-        if (game) {
+        if (game != undefined) {
             const gameStart = new StartGame();
             gameStart.colors = game.colors;
             gameStart.gameMasterUser = game.user;
@@ -51,15 +53,19 @@ export class AppService implements OnModuleInit {
     }
 
     private async searchForEvents() {
-        const events: EventEntity[] = await this.eventRepo.find();
-        for (let event of events) {
-            const eventReg = new EventRegister();
-            eventReg.type = event.type;
-            eventReg.values = event.values;
-            eventReg.schedule = event.schedule;
-            const pscope = event.user.split('.')[0];
-            const username = event.user.split('.')[1];
-            this.eventService.registerNewEvent(eventReg, {username: username, pscope: pscope});
+        try {
+            const events: EventEntity[] = await this.eventRepo.find();
+            for (let event of events) {
+                const eventReg = new EventRegister();
+                // eventReg.type = event.type;
+                eventReg.values = event.values;
+                eventReg.schedule = event.schedule;
+                const pscope = event.userId.split('.')[0];
+                const username = event.userId.split('.')[1];
+                this.eventService.registerNewEvent(eventReg, {username: username, pscope: pscope});
+            }
+        } catch (err) {
+            logger.debug(err);
         }
     }
 

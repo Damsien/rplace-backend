@@ -10,6 +10,8 @@ import { UpdateGame } from './dto/update-game.dto';
 import { client } from 'src/app.service';
 import { Game, game_schema } from './entity/game.entity';
 import { Repository } from 'redis-om';
+import { logger } from 'src/main';
+import { CancelGame } from './dto/cancel-game.dto';
 
 @UseGuards(RolesGuard)
 @UseGuards(AtAuthGuard)
@@ -39,7 +41,8 @@ export class GameController {
     }
     @HttpCode(202)
     @Delete('start')
-    cancelGameStart() {
+    async cancelGameStart(@Body() query: CancelGame) {
+        this.repo.remove(query.name);
         const timeout = this.gameService.cancelGameStart();
         return `The game start schedule has been cancelled`;
     }
@@ -55,7 +58,10 @@ export class GameController {
     }
     @HttpCode(202)
     @Delete('stop')
-    cancelGameStop() {
+    async cancelGameStop(@Body() query: CancelGame) {
+        const gameRedis = await this.repo.fetch(query.name);
+        gameRedis.stopSchedule = null;
+        this.repo.save(gameRedis);
         const timeout = this.gameService.cancelGameStop();
         return `The game stop schedule has been cancelled`;
     }

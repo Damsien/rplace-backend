@@ -21,7 +21,7 @@ export class PixelHistoryService {
 
 
   async getLastPixelOfUser(userId: string): Promise<PixelHistoryEntity> {
-    const pixels = await this.pixelHistoRepo.findBy({user: userId});
+    const pixels = await this.pixelHistoRepo.findBy({userId: userId});
     return pixels[pixels.length];
   }
 
@@ -69,7 +69,7 @@ export class PixelHistoryService {
       const pixelHistory = new PixelHistoryEntity();
       pixelHistory.pixelId = (await this.pixelRepo.findOne({where: {coord_x: pixelHistoryRedis[1], coord_y: pixelHistoryRedis[3]}})).pixelId;
       pixelHistory.date = new Date(pixelHistoryRedis[9]);
-      pixelHistory.user = pixelHistoryRedis[7];
+      pixelHistory.userId = pixelHistoryRedis[7];
       pixelHistory.color = pixelHistoryRedis[5];
       history.push(pixelHistory);
     }

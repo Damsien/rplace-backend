@@ -7,6 +7,7 @@ import { PlaceSinglePixel } from './dto/place-single-pixel.dto';
 import { Pixel } from './entity/pixel.entity';
 import { PixelService } from './pixel.service';
 import { PlacePixelGuard } from './guard/place-pixel.guard';
+import { logger } from 'src/main';
 
 @WebSocketGateway({
   cors: {
@@ -26,12 +27,9 @@ export class PixelGateway {
     @SubscribeMessage('placePixel')
     async placeSinglePixel(@MessageBody() placePixelDto: PlaceSinglePixel,
       @ConnectedSocket() client: Socket): Promise<Pixel> {
-        const pixelUser: any = placePixelDto;
-        const user = {
-            username: pixelUser.username,
-            pscope: pixelUser.pscope
-        };
-        const pixel = await this.pixelService.placeSinglePixel(placePixelDto, user);
+        logger.debug('1');
+        logger.debug(placePixelDto);
+        const pixel = await this.pixelService.placeSinglePixel(placePixelDto);
         // this.server.emit('pixel', pixel);
         client.broadcast.emit('pixel', pixel);
         return pixel;

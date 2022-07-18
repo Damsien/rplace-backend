@@ -7,6 +7,7 @@ export class StopGame {
     name: string;
 
     @IsDate()
+    @Type(() => Date)
     schedule: Date
     
 }

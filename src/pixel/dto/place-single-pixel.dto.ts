@@ -1,5 +1,5 @@
 import { Type } from "class-transformer";
-import { IsInt } from "class-validator";
+import { IsInt, IsString } from "class-validator";
 
 export class PlaceSinglePixel {
 
@@ -11,6 +11,13 @@ export class PlaceSinglePixel {
     @Type(() => Number)
     coord_y: number;
 
+    @IsString()
     color: string;
-    
+ 
+    @IsString()
+    username: string;
+
+    @IsString()
+    pscope: string;
+
 }

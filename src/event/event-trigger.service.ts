@@ -23,9 +23,7 @@ export class EventTriggerService {
     constructor(
         private readonly pixelService: PixelService,
         private readonly pixelHistoryService: PixelHistoryService
-    ) {
-      this.gameRepo = client.fetchRepository(game_schema);
-    }
+    ) {}
 
 
     private getAssociatedValue(wantedValue: string, values: string[]): string {
@@ -36,6 +34,7 @@ export class EventTriggerService {
     }
 
     private async increaseMapSize(newMap: UpdateGameMap) {
+      this.gameRepo = client.fetchRepository(game_schema);
       const count = await this.pixelHistoryService.increaseMapSize(newMap);
 
       let pixelArr = [];
@@ -46,7 +45,9 @@ export class EventTriggerService {
             pixel1.color = "white";
             pixel1.coord_x = i;
             pixel1.coord_y = j;
-            this.pixelService.placeSinglePixel(pixel1, {username: newMap.gameMasterUsername, pscope: 'all'});
+            pixel1.pscope = 'root';
+            pixel1.username = newMap.gameMasterUsername;
+            this.pixelService.placeSinglePixel(pixel1);
             pixelArr.push(`${i} ${j}`);
           }
           if(!pixelArr.includes(`${j} ${i}`)) {
@@ -54,7 +55,9 @@ export class EventTriggerService {
             pixel2.color = "white";
             pixel2.coord_x = j;
             pixel2.coord_y = i;
-            this.pixelService.placeSinglePixel(pixel2, {username: newMap.gameMasterUsername, pscope: 'all'});
+            pixel2.pscope = 'root';
+            pixel2.username = newMap.gameMasterUsername;
+            this.pixelService.placeSinglePixel(pixel2);
             pixelArr.push(`${j} ${i}`);
           }
         }
@@ -72,6 +75,7 @@ export class EventTriggerService {
     }
 
     private async updateTimer(newTimer: UpdateGameTimer) {
+      this.gameRepo = client.fetchRepository(game_schema);
       const game: Game = await this.gameRepo.search().return.all()[0];
       game.timer = newTimer.timer;
       await this.gameRepo.save(game);

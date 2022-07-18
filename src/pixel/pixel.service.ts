@@ -16,19 +16,24 @@ export class PixelService {
 
     constructor(
       private readonly pixelHistoryService: PixelHistoryService
-    ) {
-      this.repo = client.fetchRepository(schema);
-    }
+    ) {}
 
     async getMap(): Promise<Pixel[]> {
+      this.repo = client.fetchRepository(schema);
       return await this.repo.search().return.all();
     }
 
     async getSinglePixel(pxl: GetSinglePixel): Promise<Pixel> {
+      this.repo = client.fetchRepository(schema);
       return await this.repo.search().where('coord_x').eq(pxl.coord_x).and('coord_y').eq(pxl.coord_y).return.first();
     }
 
-    async placeSinglePixel(pxl: PlaceSinglePixel, user: UserPayload): Promise<Pixel> {
+    async placeSinglePixel(pxl: PlaceSinglePixel): Promise<Pixel> {
+      const user: UserPayload = {
+          username: pxl.username,
+          pscope: pxl.pscope
+      };
+      this.repo = client.fetchRepository(schema);
 
       // Create index for the Pixel entity if it's not existing
       // It's useful for RediSearch
@@ -54,6 +59,7 @@ export class PixelService {
     
 
     async startGame(game: StartGame) {
+      this.repo = client.fetchRepository(schema);
 
       try {
         const size = await this.pixelHistoryService.createMap(game.mapWidth);
@@ -64,7 +70,9 @@ export class PixelService {
             pixel.color = "white";
             pixel.coord_x = i;
             pixel.coord_y = j;
-            await this.placeSinglePixel(pixel, {username: game.gameMasterUser, pscope: 'all'});
+            pixel.pscope = 'root';
+            pixel.username = game.gameMasterUser;
+            await this.placeSinglePixel(pixel);
           }
         }
   

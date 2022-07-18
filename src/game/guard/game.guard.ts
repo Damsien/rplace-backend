@@ -12,24 +12,26 @@ export class GameGuard implements CanActivate {
         try {
             const startTimeout = this.schedulerRegistry.getTimeout('startGame');
 
-            if(startTimeout == undefined || startTimeout == null) {
-                return false;
-            }
-
-            if(!startTimeout.called) {
-                // const timeLeft = (timeout._idleStart + timeout._idleTimeout - Date.now());
+            const timeLeft = Math.ceil((startTimeout._idleStart + startTimeout._idleTimeout)/1000 - process.uptime());
+            if(timeLeft >= 0) {
                 return false;
             } else {
-                const stopTimeout = this.schedulerRegistry.getTimeout('stopGame');
 
-                if(stopTimeout == undefined || stopTimeout == null || stopTimeout.called) {
-                    return false;
+                try {
+                    const stopTimeout = this.schedulerRegistry.getTimeout('stopGame');
+    
+                    if(stopTimeout == undefined || stopTimeout == null || stopTimeout.called) {
+                        return false;
+                    }
+
+                    return true;
+                } catch (err) {
+                    logger.debug('StopTimeout but startTimeout is fine not found');
+                    return  true;
                 }
-
-                return true;
             }
         } catch(err) {
-            logger.debug(err);
+            logger.debug('StartTimeout not found');
             return false;
         }
     }

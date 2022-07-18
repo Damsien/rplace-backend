@@ -1,5 +1,5 @@
 import { HttpModule } from '@nestjs/axios';
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PuppeteerModule } from 'nest-puppeteer';
 import { UserEntity } from './entity/user.entity';
@@ -17,7 +17,7 @@ import { PixelHistoryService } from 'src/pixel-history/pixel-history.service';
     PuppeteerModule.forRoot({ pipe: true }),
     HttpModule,
     TypeOrmModule.forFeature([UserEntity, PixelEntity, PixelHistoryEntity]),
-    PixelModule
+    forwardRef(() => PixelModule)
   ],
   providers: [PixelService, UserService, GameService, PixelHistoryService],
   exports: [UserService],

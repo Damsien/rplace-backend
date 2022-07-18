@@ -19,6 +19,7 @@ import { UserEntity } from './user/entity/user.entity';
 import { PixelService } from './pixel/pixel.service';
 import { EventTriggerService } from './event/event-trigger.service';
 import { PixelHistoryService } from './pixel-history/pixel-history.service';
+import { HttpModule } from '@nestjs/axios';
 
 const ENV = process.env.NODE_ENV;
 
@@ -45,7 +46,8 @@ const ENV = process.env.NODE_ENV;
     UserModule,
     AuthModule,
     GameModule,
-    EventModule
+    EventModule,
+    HttpModule
   ],
   controllers: [AppController],
   providers: [AppService, GameService, EventService, PixelService, EventTriggerService, PixelHistoryService],
