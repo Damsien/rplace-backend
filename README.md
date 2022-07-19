@@ -36,13 +36,17 @@ Got to `localhost:8001` to manage data with Redis Insight.
 Then run MariaDB database
 ```bash
 # run mariadb database
-$ docker run --env MARIADB_ROOT_PASSWORD=password -p 3306:3306 mariadb:10.7.4-focal
+docker run -d --name mariadb --env MARIADB_ROOT_PASSWORD=password -p 3306:3306 mariadb:10.7.4-focal
+docker exec -it mariadb /bin/bash
+mysql -u root --password=password
+CREATE DATABASE rplace;
+USE rplace;
 ```
 
 Finally, run NestJS server (you need to be placed in this folder).
 ```bash
 # development
-$ yarn run start:dev
+yarn run start:dev
 ```
 Make call on api with `localhost:3000`.
 
@@ -50,7 +54,15 @@ Make call on api with `localhost:3000`.
 
 ### Redis structure
 
-![rplace data structure redis side](rplace-backend-redis.png)
+![rplace data structure redis side](rplace-backend-redis-global.png)
+
+The game is an entity usable in the code.
+
+![rplace game data redis side](rplace-backend-redis-game.png)
+
+### MariaDb structure
+
+![rplace game data mariadb side](rplace-backend-mariadb.png)
 
 ### Global structure (redis and mariadb)
 
