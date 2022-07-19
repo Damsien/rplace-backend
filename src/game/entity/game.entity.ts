@@ -3,8 +3,6 @@ import { Entity, Schema } from "redis-om";
 
 export class Game extends Entity {
 
-    name: string;
-
     user: string;
 
     startSchedule: Date;
@@ -20,8 +18,6 @@ export class Game extends Entity {
 }
 
 export const game_schema = new Schema(Game, {
-
-    name: {type: 'string'},
 
     user: {type: 'string'},
 
