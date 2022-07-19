@@ -5,6 +5,7 @@ import { UserPayload } from 'src/auth/type/userpayload.type';
 import { StartGame } from 'src/game/dto/start-game.dto';
 import { logger } from 'src/main';
 import { PixelHistoryService } from 'src/pixel-history/pixel-history.service';
+import { User, user_schema } from 'src/user/entity/user.entity';
 import { GetSinglePixel } from './dto/get-single-pixel.dto';
 import { PlaceSinglePixel } from './dto/place-single-pixel.dto';
 import { Pixel, schema } from './entity/pixel.entity';
@@ -33,6 +34,9 @@ export class PixelService {
           username: pxl.username,
           pscope: pxl.pscope
       };
+      const userId = `${user.pscope}.${user.username}`;
+      const now = new Date();
+
       this.repo = client.fetchRepository(schema);
 
       // Create index for the Pixel entity if it's not existing
@@ -46,13 +50,20 @@ export class PixelService {
       pixel.coord_x = pxl.coord_x;
       pixel.coord_y = pxl.coord_y;
       pixel.color = pxl.color;
-      pixel.user = `${user.pscope}.${user.username}`;
-      pixel.date = new Date();
+      pixel.user = userId;
+      pixel.date = now;
 
       this.repo.save(pixel);
 
       /*    Pushing pixel in PixelHistory section   */
       this.pixelHistoryService.addSinglePixel(pixel);
+      
+      /*    Redis   */
+      const userRepo = client.fetchRepository(user_schema);
+      await userRepo.createIndex();
+      const userRedis: User = await userRepo.fetch(userId);
+      userRedis.lastPlacedPixel = now;
+      await userRepo.save(userRedis);
 
       return pixel;
     }

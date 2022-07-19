@@ -28,9 +28,8 @@ export class GameController {
     @HttpCode(201)
     @Post('start')
     async startGame(@Body() query: StartGame) {
-        const gameRedis = await this.repo.fetch(query.name);
+        const gameRedis = await this.repo.fetch('Game');
         gameRedis.colors = query.colors;
-        gameRedis.name = query.name;
         gameRedis.user = query.gameMasterUser;
         gameRedis.startSchedule = query.schedule;
         gameRedis.timer = query.timer;
@@ -43,14 +42,14 @@ export class GameController {
     @Delete('start')
     async cancelGameStart(@Body() query: CancelGame) {
         this.repo.remove(query.name);
-        const timeout = this.gameService.cancelGameStart();
+        this.gameService.cancelGameStart();
         return `The game start schedule has been cancelled`;
     }
 
     @HttpCode(201)
     @Post('stop')
     async stopGame(@Body() query: StopGame) {
-        const gameRedis = await this.repo.fetch(query.name);
+        const gameRedis = await this.repo.fetch('Game');
         gameRedis.stopSchedule = query.schedule;
         this.repo.save(gameRedis);
         const timeout = this.gameService.stopGame(query);
@@ -62,7 +61,7 @@ export class GameController {
         const gameRedis = await this.repo.fetch(query.name);
         gameRedis.stopSchedule = null;
         this.repo.save(gameRedis);
-        const timeout = this.gameService.cancelGameStop();
+        this.gameService.cancelGameStop();
         return `The game stop schedule has been cancelled`;
     }
 

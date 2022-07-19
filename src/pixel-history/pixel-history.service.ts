@@ -1,4 +1,5 @@
 import { ConflictException, HttpCode, HttpException, HttpStatus, Inject, Injectable, NotAcceptableException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { Interval } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
 import { client } from 'src/app.service';
@@ -93,7 +94,7 @@ export class PixelHistoryService {
     return pixelHistory;
   }
 
-  @Interval('pushOnMySQL', 30000)
+  @Interval('pushOnMySQL', parseInt(process.env.REDIS_SQL_TRANSFERT_OFFSET))
   async pushOnMySQL() {
 
     const qRunner = this.dataSoucre.createQueryRunner();

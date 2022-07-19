@@ -1,25 +1,21 @@
-import { Column, Entity, PrimaryColumn } from "typeorm";
+import { Entity, Schema } from "redis-om";
 
-@Entity()
-export class UserEntity {
+export class User extends Entity {
 
-    @PrimaryColumn()
-    userId: string;     // pcsope.username
+    timer: number;
 
-    @Column()
-    username: string;
+    lastPlacedPixel: Date;
 
-    @Column()
-    pscope: string;
-
-    @Column({
-        nullable: true
-    })
-    timer: number = null;
-
-    @Column("simple-array", {
-        nullable: true
-    })
-    colors: string[] = null;
+    colors: string[];
 
 }
+
+export const user_schema = new Schema(User, {
+
+    timer: {type: 'number'},
+
+    lastPlacedPixel: {type: 'date'},
+
+    colors: {type: 'string[]'}
+
+});

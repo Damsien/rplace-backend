@@ -2,7 +2,7 @@ import { HttpModule } from '@nestjs/axios';
 import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PuppeteerModule } from 'nest-puppeteer';
-import { UserEntity } from './entity/user.entity';
+import { UserEntity } from './entity/user-sql.entity';
 import { UserService } from './user.service';
 import { UserController } from './user.controller';
 import { GameService } from 'src/game/game.service';

@@ -5,7 +5,7 @@ import { PassportModule } from '@nestjs/passport';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PixelHistoryEntity } from 'src/pixel-history/entity/pixel-history.entity';
 import { PixelEntity } from 'src/pixel/entity/pixel-sql.entity';
-import { UserEntity } from 'src/user/entity/user.entity';
+import { UserEntity } from 'src/user/entity/user-sql.entity';
 import { UserModule } from 'src/user/user.module';
 import { UserService } from 'src/user/user.service';
 import { AuthService } from './auth.service';

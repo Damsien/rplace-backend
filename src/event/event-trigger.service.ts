@@ -65,7 +65,7 @@ export class EventTriggerService {
       
       await this.pixelHistoryService.pushOnMySQL();
       
-      const game: Game = await this.gameRepo.search().return.all()[0];
+      const game: Game = await this.gameRepo.fetch('Game');
       game.width = newMap.width;
       await this.gameRepo.save(game);
 
@@ -76,7 +76,7 @@ export class EventTriggerService {
 
     private async updateTimer(newTimer: UpdateGameTimer) {
       this.gameRepo = client.fetchRepository(game_schema);
-      const game: Game = await this.gameRepo.search().return.all()[0];
+      const game: Game = await this.gameRepo.fetch('Game');
       game.timer = newTimer.timer;
       await this.gameRepo.save(game);
 
@@ -86,7 +86,7 @@ export class EventTriggerService {
     }
 
     private async updateColors(newColors: UpdateGameColors) {
-      const game: Game = await this.gameRepo.search().return.all()[0];
+      const game: Game = await this.gameRepo.fetch('Game');
       game.colors = newColors.colors;
       await this.gameRepo.save(game);
 

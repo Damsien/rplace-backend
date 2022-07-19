@@ -4,11 +4,12 @@ import { Browser } from 'puppeteer';
 import { InjectBrowser } from 'nest-puppeteer';
 import { UserPayload } from 'src/auth/type/userpayload.type';
 import { Repository } from 'typeorm';
-import { UserEntity } from './entity/user.entity';
+import { UserEntity } from './entity/user-sql.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PixelHistoryEntity } from 'src/pixel-history/entity/pixel-history.entity';
 import { PlaceSinglePixel } from 'src/pixel/dto/place-single-pixel.dto';
 import { GameSpec } from 'src/game/type/game-spec.type';
+import { UserRightOptions } from './dto/UserRightOptions.dto';
 
 @Injectable()
 export class UserService {
@@ -19,6 +20,10 @@ export class UserService {
         private readonly axios: HttpService,
         @InjectRepository(UserEntity) private userRepo: Repository<UserEntity>
     ) {}
+
+    static UserRightOptions = {
+
+    }
 
     async createUser(user: UserPayload) {
         if (await this.userRepo.count({where: {userId: `${user.pscope}.${user.username}`}}) == 0) {
@@ -36,18 +41,13 @@ export class UserService {
     }
 
 
-    async doUserIsRight(
-        userId: string,
-        pixel: PlaceSinglePixel,
-        game: GameSpec,
-        date: Date,
-        lastPixel: PixelHistoryEntity
-    ) {
-        const user = await this.getUserById(userId);
+    doUserIsRight(
+        options: UserRightOptions
+    ): boolean {
 
-        return this.doUserHaveRightColor(user, pixel.color) &&
-            this.doUserHaveRightPlacement(pixel, game) &&
-            this.doUserHaveRightTime(user, date, lastPixel, game.timer);
+        return this.doUserHaveRightColor(options.colors, options.pixel.color) &&
+            this.doUserHaveRightPlacement(options.pixel, options.game) &&
+            this.doUserHaveRightTime(options.date, options.lastPlacedPixelDate, options.offset);
     }
 
     private doUserHaveRightPlacement(pixel: PlaceSinglePixel, game: GameSpec): boolean {
@@ -55,16 +55,15 @@ export class UserService {
     }
 
     private doUserHaveRightTime(
-        user: UserEntity,
         date: Date,
-        pixel: PixelHistoryEntity,
+        lastPixelDate: Date,
         offset: number
     ): boolean {
-        return date.getTime() - pixel.date.getTime() >= (user.timer == null ? offset : user.timer)*1000;
+        return date.getTime() - lastPixelDate.getTime() >= offset *1000;
     }
 
-    private doUserHaveRightColor(user: UserEntity, color: string): boolean {
-        return user.colors.includes(color);
+    private doUserHaveRightColor(colors: Array<string>, color: string): boolean {
+        return colors.includes(color);
     }
 
 

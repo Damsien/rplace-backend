@@ -1,10 +1,13 @@
 import { Type } from "class-transformer";
 import { IsDate, IsInt, IsString } from "class-validator";
 
-export class StopGame {
+export class UpdateTimer {
 
     @IsDate()
-    @Type(() => Date)
     schedule: Date
+
+    @IsInt()
+    @Type(() => Number)
+    timer: number;  // in second
     
 }

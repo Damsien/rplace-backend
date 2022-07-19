@@ -12,7 +12,7 @@ import { PixelHistoryService } from 'src/pixel-history/pixel-history.service';
 import { UserModule } from 'src/user/user.module';
 import { UserService } from 'src/user/user.service';
 import { HttpModule } from '@nestjs/axios';
-import { UserEntity } from 'src/user/entity/user.entity';
+import { UserEntity } from 'src/user/entity/user-sql.entity';
 
 @Module({
   imports: [PixelModule, PixelHistoryModule, UserModule,

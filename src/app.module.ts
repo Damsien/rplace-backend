@@ -15,7 +15,7 @@ import { PixelEntity } from './pixel/entity/pixel-sql.entity';
 import { GameService } from './game/game.service';
 import { EventService } from './event/event.service';
 import { EventEntity } from './event/entity/event.entity';
-import { UserEntity } from './user/entity/user.entity';
+import { UserEntity } from './user/entity/user-sql.entity';
 import { PixelService } from './pixel/pixel.service';
 import { EventTriggerService } from './event/event-trigger.service';
 import { PixelHistoryService } from './pixel-history/pixel-history.service';

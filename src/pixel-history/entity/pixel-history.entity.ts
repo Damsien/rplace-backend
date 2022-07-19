@@ -1,5 +1,5 @@
 import { PixelEntity } from "../../pixel/entity/pixel-sql.entity";
-import { UserEntity } from "../../user/entity/user.entity";
+import { UserEntity } from "../../user/entity/user-sql.entity";
 import { Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()

@@ -1,4 +1,4 @@
-import { UserEntity } from "src/user/entity/user.entity";
+import { UserEntity } from "src/user/entity/user-sql.entity";
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { EventType } from "./event.enum";
 

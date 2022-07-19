@@ -4,9 +4,6 @@ import { IsArray, IsDate, IsInt, IsNumber, IsString } from "class-validator";
 export class StartGame {
 
     @IsString()
-    name: string;
-
-    @IsString()
     gameMasterUser: string;
 
     @IsArray()
