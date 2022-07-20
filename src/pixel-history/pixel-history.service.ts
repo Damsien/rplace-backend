@@ -69,7 +69,7 @@ export class PixelHistoryService {
       const pixelHistoryRedis = stream[i][1];
       const pixelHistory = new PixelHistoryEntity();
       pixelHistory.pixelId = (await this.pixelRepo.findOne({where: {coord_x: pixelHistoryRedis[1], coord_y: pixelHistoryRedis[3]}})).pixelId;
-      pixelHistory.date = new Date(pixelHistoryRedis[9]);
+      pixelHistory.timestamp = new Date(pixelHistoryRedis[9]).getTime();
       pixelHistory.userId = pixelHistoryRedis[7];
       pixelHistory.color = pixelHistoryRedis[5];
       history.push(pixelHistory);

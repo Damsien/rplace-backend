@@ -14,7 +14,7 @@ export class PixelHistoryEntity {
     pixelId: number;
 
     @PrimaryColumn()
-    date: Date;
+    timestamp: number;
 
     @Column()
     color: string;
