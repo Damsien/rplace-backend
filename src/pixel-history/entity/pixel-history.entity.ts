@@ -5,16 +5,16 @@ import { Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryColumn, Primary
 @Entity()
 export class PixelHistoryEntity {
 
-    // @PrimaryGeneratedColumn('increment')
-    // id: number
+    @PrimaryGeneratedColumn('increment')
+    id: number
 
-    @PrimaryColumn()
+    @Column()
     @ManyToOne(() => PixelEntity)
     @JoinColumn({ name: "pixelId" })
     pixelId: number;
 
-    @PrimaryColumn()
-    timestamp: number;
+    @Column()
+    date: Date;
 
     @Column()
     color: string;

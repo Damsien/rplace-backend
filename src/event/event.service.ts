@@ -9,6 +9,8 @@ import { EventEntity } from './entity/event.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EventTriggerService } from './event-trigger.service';
+import { PixelService } from 'src/pixel/pixel.service';
+import { PixelHistoryService } from 'src/pixel-history/pixel-history.service';
 
 @Injectable()
 export class EventService {
@@ -16,6 +18,8 @@ export class EventService {
     constructor(
         private readonly eventTriggerService: EventTriggerService,
         private readonly schedulerRegistry: SchedulerRegistry,
+        private readonly pixelService: PixelService,
+        private readonly pixelHistoryService: PixelHistoryService,
         @InjectRepository(EventEntity) private eventRepo: Repository<EventEntity>
     ) {}
 
@@ -48,8 +52,8 @@ export class EventService {
         const [func, dto] = this.registerEventFromType(event);
         const scheduleName = `${event.type}:${user.pscope}.${user.username}`;
   
-        const timeout = setTimeout(() => {
-            func.call(dto);
+        const timeout = setTimeout(async () => {
+            await func.call(this.pixelHistoryService, this.pixelService, dto);
             this.schedulerRegistry.deleteTimeout(scheduleName);
             logger.log(`[Event] ${event.type} - Triggered at ${Date.now()} with values :
                 ${dto}

@@ -31,7 +31,7 @@ export class GameService {
       const milliseconds = EventService.findMsDifference(new Date(), game.schedule);
 
       const timeout = setTimeout(async () => {
-        await this.userService.createUser({username: game.gameMasterUser, pscope: 'root'})
+        await this.userService.createUser({username: game.gameMasterUsername, pscope: 'root'})
         this.pixelService.startGame(game);
       }, milliseconds);
 
@@ -81,7 +81,7 @@ export class GameService {
 
     async getGlobalGame(): Promise<AllGame> {
       this.repo = client.fetchRepository(game_schema);
-      const game: Game = await this.repo.fetch('Game');
+      const game: Game = await this.repo.search().where('name').eq('Game').return.first();
       const map = await this.pixelService.getMap();
       return {
         timer: game.timer,
@@ -93,8 +93,7 @@ export class GameService {
 
     async getGlobalGameSpec(): Promise<GameSpec> {
       this.repo = client.fetchRepository(game_schema);
-      const game: Game = await this.repo.fetch('Game');
-      logger.debug(game);
+      const game: Game = await this.repo.search().where('name').eq('Game').return.first();
       return {
         timer: game.timer,
         width: game.width,
@@ -105,7 +104,7 @@ export class GameService {
     async getUserGame(user: UserPayload): Promise<UserSpec> {
       this.repo = client.fetchRepository(game_schema);
       const userEntity = await this.userService.getUserById(`${user.pscope}.${user.username}`);
-      const allGame: Game = await this.repo.fetch('Game');
+      const allGame: Game = await this.repo.search().where('name').eq('Game').return.first();
       return {
         timer: userEntity.timer != null ? userEntity.timer : allGame.timer,
         colors: userEntity.colors != null ? userEntity.colors : allGame.colors

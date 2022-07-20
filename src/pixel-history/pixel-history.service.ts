@@ -69,7 +69,7 @@ export class PixelHistoryService {
       const pixelHistoryRedis = stream[i][1];
       const pixelHistory = new PixelHistoryEntity();
       pixelHistory.pixelId = (await this.pixelRepo.findOne({where: {coord_x: pixelHistoryRedis[1], coord_y: pixelHistoryRedis[3]}})).pixelId;
-      pixelHistory.timestamp = new Date(pixelHistoryRedis[9]).getTime();
+      pixelHistory.date = new Date(pixelHistoryRedis[9]);
       pixelHistory.userId = pixelHistoryRedis[7];
       pixelHistory.color = pixelHistoryRedis[5];
       history.push(pixelHistory);
@@ -94,7 +94,7 @@ export class PixelHistoryService {
     return pixelHistory;
   }
 
-  @Interval('pushOnMySQL', parseInt(process.env.REDIS_SQL_TRANSFERT_OFFSET))
+  @Interval('pushOnMySQL', 30000)
   async pushOnMySQL() {
 
     const qRunner = this.dataSoucre.createQueryRunner();
@@ -120,6 +120,7 @@ export class PixelHistoryService {
       logger.debug(err);
       // since we have errors lets rollback the changes we made
       await qRunner.rollbackTransaction();
+      await this.delStreams();
     } finally {
       // you need to release a queryRunner which was manually instantiated
       await qRunner.release();

@@ -7,7 +7,9 @@ import { PlaceSinglePixel } from './dto/place-single-pixel.dto';
 import { Pixel } from './entity/pixel.entity';
 import { PixelService } from './pixel.service';
 import { PlacePixelGuard } from './guard/place-pixel.guard';
+import { client as redisClient } from "src/app.service";
 import { logger } from 'src/main';
+import { User, user_schema } from 'src/user/entity/user.entity';
 
 @WebSocketGateway({
   cors: {
@@ -27,8 +29,14 @@ export class PixelGateway {
     @SubscribeMessage('placePixel')
     async placeSinglePixel(@MessageBody() placePixelDto: PlaceSinglePixel,
       @ConnectedSocket() client: Socket): Promise<Pixel> {
-        logger.debug('1');
-        logger.debug(placePixelDto);
+        
+        const userId = `${placePixelDto.pscope}.${placePixelDto.username}`;
+        // Push on redis
+        const userRepo = redisClient.fetchRepository(user_schema);
+        const userRedis: User = await userRepo.fetch(userId);
+        userRedis.lastPlacedPixel = new Date();
+        await userRepo.save(userRedis);
+
         const pixel = await this.pixelService.placeSinglePixel(placePixelDto);
         // this.server.emit('pixel', pixel);
         client.broadcast.emit('pixel', pixel);

@@ -20,10 +20,7 @@ export class EventTriggerService {
 
     private gameRepo: Repository<Game>;
 
-    constructor(
-        private readonly pixelService: PixelService,
-        private readonly pixelHistoryService: PixelHistoryService
-    ) {}
+    constructor() {}
 
 
     private getAssociatedValue(wantedValue: string, values: string[]): string {
@@ -33,9 +30,9 @@ export class EventTriggerService {
         return null;
     }
 
-    private async increaseMapSize(newMap: UpdateGameMap) {
+    private async increaseMapSize(pixelHistoryService: PixelHistoryService, pixelService: PixelService, newMap: UpdateGameMap) {
       this.gameRepo = client.fetchRepository(game_schema);
-      const count = await this.pixelHistoryService.increaseMapSize(newMap);
+      const count = await pixelHistoryService.increaseMapSize(newMap);
 
       let pixelArr = [];
       for(let i=Math.sqrt(count)+1; i<newMap.width+1; i++) {
@@ -47,7 +44,7 @@ export class EventTriggerService {
             pixel1.coord_y = j;
             pixel1.pscope = 'root';
             pixel1.username = newMap.gameMasterUsername;
-            this.pixelService.placeSinglePixel(pixel1);
+            pixelService.placeSinglePixel(pixel1);
             pixelArr.push(`${i} ${j}`);
           }
           if(!pixelArr.includes(`${j} ${i}`)) {
@@ -57,15 +54,15 @@ export class EventTriggerService {
             pixel2.coord_y = i;
             pixel2.pscope = 'root';
             pixel2.username = newMap.gameMasterUsername;
-            this.pixelService.placeSinglePixel(pixel2);
+            pixelService.placeSinglePixel(pixel2);
             pixelArr.push(`${j} ${i}`);
           }
         }
       }
       
-      await this.pixelHistoryService.pushOnMySQL();
+      await pixelHistoryService.pushOnMySQL();
       
-      const game: Game = await this.gameRepo.fetch('Game');
+      const game: Game = await this.gameRepo.search().where('name').eq('Game').return.first();
       game.width = newMap.width;
       await this.gameRepo.save(game);
 
@@ -76,7 +73,7 @@ export class EventTriggerService {
 
     private async updateTimer(newTimer: UpdateGameTimer) {
       this.gameRepo = client.fetchRepository(game_schema);
-      const game: Game = await this.gameRepo.fetch('Game');
+      const game: Game = await this.gameRepo.search().where('name').eq('Game').return.first();
       game.timer = newTimer.timer;
       await this.gameRepo.save(game);
 
@@ -86,7 +83,7 @@ export class EventTriggerService {
     }
 
     private async updateColors(newColors: UpdateGameColors) {
-      const game: Game = await this.gameRepo.fetch('Game');
+      const game: Game = await this.gameRepo.search().where('name').eq('Game').return.first();
       game.colors = newColors.colors;
       await this.gameRepo.save(game);
 

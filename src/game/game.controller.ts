@@ -11,7 +11,6 @@ import { client } from 'src/app.service';
 import { Game, game_schema } from './entity/game.entity';
 import { Repository } from 'redis-om';
 import { logger } from 'src/main';
-import { CancelGame } from './dto/cancel-game.dto';
 
 @UseGuards(RolesGuard)
 @UseGuards(AtAuthGuard)
@@ -29,8 +28,9 @@ export class GameController {
     @Post('start')
     async startGame(@Body() query: StartGame) {
         const gameRedis = await this.repo.fetch('Game');
+        gameRedis.name = 'Game';
         gameRedis.colors = query.colors;
-        gameRedis.user = query.gameMasterUser;
+        gameRedis.user = query.gameMasterUsername;
         gameRedis.startSchedule = query.schedule;
         gameRedis.timer = query.timer;
         gameRedis.width = query.mapWidth;
@@ -40,8 +40,8 @@ export class GameController {
     }
     @HttpCode(202)
     @Delete('start')
-    async cancelGameStart(@Body() query: CancelGame) {
-        this.repo.remove(query.name);
+    async cancelGameStart() {
+        this.repo.remove('Game');
         this.gameService.cancelGameStart();
         return `The game start schedule has been cancelled`;
     }
@@ -49,7 +49,7 @@ export class GameController {
     @HttpCode(201)
     @Post('stop')
     async stopGame(@Body() query: StopGame) {
-        const gameRedis = await this.repo.fetch('Game');
+        const gameRedis = await this.repo.search().where('name').eq('Game').return.first();
         gameRedis.stopSchedule = query.schedule;
         this.repo.save(gameRedis);
         const timeout = this.gameService.stopGame(query);
@@ -57,8 +57,8 @@ export class GameController {
     }
     @HttpCode(202)
     @Delete('stop')
-    async cancelGameStop(@Body() query: CancelGame) {
-        const gameRedis = await this.repo.fetch(query.name);
+    async cancelGameStop() {
+        const gameRedis: Game = await this.repo.search().where('name').eq('Game').return.first();
         gameRedis.stopSchedule = null;
         this.repo.save(gameRedis);
         this.gameService.cancelGameStop();

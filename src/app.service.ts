@@ -32,11 +32,11 @@ export class AppService implements OnModuleInit {
 
     private async searchForGame() {
         await this.gameRepo.createIndex();
-        const game: Game = await this.gameRepo.fetch('Game');
+        const game: Game = await this.gameRepo.search().where('name').eq('Game').return.first();
         if (game != undefined) {
             const gameStart = new StartGame();
             gameStart.colors = game.colors;
-            gameStart.gameMasterUser = game.user;
+            gameStart.gameMasterUsername = game.user;
             gameStart.mapWidth = game.width;
             gameStart.timer = game.timer;
             gameStart.schedule = game.startSchedule;

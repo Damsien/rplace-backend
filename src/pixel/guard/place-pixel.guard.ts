@@ -26,7 +26,7 @@ export class PlacePixelGuard implements CanActivate {
             const user: User = await userRepo.fetch(userId);
             const lastPlacedPixelDate = user.lastPlacedPixel;
             const offset = (user.timer == undefined ? game.timer : user.timer);
-            const colors = [...game.colors, ...user.colors];
+            const colors = user.colors == null ? game.colors : [...game.colors, ...user.colors];
 
             return this.userService.doUserIsRight({
                 userId: userId,

@@ -9,7 +9,7 @@ export class GameGuard implements CanActivate {
 
     async canActivate(context: ExecutionContext): Promise<boolean> {
         const repo = client.fetchRepository(game_schema);
-        const game: Game = await repo.fetch('Game');
+        const game: Game = await repo.search().where('name').eq('Game').return.first();
 
         try {
             if (game != undefined) {
