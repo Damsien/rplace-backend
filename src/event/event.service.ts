@@ -8,18 +8,18 @@ import { EventCancel } from './dto/event-cancel.dto';
 import { EventEntity } from './entity/event.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { EventTriggerService } from './event-trigger.service';
 import { PixelService } from 'src/pixel/pixel.service';
 import { PixelHistoryService } from 'src/pixel-history/pixel-history.service';
+import { RunnerService } from 'src/runner/runner.service';
 
 @Injectable()
 export class EventService {
 
     constructor(
-        private readonly eventTriggerService: EventTriggerService,
         private readonly schedulerRegistry: SchedulerRegistry,
         private readonly pixelService: PixelService,
         private readonly pixelHistoryService: PixelHistoryService,
+        private readonly runnerService: RunnerService,
         @InjectRepository(EventEntity) private eventRepo: Repository<EventEntity>
     ) {}
 
@@ -39,9 +39,9 @@ export class EventService {
     private registerEventFromType(event: EventRegister): [Function, any] {
         switch (event.type) {
 
-            case EventType.INCREASE_MAP: return this.eventTriggerService.register_increaseMap(event);
-            case EventType.UPDATE_TIMER: return this.eventTriggerService.register_updateTimer(event);
-            case EventType.UPDATE_COLORS: return this.eventTriggerService.register_updateColors(event);
+            case EventType.INCREASE_MAP: return this.runnerService.register_increaseMap(event);
+            case EventType.UPDATE_TIMER: return this.runnerService.register_updateTimer(event);
+            case EventType.UPDATE_COLORS: return this.runnerService.register_updateColors(event);
 
         }
     }
@@ -53,7 +53,7 @@ export class EventService {
         const scheduleName = `${event.type}:${user.pscope}.${user.username}`;
   
         const timeout = setTimeout(async () => {
-            await func.call(this.pixelHistoryService, this.pixelService, dto);
+            await func.call(dto);
             this.schedulerRegistry.deleteTimeout(scheduleName);
             logger.log(`[Event] ${event.type} - Triggered at ${Date.now()} with values :
                 ${dto}

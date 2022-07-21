@@ -1,26 +1,29 @@
-import { Injectable } from "@nestjs/common";
-import { WebSocketServer } from "@nestjs/websockets";
-import { Server } from "socket.io";
-import { Repository } from "redis-om";
-import { client } from "src/app.service";
-import { Game, game_schema } from "src/game/entity/game.entity";
-import { PixelHistoryService } from "src/pixel-history/pixel-history.service";
-import { PlaceSinglePixel } from "src/pixel/dto/place-single-pixel.dto";
-import { PixelService } from "src/pixel/pixel.service";
-import { EventRegister } from "./dto/event-register.dto";
-import { UpdateGameMap } from "./dto/update-game-map.dto";
-import { UpdateGameTimer } from "./dto/update-game-timer.dto";
-import { UpdateGameColors } from "./dto/update-game-colors.dto";
+import { Injectable } from '@nestjs/common';
+import { WebSocketServer } from '@nestjs/websockets';
+import { Repository } from 'redis-om';
+import { Server } from 'socket.io';
+import { client } from 'src/app.service';
+import { EventRegister } from 'src/event/dto/event-register.dto';
+import { UpdateGameColors } from 'src/event/dto/update-game-colors.dto';
+import { UpdateGameMap } from 'src/event/dto/update-game-map.dto';
+import { UpdateGameTimer } from 'src/event/dto/update-game-timer.dto';
+import { Game, game_schema } from 'src/game/entity/game.entity';
+import { PixelHistoryService } from 'src/pixel-history/pixel-history.service';
+import { PlaceSinglePixel } from 'src/pixel/dto/place-single-pixel.dto';
+import { PixelService } from 'src/pixel/pixel.service';
 
 @Injectable()
-export class EventTriggerService {
+export class RunnerService {
 
     @WebSocketServer()
     server: Server;
 
     private gameRepo: Repository<Game>;
 
-    constructor() {}
+    constructor(
+        private readonly pixelHistoryService: PixelHistoryService,
+        private readonly pixelService: PixelService
+    ) {}
 
 
     private getAssociatedValue(wantedValue: string, values: string[]): string {
@@ -30,9 +33,9 @@ export class EventTriggerService {
         return null;
     }
 
-    private async increaseMapSize(pixelHistoryService: PixelHistoryService, pixelService: PixelService, newMap: UpdateGameMap) {
+    private async increaseMapSize(newMap: UpdateGameMap) {
       this.gameRepo = client.fetchRepository(game_schema);
-      const count = await pixelHistoryService.increaseMapSize(newMap);
+      const count = await this.pixelHistoryService.increaseMapSize(newMap);
 
       let pixelArr = [];
       for(let i=Math.sqrt(count)+1; i<newMap.width+1; i++) {
@@ -44,7 +47,7 @@ export class EventTriggerService {
             pixel1.coord_y = j;
             pixel1.pscope = 'root';
             pixel1.username = newMap.gameMasterUsername;
-            pixelService.placeSinglePixel(pixel1);
+            this.pixelService.placeSinglePixel(pixel1);
             pixelArr.push(`${i} ${j}`);
           }
           if(!pixelArr.includes(`${j} ${i}`)) {
@@ -54,13 +57,13 @@ export class EventTriggerService {
             pixel2.coord_y = i;
             pixel2.pscope = 'root';
             pixel2.username = newMap.gameMasterUsername;
-            pixelService.placeSinglePixel(pixel2);
+            this.pixelService.placeSinglePixel(pixel2);
             pixelArr.push(`${j} ${i}`);
           }
         }
       }
       
-      await pixelHistoryService.pushOnMySQL();
+      await this.pixelHistoryService.pushOnMySQL();
       
       const game: Game = await this.gameRepo.search().where('name').eq('Game').return.first();
       game.width = newMap.width;
