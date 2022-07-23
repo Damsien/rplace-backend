@@ -11,6 +11,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { PixelService } from 'src/pixel/pixel.service';
 import { PixelHistoryService } from 'src/pixel-history/pixel-history.service';
 import { RunnerService } from 'src/runner/runner.service';
+import { UpdateGameMap } from './dto/update-game-map.dto';
 
 @Injectable()
 export class EventService {
@@ -36,28 +37,33 @@ export class EventService {
     }
 
     /*      REGISTER NEW EVENT HERE     */
-    private registerEventFromType(event: EventRegister): [Function, any] {
-        switch (event.type) {
-
-            case EventType.INCREASE_MAP: return this.runnerService.register_increaseMap(event);
-            case EventType.UPDATE_TIMER: return this.runnerService.register_updateTimer(event);
-            case EventType.UPDATE_COLORS: return this.runnerService.register_updateColors(event);
-
-        }
-    }
 
     registerNewEvent(event: EventRegister, user: UserPayload) {
         const milliseconds = EventService.findMsDifference(new Date(), event.schedule);
 
-        const [func, dto] = this.registerEventFromType(event);
         const scheduleName = `${event.type}:${user.pscope}.${user.username}`;
   
         const timeout = setTimeout(async () => {
-            await func.call(dto);
+            logger.debug(event.type);
+            switch (event.type) {
+
+                case EventType.INCREASE_MAP: {
+                    const dto = this.runnerService.register_increaseMap(event);
+                    this.runnerService.increaseMapSize(dto);
+                } break;
+                case EventType.UPDATE_TIMER: {
+                    const dto = this.runnerService.register_updateTimer(event);
+                    this.runnerService.updateTimer(dto);
+                } break;
+                case EventType.UPDATE_COLORS: {
+                    const dto = this.runnerService.register_updateColors(event);
+                    this.runnerService.updateColors(dto);
+                } break;
+
+            }
             this.schedulerRegistry.deleteTimeout(scheduleName);
-            logger.log(`[Event] ${event.type} - Triggered at ${Date.now()} with values :
-                ${dto}
-                by ${user.pscope}.${user.username}`);
+            logger.log(`
+            [Event] ${event.type} - Triggered at ${Date.now()} by ${user.pscope}.${user.username}`);
         }, milliseconds);
   
         this.schedulerRegistry.addTimeout(scheduleName, timeout);

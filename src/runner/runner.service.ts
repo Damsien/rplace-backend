@@ -7,7 +7,9 @@ import { EventRegister } from 'src/event/dto/event-register.dto';
 import { UpdateGameColors } from 'src/event/dto/update-game-colors.dto';
 import { UpdateGameMap } from 'src/event/dto/update-game-map.dto';
 import { UpdateGameTimer } from 'src/event/dto/update-game-timer.dto';
+import { EventType } from 'src/event/entity/event.enum';
 import { Game, game_schema } from 'src/game/entity/game.entity';
+import { logger } from 'src/main';
 import { PixelHistoryService } from 'src/pixel-history/pixel-history.service';
 import { PlaceSinglePixel } from 'src/pixel/dto/place-single-pixel.dto';
 import { PixelService } from 'src/pixel/pixel.service';
@@ -27,15 +29,18 @@ export class RunnerService {
 
 
     private getAssociatedValue(wantedValue: string, values: string[]): string {
-        values.forEach(el => {
-            if (el.split(':')[0] == wantedValue) return el.split(':')[1];
-        });
-        return null;
+      let val;
+      values.forEach(el => {
+        if (wantedValue.includes(el.split(':')[0])) val = el.split(':')[1];
+      });
+      return val;
     }
 
-    private async increaseMapSize(newMap: UpdateGameMap) {
+    async increaseMapSize(newMap: UpdateGameMap) {
+      this.server = new Server();
       this.gameRepo = client.fetchRepository(game_schema);
       const count = await this.pixelHistoryService.increaseMapSize(newMap);
+      logger.debug(count);
 
       let pixelArr = [];
       for(let i=Math.sqrt(count)+1; i<newMap.width+1; i++) {
@@ -62,6 +67,7 @@ export class RunnerService {
           }
         }
       }
+      logger.debug(pixelArr);
       
       await this.pixelHistoryService.pushOnMySQL();
       
@@ -74,7 +80,7 @@ export class RunnerService {
       });
     }
 
-    private async updateTimer(newTimer: UpdateGameTimer) {
+    async updateTimer(newTimer: UpdateGameTimer) {
       this.gameRepo = client.fetchRepository(game_schema);
       const game: Game = await this.gameRepo.search().where('name').eq('Game').return.first();
       game.timer = newTimer.timer;
@@ -85,7 +91,7 @@ export class RunnerService {
       });
     }
 
-    private async updateColors(newColors: UpdateGameColors) {
+    async updateColors(newColors: UpdateGameColors) {
       const game: Game = await this.gameRepo.search().where('name').eq('Game').return.first();
       game.colors = newColors.colors;
       await this.gameRepo.save(game);
@@ -94,6 +100,7 @@ export class RunnerService {
         colors: newColors.colors
       });
     }
+
 
     
 
@@ -104,11 +111,11 @@ export class RunnerService {
         ],
         "schedule": "1657983277"
     */
-    register_increaseMap(event: EventRegister): [Function, any] {
+    register_increaseMap(event: EventRegister): UpdateGameMap {
         const val = new UpdateGameMap();
         val.gameMasterUsername = this.getAssociatedValue('gameMasterUsername', event.values);
         val.width = parseInt(this.getAssociatedValue('width', event.values));
-        return [this.increaseMapSize, val];
+        return val;
     }
 
     /*  Body example - timer in second
@@ -118,10 +125,10 @@ export class RunnerService {
         ],
         "schedule": "1657983277"
     */
-    register_updateTimer(event: EventRegister): [Function, any] {
+    register_updateTimer(event: EventRegister): UpdateGameTimer {
       const val = new UpdateGameTimer();
       val.timer = parseInt(this.getAssociatedValue('timer', event.values));
-      return [this.updateTimer, val];
+      return val;
     }
 
     /*  Body example
@@ -131,12 +138,12 @@ export class RunnerService {
         ],
         "schedule": "1657983277"
     */
-    register_updateColors(event: EventRegister): [Function, any] {
+    register_updateColors(event: EventRegister): UpdateGameColors {
       const val = new UpdateGameColors();
       for(let color of this.getAssociatedValue('timer', event.values).split(',')) {
         val.colors.push(color);
       }
-      return [this.updateColors, val];
+      return val;
     }
 
 }

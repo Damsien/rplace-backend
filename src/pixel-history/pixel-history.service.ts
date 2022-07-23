@@ -165,6 +165,7 @@ export class PixelHistoryService {
     const qRunner = this.dataSoucre.createQueryRunner();
     await qRunner.connect();
     await qRunner.startTransaction();
+    logger.debug(newMap.width);
 
     let pixelArr = [];
 
@@ -180,6 +181,7 @@ export class PixelHistoryService {
       for(let i=Math.sqrt(count)+1; i<newMap.width+1; i++) {
         for(let j=1; j<newMap.width+1; j++) {
           if(!pixelArr.includes(`${i} ${j}`)) {
+            logger.debug(`${i}    ${j}`);
             const pixel1 = new PixelEntity();
             pixel1.coord_x = i;
             pixel1.coord_y = j;
@@ -187,6 +189,7 @@ export class PixelHistoryService {
             pixelArr.push(`${i} ${j}`);
           }
           if(!pixelArr.includes(`${j} ${i}`)) {
+            logger.debug(`${j}    ${i}`);
             const pixel2 = new PixelEntity();
             pixel2.coord_x = j;
             pixel2.coord_y = i;
