@@ -44,20 +44,19 @@ export class EventService {
         const scheduleName = `${event.type}:${user.pscope}.${user.username}`;
   
         const timeout = setTimeout(async () => {
-            logger.debug(event.type);
             switch (event.type) {
 
                 case EventType.INCREASE_MAP: {
                     const dto = this.runnerService.register_increaseMap(event);
-                    this.runnerService.increaseMapSize(dto);
+                    await this.runnerService.increaseMapSize(dto);
                 } break;
                 case EventType.UPDATE_TIMER: {
                     const dto = this.runnerService.register_updateTimer(event);
-                    this.runnerService.updateTimer(dto);
+                    await this.runnerService.updateTimer(dto);
                 } break;
                 case EventType.UPDATE_COLORS: {
                     const dto = this.runnerService.register_updateColors(event);
-                    this.runnerService.updateColors(dto);
+                    await this.runnerService.updateColors(dto);
                 } break;
 
             }

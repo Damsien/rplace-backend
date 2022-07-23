@@ -2,7 +2,7 @@ import { Injectable, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Client, Repository, } from 'redis-om';
-import { Repository as SQLRepo } from 'typeorm';
+import { MoreThanOrEqual, Repository as SQLRepo } from 'typeorm';
 import { EventRegister } from './event/dto/event-register.dto';
 import { EventEntity } from './event/entity/event.entity';
 import { EventService } from './event/event.service';
@@ -52,10 +52,10 @@ export class AppService implements OnModuleInit {
 
     private async searchForEvents() {
         try {
-            const events: EventEntity[] = await this.eventRepo.find();
+            const events: EventEntity[] = await this.eventRepo.find({where: {schedule: MoreThanOrEqual(new Date())}});
             for (let event of events) {
                 const eventReg = new EventRegister();
-                // eventReg.type = event.type;
+                eventReg.type = event.type;
                 eventReg.values = event.values;
                 eventReg.schedule = event.schedule;
                 const pscope = event.userId.split('.')[0];

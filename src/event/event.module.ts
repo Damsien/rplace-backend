@@ -6,6 +6,7 @@ import { PixelHistoryService } from 'src/pixel-history/pixel-history.service';
 import { PixelEntity } from 'src/pixel/entity/pixel-sql.entity';
 import { PixelModule } from 'src/pixel/pixel.module';
 import { PixelService } from 'src/pixel/pixel.service';
+import { RunnerGateway } from 'src/runner/runner.gateway';
 import { RunnerModule } from 'src/runner/runner.module';
 import { RunnerService } from 'src/runner/runner.service';
 import { EventEntity } from './entity/event.entity';
@@ -15,6 +16,6 @@ import { EventService } from './event.service';
 @Module({
   imports: [PixelModule, TypeOrmModule.forFeature([EventEntity, PixelEntity, PixelHistoryEntity]), PixelHistoryModule, RunnerModule],
   controllers: [EventController],
-  providers: [EventService, PixelService, PixelHistoryService, RunnerService]
+  providers: [EventService, PixelService, PixelHistoryService, RunnerService, RunnerGateway]
 })
 export class EventModule {}

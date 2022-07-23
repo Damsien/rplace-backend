@@ -21,6 +21,7 @@ import { PixelHistoryService } from './pixel-history/pixel-history.service';
 import { HttpModule } from '@nestjs/axios';
 import { RunnerModule } from './runner/runner.module';
 import { RunnerService } from './runner/runner.service';
+import { RunnerGateway } from './runner/runner.gateway';
 
 const ENV = process.env.NODE_ENV;
 
@@ -52,6 +53,6 @@ const ENV = process.env.NODE_ENV;
     RunnerModule
   ],
   controllers: [AppController],
-  providers: [AppService, GameService, EventService, PixelService, PixelHistoryService, RunnerService],
+  providers: [AppService, GameService, EventService, PixelService, PixelHistoryService, RunnerService, RunnerGateway],
 })
 export class AppModule {}
