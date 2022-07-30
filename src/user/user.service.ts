@@ -3,27 +3,28 @@ import { HttpService } from '@nestjs/axios';
 import { Browser } from 'puppeteer';
 import { InjectBrowser } from 'nest-puppeteer';
 import { UserPayload } from 'src/auth/type/userpayload.type';
-import { Repository } from 'typeorm';
 import { UserEntity } from './entity/user-sql.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PixelHistoryEntity } from 'src/pixel-history/entity/pixel-history.entity';
 import { PlaceSinglePixel } from 'src/pixel/dto/place-single-pixel.dto';
 import { GameSpec } from 'src/game/type/game-spec.type';
 import { UserRightOptions } from './dto/UserRightOptions.dto';
+import { User, user_schema } from './entity/user.entity';
+import { client } from 'src/app.service';
+import { Repository as RedisRepo } from 'redis-om';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class UserService {
     private static LOGIN_URL="https://authc.univ-toulouse.fr/login";
+
+    private repo: RedisRepo<User>;
 
     constructor(
         @InjectBrowser() private readonly browser: Browser,
         private readonly axios: HttpService,
         @InjectRepository(UserEntity) private userRepo: Repository<UserEntity>
     ) {}
-
-    static UserRightOptions = {
-
-    }
 
     async createUser(user: UserPayload) {
         if (await this.userRepo.count({where: {userId: `${user.pscope}.${user.username}`}}) == 0) {
@@ -38,6 +39,11 @@ export class UserService {
 
     async getUserById(id: string): Promise<UserEntity> {
         return await this.userRepo.findOneBy({userId: id});
+    }
+
+    async getUserRedis(id: string): Promise<User> {
+        this.repo = client.fetchRepository(user_schema);
+        return await this.repo.fetch(id);
     }
 
 

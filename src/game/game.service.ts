@@ -87,7 +87,7 @@ export class GameService {
         timer: game.timer,
         map: map,
         width: game.width,
-        colors: game.colors
+        colors: game.getColorsName()
       };
     }
 
@@ -97,18 +97,24 @@ export class GameService {
       return {
         timer: game.timer,
         width: game.width,
-        colors: game.colors
+        colors: game.getColorsName()
       }
     }
 
     async getUserGame(user: UserPayload): Promise<UserSpec> {
       this.repo = client.fetchRepository(game_schema);
-      const userEntity = await this.userService.getUserById(`${user.pscope}.${user.username}`);
+      const userRedis = await this.userService.getUserRedis(`${user.pscope}.${user.username}`);
       const allGame: Game = await this.repo.search().where('name').eq('Game').return.first();
       return {
-        timer: userEntity.timer != null ? userEntity.timer : allGame.timer,
-        colors: userEntity.colors != null ? userEntity.colors : allGame.colors
+        timer: userRedis.timer != null ? userRedis.timer : allGame.timer,
+        colors: userRedis.colors != null ? userRedis.colors : allGame.getColorsName()
       };
+    }
+
+    async getAssociatedColor(name: string) {
+      this.repo = client.fetchRepository(game_schema);
+      const game: Game = await this.repo.search().where('name').eq('Game').return.first();
+      return game.getHexFromName(name);
     }
 
 

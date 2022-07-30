@@ -40,7 +40,7 @@ const ENV = process.env.NODE_ENV;
       password: process.env.MARIADB_PASSWORD,
       database: process.env.MARIADB_DATABASE,
       entities: [PixelEntity, PixelHistoryEntity, EventEntity, UserEntity],
-      synchronize: (/true/i).test(process.env.MARIADB_DEV)
+      synchronize: true
     }),
     TypeOrmModule.forFeature([EventEntity, PixelHistoryEntity, PixelEntity]),
     PixelHistoryModule,

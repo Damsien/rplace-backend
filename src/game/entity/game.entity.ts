@@ -16,7 +16,39 @@ export class Game extends Entity {
     // In seconds
     timer: number;
 
-    colors: string[];
+    private colors: string[];
+
+    setColors(colors: string[]) {
+        this.colors = colors;
+    }
+
+    getColorsMap() {
+        return this.colors;
+    }
+
+    getColorsName() {
+        let colors = [];
+        for (let color of this.colors) {
+            colors.push(color.split(':')[0]);
+        }
+        return colors;
+    }
+
+    getColorsHex() {
+        let colors = [];
+        for (let color of this.colors) {
+            colors.push(color.split(':')[1]);
+        }
+        return colors;
+    }
+
+    getHexFromName(name: string) {
+        for (let color of this.colors) {
+            if(color.split(':')[0] == name) {
+                return color.split(':')[1];
+            }
+        }
+    }
 
 }
 

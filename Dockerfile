@@ -4,11 +4,14 @@ WORKDIR /usr/src/app
 
 COPY package*.json ./
 
-RUN npm install
-RUN npm ci --only=production
-
 COPY . .
+RUN rm -rf ./nodes_modules
+RUN rm -rf ./dist
+
+RUN npm install yarn --legacy-peer-deps
+RUN yarn install
+RUN yarn run build
 
 EXPOSE 3000
 
-CMD ["node", "dist/main"]
+CMD ["yarn", "run", "start:prod"]

@@ -28,7 +28,7 @@ export class PlacePixelGuard implements CanActivate {
             const offset = (user.timer == undefined ? game.timer : user.timer);
             const colors = user.colors == null ? game.colors : [...game.colors, ...user.colors];
 
-            return this.userService.doUserIsRight({
+            let isRight = this.userService.doUserIsRight({
                 userId: userId,
                 pixel: pixel,
                 game: game,
@@ -37,6 +37,11 @@ export class PlacePixelGuard implements CanActivate {
                 offset: offset,
                 colors: colors
             });
+
+            // white -> #FFFFFF
+            pixel.color = await this.gameService.getAssociatedColor(pixel.color);
+
+            return isRight;
 
         } catch(err) {
             logger.debug(err);

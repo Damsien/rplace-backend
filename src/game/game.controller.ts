@@ -29,7 +29,7 @@ export class GameController {
     async startGame(@Body() query: StartGame) {
         const gameRedis = await this.repo.fetch('Game');
         gameRedis.name = 'Game';
-        gameRedis.colors = query.colors;
+        gameRedis.setColors(query.colors);
         gameRedis.user = query.gameMasterUsername;
         gameRedis.startSchedule = query.schedule;
         gameRedis.timer = query.timer;

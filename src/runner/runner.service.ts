@@ -95,11 +95,15 @@ export class RunnerService {
     async updateColors(newColors: UpdateGameColors) {
       this.gameRepo = client.fetchRepository(game_schema);
       const game: Game = await this.gameRepo.search().where('name').eq('Game').return.first();
-      game.colors = newColors.colors;
+      let colors = [];
+      for(let color of newColors.colors.entries()) {
+        colors.push(`${color[0]}:${color[1]}`);
+      }
+      game.setColors(colors);
       await this.gameRepo.save(game);
 
       this.runnerGateway.sendGameEvent({
-        colors: newColors.colors
+        colors: Array.from(newColors.colors.keys())
       });
     }
 
@@ -136,15 +140,15 @@ export class RunnerService {
     /*  Body example
         "type": "game:colors",
         "values": [
-            "colors:#F546BC,#20AD5A"
+            "blue:#F546BC,red:#20AD5A"
         ],
         "schedule": "2022-07-23T13:30:00"
     */
     register_updateColors(event: EventRegister): UpdateGameColors {
       const val = new UpdateGameColors();
-      val.colors = [];
-      for(let color of this.getAssociatedValue('colors', event.values).split(',')) {
-        val.colors.push(color);
+      val.colors = new Map<string, string>();
+      for(let color of event.values) {
+        val.colors.set(color.split(':')[0], color.split(':')[1]);
       }
       return val;
     }
