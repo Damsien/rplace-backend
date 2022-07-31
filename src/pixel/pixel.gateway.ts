@@ -20,8 +20,8 @@ import { User, user_schema } from 'src/user/entity/user.entity';
 @UseGuards(WsGuard)
 export class PixelGateway {
 
-    // @WebSocketServer()
-    // server: Server;
+    @WebSocketServer()
+    server: Server;
 
     constructor(private readonly pixelService: PixelService) {}
 
@@ -38,8 +38,8 @@ export class PixelGateway {
         await userRepo.save(userRedis);
 
         const pixel = await this.pixelService.placeSinglePixel(placePixelDto);
-        // this.server.emit('pixel', pixel);
-        client.broadcast.emit('pixel', pixel);
+        this.server.emit('pixel', pixel);
+        // client.broadcast.emit('pixel', pixel);
         return pixel;
     }
 
