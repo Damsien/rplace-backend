@@ -66,8 +66,6 @@ export class RunnerService {
           }
         }
         
-        await this.pixelHistoryService.pushOnMySQL();
-        
         const game: Game = await this.gameRepo.search().where('name').eq('Game').return.first();
         game.width = newMap.width;
         await this.gameRepo.save(game);

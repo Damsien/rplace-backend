@@ -34,7 +34,9 @@ export class GameController {
         gameRedis.startSchedule = query.schedule;
         gameRedis.timer = query.timer;
         gameRedis.width = query.mapWidth;
-        this.repo.save(gameRedis);
+        gameRedis.isMapReady = false;
+        gameRedis.isOperationReady = true;
+        await this.repo.save(gameRedis);
         const timeout = this.gameService.startGame(query);
         return `The game will start in ${timeout}ms (or ${query.schedule})`;
     }

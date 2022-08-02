@@ -18,9 +18,48 @@ export class PixelService {
       private readonly pixelHistoryService: PixelHistoryService
     ) {}
 
+    private async getJsonPixel(pxl: string): Promise<Pixel> {
+      const json = await client.execute([
+        'JSON.GET', pxl
+      ])
+
+      const coord_x = Number(String(json).split(':')[1].split(',')[0]);
+      const coord_y = Number(String(json).split(':')[2].split(',')[0]);
+      const preColor = String(json).split(':')[3].split(',')[0];
+      const color = preColor.slice(1, preColor.length-1);
+      const preUser = String(json).split(':')[4].split(',')[0];
+      const user = preUser.slice(1, preUser.length-1);
+      const preDate = String(json).split(':')[5];
+      const date = Number(preDate.slice(0, preDate.length-1));
+
+      const pixel = new Pixel(schema, `${coord_x}-${coord_y}`);
+      pixel.color = color;
+      pixel.user = user;
+      pixel.date = new Date(date);
+      
+      return pixel;
+    }
+
+    private async fetchMapRaw(): Promise<Pixel[]> {
+      let pixels = new Array<Pixel>();
+
+      let all;
+      all = await client.execute([
+          'KEYS', 'Pixel:*'
+      ]);
+
+      for(let i=0; i<all.length; i++) {
+        if (all[i] != 'Pixel:index:hash') {
+          pixels.push(await this.getJsonPixel(all[i]));
+        }
+      }
+
+      return pixels;
+    }
+
     async getMap(): Promise<Pixel[]> {
       this.repo = client.fetchRepository(schema);
-      return await this.repo.search().return.all();
+      return this.fetchMapRaw();
     }
 
     async getSinglePixel(pxl: GetSinglePixel): Promise<Pixel> {
@@ -78,8 +117,7 @@ export class PixelService {
             await this.placeSinglePixel(pixel);
           }
         }
-  
-        await this.pixelHistoryService.pushOnMySQL();
+        
       } catch(err) {
         logger.error(err);
       }

@@ -16,6 +16,10 @@ export class Game extends Entity {
     // In seconds
     timer: number;
 
+    isOperationReady: boolean;
+
+    isMapReady: boolean;
+
     private colors: string[];
 
     setColors(colors: string[]) {
@@ -67,5 +71,9 @@ export const game_schema = new Schema(Game, {
     timer: {type: 'number'},
 
     colors: {type: 'string[]'},
+
+    isOperationReady: {type: 'boolean'},
+
+    isMapReady: {type: 'boolean'}
 
 });

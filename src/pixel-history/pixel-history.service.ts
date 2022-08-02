@@ -5,15 +5,19 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { client } from 'src/app.service';
 import { UpdateGameMap } from 'src/event/dto/update-game-map.dto';
 import { StartGame } from 'src/game/dto/start-game.dto';
+import { Game, game_schema } from 'src/game/entity/game.entity';
 import { logger } from 'src/main';
 import { PixelEntity } from 'src/pixel/entity/pixel-sql.entity';
 import { Pixel } from 'src/pixel/entity/pixel.entity';
 import { DataSource, EntityManager, Repository } from 'typeorm';
+import { Repository as RedisRepository } from 'redis-om';
 import { PixelHistoryEntity } from './entity/pixel-history.entity';
 
 @Injectable()
 export class PixelHistoryService {
   
+  private gameRepo: RedisRepository<Game>;
+
   constructor(
     private dataSoucre: DataSource,
     @InjectRepository(PixelHistoryEntity) private pixelHistoRepo: Repository<PixelHistoryEntity>,
@@ -39,92 +43,6 @@ export class PixelHistoryService {
       'username', pxl.user,
       'date', pxl.date.toString()
     ]);
-  }
-
-
-
-  private async delStreams() {
-    let streams;
-    streams = await client.execute([
-      'KEYS', 'PixelHistory:*'
-    ]);
-
-    for(let stream of streams) {
-      await client.execute([
-        'DEL', stream
-      ]);
-    }
-  }
-  
-  private async getSinglePixelStream(pixelStream): Promise<Array<PixelHistoryEntity>> {
-    let stream;
-    stream = await client.execute([
-      'XRANGE', pixelStream,
-      '-', '+'
-    ]);
-
-    const history = new Array<PixelHistoryEntity>();
-
-    for(let i=0; i<stream.length; i++) {
-      const pixelHistoryRedis = stream[i][1];
-      const pixelHistory = new PixelHistoryEntity();
-      pixelHistory.pixelId = (await this.pixelRepo.findOne({where: {coord_x: pixelHistoryRedis[1], coord_y: pixelHistoryRedis[3]}})).pixelId;
-      pixelHistory.date = new Date(pixelHistoryRedis[9]);
-      pixelHistory.userId = pixelHistoryRedis[7];
-      pixelHistory.color = pixelHistoryRedis[5];
-      history.push(pixelHistory);
-    }
-
-    return history;
-  }
-
-  private async getPixels(): Promise<Array<PixelHistoryEntity[]>> {
-
-    let pixelHistory = new Array<PixelHistoryEntity[]>();
-
-    let streams;
-    streams = await client.execute([
-      'KEYS', 'PixelHistory:*'
-    ]);
-
-    for(let i=0; i<streams.length; i++) {
-      pixelHistory.push(await this.getSinglePixelStream(streams[i]));
-    }
-
-    return pixelHistory;
-  }
-
-  @Interval('pushOnMySQL', 30000)
-  async pushOnMySQL() {
-
-    const qRunner = this.dataSoucre.createQueryRunner();
-    await qRunner.connect();
-    await qRunner.startTransaction();
-
-    const pixels = await this.getPixels();
-
-    try {
-
-      for(let i=0; i<pixels.length; i++) {
-        for(let j=0; j<pixels[i].length; j++) {
-          const pixel: PixelHistoryEntity = pixels[i][j];
-
-          await qRunner.manager.save(pixel);
-        }
-      }
-  
-      await qRunner.commitTransaction();
-
-      await this.delStreams();
-    } catch (err) {
-      logger.debug(err);
-      // since we have errors lets rollback the changes we made
-      await qRunner.rollbackTransaction();
-      await this.delStreams();
-    } finally {
-      // you need to release a queryRunner which was manually instantiated
-      await qRunner.release();
-    }
   }
 
 
