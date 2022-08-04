@@ -6,6 +6,7 @@ import { StartGame } from 'src/game/dto/start-game.dto';
 import { logger } from 'src/main';
 import { PixelHistoryService } from 'src/pixel-history/pixel-history.service';
 import { GetSinglePixel } from './dto/get-single-pixel.dto';
+import { PixelAnon } from './dto/pixel-anon.dto';
 import { PlaceSinglePixel } from './dto/place-single-pixel.dto';
 import { Pixel, schema } from './entity/pixel.entity';
 
@@ -18,30 +19,20 @@ export class PixelService {
       private readonly pixelHistoryService: PixelHistoryService
     ) {}
 
-    private async getJsonPixel(pxl: string): Promise<Pixel> {
-      const json = await client.execute([
-        'JSON.GET', pxl
-      ])
+    private async getJsonPixel(pxl: string): Promise<PixelAnon> {
 
-      const coord_x = Number(String(json).split(':')[1].split(',')[0]);
-      const coord_y = Number(String(json).split(':')[2].split(',')[0]);
-      const preColor = String(json).split(':')[3].split(',')[0];
-      const color = preColor.slice(1, preColor.length-1);
-      const preUser = String(json).split(':')[4].split(',')[0];
-      const user = preUser.slice(1, preUser.length-1);
-      const preDate = String(json).split(':')[5];
-      const date = Number(preDate.slice(0, preDate.length-1));
+      const json = await client.jsonget(pxl);
 
-      const pixel = new Pixel(schema, `${coord_x}-${coord_y}`);
-      pixel.color = color;
-      pixel.user = user;
-      pixel.date = new Date(date);
+      const pixel = new PixelAnon();
+      pixel.coord_x = json['coord_x'];
+      pixel.coord_y = json['coord_y'];
+      pixel.color = json['color'];
       
       return pixel;
     }
 
-    private async fetchMapRaw(): Promise<Pixel[]> {
-      let pixels = new Array<Pixel>();
+    private async fetchMapRaw(): Promise<PixelAnon[]> {
+      let pixels = new Array<PixelAnon>();
 
       let all;
       all = await client.execute([
@@ -57,7 +48,7 @@ export class PixelService {
       return pixels;
     }
 
-    async getMap(): Promise<Pixel[]> {
+    async getMap(): Promise<PixelAnon[]> {
       this.repo = client.fetchRepository(schema);
       return this.fetchMapRaw();
     }

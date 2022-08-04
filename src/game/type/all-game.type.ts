@@ -1,4 +1,4 @@
 import { GameSpec } from "../type/game-spec.type";
-import { Pixel } from "../../pixel/entity/pixel.entity";
+import { PixelAnon } from "src/pixel/dto/pixel-anon.dto";
 
-export type AllGame = GameSpec & { map: Pixel[] };
+export type AllGame = GameSpec & { map: PixelAnon[] };

@@ -9,6 +9,7 @@ import { Roles } from '../user/decorator/roles.decorator';
 import { Role } from 'src/user/type/role.enum';
 import { RolesGuard } from 'src/user/guard/roles.guard';
 import { GameGuard } from 'src/game/guard/game.guard';
+import { PixelAnon } from './dto/pixel-anon.dto';
 
 @UseGuards(GameGuard)
 @Controller('pixel')
@@ -17,7 +18,7 @@ export class PixelController {
     constructor(private readonly pixelService: PixelService) {}
 
     @Get('map')
-    async getPixels(): Promise<Pixel[]> {
+    async getPixels(): Promise<PixelAnon[]> {
         let pixels = await this.pixelService.getMap();
         
         return pixels;

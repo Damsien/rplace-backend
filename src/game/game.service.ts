@@ -87,7 +87,7 @@ export class GameService {
         timer: game.timer,
         map: map,
         width: game.width,
-        colors: game.getColorsName()
+        colors: game.getColorsMap()
       };
     }
 
@@ -107,7 +107,7 @@ export class GameService {
       const allGame: Game = await this.repo.search().where('name').eq('Game').return.first();
       return {
         timer: userRedis.timer != null ? userRedis.timer : allGame.timer,
-        colors: userRedis.colors != null ? userRedis.colors : allGame.getColorsName()
+        colors: userRedis.colors != null ? userRedis.colors : allGame.getColorsMap()
       };
     }
 
