@@ -80,26 +80,26 @@ export class GameService {
       }
     }
 
-    async getGlobalGame(): Promise<AllGame> {
+    async getUserGameMap(user: UserPayload): Promise<AllGame> {
       this.repo = client.fetchRepository(game_schema);
+      const userRedis = await this.userService.getUserRedis(`${user.pscope}.${user.username}`);
       const game: Game = await this.repo.search().where('name').eq('Game').return.first();
       const map = await this.pixelService.getMap();
       return {
-        timer: game.timer,
+        timer: userRedis.timer != null ? userRedis.timer : game.timer,
         map: map,
         width: game.width,
-        colors: game.getColorsMap()
+        colors: userRedis.colors != null ? userRedis.colors : game.getColorsMap()
       };
     }
 
-    async getGlobalGameSpec(): Promise<ServerGameSpec> {
+    async getGlobalGameSpec(): Promise<GameSpec> {
       this.repo = client.fetchRepository(game_schema);
       const game: Game = await this.repo.search().where('name').eq('Game').return.first();
       return {
         timer: game.timer,
         width: game.width,
-        colors: game.getColorsName(),
-        isMapReady: game.isMapReady
+        colors: game.getColorsMap()
       };
     }
 
@@ -110,6 +110,18 @@ export class GameService {
       return {
         timer: userRedis.timer != null ? userRedis.timer : allGame.timer,
         colors: userRedis.colors != null ? userRedis.colors : allGame.getColorsMap()
+      };
+    }
+
+
+    async serverGetGlobalGameSpec(): Promise<ServerGameSpec> {
+      this.repo = client.fetchRepository(game_schema);
+      const game: Game = await this.repo.search().where('name').eq('Game').return.first();
+      return {
+        timer: game.timer,
+        width: game.width,
+        colors: game.getColorsName(),
+        isMapReady: game.isMapReady
       };
     }
 

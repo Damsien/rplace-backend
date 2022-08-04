@@ -22,7 +22,7 @@ export class PlacePixelGuard implements CanActivate {
         try {
             const pixel: PlaceSinglePixel = context.getArgs()[1];
             const userId = `${pixel.pscope}.${pixel.username}`;
-            const game = await this.gameService.getGlobalGameSpec();
+            const game = await this.gameService.serverGetGlobalGameSpec();
             const user: User = await userRepo.fetch(userId);
             const lastPlacedPixelDate = user.lastPlacedPixel;
             const offset = (user.timer == undefined ? game.timer : user.timer);

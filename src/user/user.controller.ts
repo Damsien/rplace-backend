@@ -17,9 +17,15 @@ export class UserController {
     }
     
     @HttpCode(200)
-    @Get('game-all')
-    getAllGame() {
-        return this.gameService.getGlobalGame();
+    @Get('game/all')
+    getAllGame(@Request() req) {
+        return this.gameService.getUserGameMap(req.user);
+    }
+
+    @HttpCode(200)
+    @Get('game/spec')
+    getAllGameSpec() {
+        return this.gameService.getGlobalGameSpec();
     }
 
 }
