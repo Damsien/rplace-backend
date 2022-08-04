@@ -53,7 +53,12 @@ export class UserService {
 
         return this.doUserHaveRightColor(options.colors, options.pixel.color) &&
             this.doUserHaveRightPlacement(options.pixel, options.game) &&
-            this.doUserHaveRightTime(options.date, options.lastPlacedPixelDate, options.offset);
+            this.doUserHaveRightTime(options.date, options.lastPlacedPixelDate, options.offset) &&
+            this.doMapIsReady(options.game);
+    }
+
+    private doMapIsReady(game) {
+        return game.isMapReady;
     }
 
     private doUserHaveRightPlacement(pixel: PlaceSinglePixel, game: GameSpec): boolean {

@@ -37,6 +37,11 @@ export class RunnerService {
 
     async increaseMapSize(newMap: UpdateGameMap) {
       this.gameRepo = client.fetchRepository(game_schema);
+      const game: Game = await this.gameRepo.search().where('name').eq('Game').return.first();
+
+      game.isMapReady = false;
+      await this.gameRepo.save(game);
+      
       try {
         const count = await this.pixelHistoryService.increaseMapSize(newMap);
 
@@ -65,8 +70,7 @@ export class RunnerService {
             }
           }
         }
-        
-        const game: Game = await this.gameRepo.search().where('name').eq('Game').return.first();
+
         game.width = newMap.width;
         await this.gameRepo.save(game);
 

@@ -15,6 +15,7 @@ import { AllGame } from './type/all-game.type';
 import { UserService } from 'src/user/user.service';
 import { UserSpec } from './type/user-spec';
 import { UpdateGame } from './dto/update-game.dto';
+import { ServerGameSpec } from './type/server-game-spec.dto';
 
 @Injectable()
 export class GameService {
@@ -91,14 +92,15 @@ export class GameService {
       };
     }
 
-    async getGlobalGameSpec(): Promise<GameSpec> {
+    async getGlobalGameSpec(): Promise<ServerGameSpec> {
       this.repo = client.fetchRepository(game_schema);
       const game: Game = await this.repo.search().where('name').eq('Game').return.first();
       return {
         timer: game.timer,
         width: game.width,
-        colors: game.getColorsName()
-      }
+        colors: game.getColorsName(),
+        isMapReady: game.isMapReady
+      };
     }
 
     async getUserGame(user: UserPayload): Promise<UserSpec> {
