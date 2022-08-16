@@ -35,6 +35,7 @@ export class AppService implements OnModuleInit {
         const game: Game = await this.gameRepo.search().where('name').eq('Game').return.first();
         if (game != undefined) {
             const gameStart = new StartGame();
+            gameStart.steps = game.getStepsMap();
             gameStart.colors = game.getColorsMap();
             gameStart.gameMasterUsername = game.user;
             gameStart.mapWidth = game.width;

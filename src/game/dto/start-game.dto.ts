@@ -9,6 +9,9 @@ export class StartGame {
     @IsArray()
     colors: string[];
 
+    @IsArray()
+    steps: string[];
+
     @IsInt()
     @Type(() => Number)
     timer: number;

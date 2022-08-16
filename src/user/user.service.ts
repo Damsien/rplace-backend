@@ -14,7 +14,7 @@ import { client } from 'src/app.service';
 import { Repository as RedisRepo } from 'redis-om';
 import { Repository } from 'typeorm';
 import { Pixel } from 'src/pixel/entity/pixel.entity';
-import { Grade } from 'src/user/type/grade.enum';
+import { Game, game_schema } from 'src/game/entity/game.entity';
 
 @Injectable()
 export class UserService {
@@ -73,23 +73,23 @@ export class UserService {
     }
 
 
-    private async setUserGrade(points: number, userRedis: User) {
+    private async setUserGrade(points: number, userRedis: User, game: Game) {
         const userEntity = await this.userRepo.findOneBy({userId: userRedis.entityId});
         
         switch (points) {
-            case Grade.STEP_ONE:
+            case Number(game.getStepsPoints()[0]):
                 userRedis.stickedPixelAvailable = 5;
                 userEntity.stickedPixelAvailable = 5;
                 break;
-            case Grade.STEP_TWO:
+            case Number(game.getStepsPoints()[1]):
                 userRedis.bombAvailable = 1;
                 userRedis.bombAvailable = 1;
                 break;
-            case Grade.STEP_THREE:
+            case Number(game.getStepsPoints()[2]):
                 userRedis.isUserGold = true;
                 userEntity.isUserGold = true;
                 break;
-            case Grade.STEP_FOUR:
+            case Number(game.getStepsPoints()[3]):
                 userRedis.stickedPixelAvailable += 5;
                 userEntity.stickedPixelAvailable += 5;
                 break;
@@ -102,10 +102,12 @@ export class UserService {
 
 
     async checkPoints(user: User) {
-        for (let [step, points] of Object.entries(Grade)) {
+        const game = await client.fetchRepository(game_schema)
+            .search().where('name').eq('Game').return.first();
+        for (let points of game.getStepsPoints()) {
             if (Number(points) <= user.pixelsPlaced+1) {
                 if (Number(points) > user.pixelsPlaced) {
-                    await this.setUserGrade(Number(points), user);
+                    await this.setUserGrade(Number(points), user, game);
                 }
             }
         }
