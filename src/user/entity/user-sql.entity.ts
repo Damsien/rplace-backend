@@ -22,4 +22,19 @@ export class UserEntity {
     })
     colors: string[] = null;
 
+    @Column({
+        nullable: true
+    })
+    stickedPixelAvailable: number;
+
+    @Column({
+        nullable: true
+    })
+    bombAvailable: number;
+
+    @Column({
+        nullable: true
+    })
+    isUserGold: boolean;
+
 }

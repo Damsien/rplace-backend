@@ -8,6 +8,14 @@ export class User extends Entity {
 
     colors: string[];
 
+    stickedPixelAvailable: number;
+
+    bombAvailable: number;
+
+    isUserGold: boolean;
+
+    pixelsPlaced: number;
+
 }
 
 export const user_schema = new Schema(User, {
@@ -16,6 +24,14 @@ export const user_schema = new Schema(User, {
 
     lastPlacedPixel: {type: 'date'},
 
-    colors: {type: 'string[]'}
+    colors: {type: 'string[]'},
+
+    stickedPixelAvailable: {type: 'number'},
+
+    bombAvailable: {type: 'number'},
+
+    isUserGold: {type: 'boolean'},
+
+    pixelsPlaced: {type: 'number'}
 
 });

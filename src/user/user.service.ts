@@ -13,6 +13,8 @@ import { User, user_schema } from './entity/user.entity';
 import { client } from 'src/app.service';
 import { Repository as RedisRepo } from 'redis-om';
 import { Repository } from 'typeorm';
+import { Pixel } from 'src/pixel/entity/pixel.entity';
+import { Grade } from 'src/user/type/grade.enum';
 
 @Injectable()
 export class UserService {
@@ -23,7 +25,8 @@ export class UserService {
     constructor(
         @InjectBrowser() private readonly browser: Browser,
         private readonly axios: HttpService,
-        @InjectRepository(UserEntity) private userRepo: Repository<UserEntity>
+        @InjectRepository(UserEntity) private userRepo: Repository<UserEntity>,
+        @InjectRepository(PixelHistoryEntity) private pixelHistoRepo: Repository<PixelHistoryEntity>
     ) {}
 
     async createUser(user: UserPayload) {
@@ -46,6 +49,68 @@ export class UserService {
         return await this.repo.fetch(id);
     }
 
+    async getUserRank(user: User): Promise<number> {
+        return client.fetchRepository(user_schema).search()
+            .where('pixelsPlaced').greaterThanOrEqualTo(user.pixelsPlaced).count();
+    }
+
+    async getUserFavColor(userId: string): Promise<string> {
+        const colors = await this.pixelHistoRepo.manager.createQueryBuilder(PixelHistoryEntity, 'pixel')
+            .select(['pixel.color']).addSelect('COUNT(pixel.color)', 'count')
+            .leftJoin('pixel.userId', 'user')
+            .where('pixel.userId = :userId', {userId: userId}).getRawMany();
+            // [{'color': 'green', 'count', '3'}, {'color': 'red', 'count', '6'}]
+        
+        let fav;
+        let count = 0;
+        for (let color of colors) {
+            if (Number(color['count']) >= count) {
+                count = color['count'];
+                fav = color['color'];
+            }
+        }
+        return fav;
+    }
+
+
+    private async setUserGrade(points: number, userRedis: User) {
+        const userEntity = await this.userRepo.findOneBy({userId: userRedis.entityId});
+        
+        switch (points) {
+            case Grade.STEP_ONE:
+                userRedis.stickedPixelAvailable = 5;
+                userEntity.stickedPixelAvailable = 5;
+                break;
+            case Grade.STEP_TWO:
+                userRedis.bombAvailable = 1;
+                userRedis.bombAvailable = 1;
+                break;
+            case Grade.STEP_THREE:
+                userRedis.isUserGold = true;
+                userEntity.isUserGold = true;
+                break;
+            case Grade.STEP_FOUR:
+                userRedis.stickedPixelAvailable += 5;
+                userEntity.stickedPixelAvailable += 5;
+                break;
+        }
+
+        userRedis.pixelsPlaced++;
+        await this.userRepo.save(userRedis);
+        await client.fetchRepository(user_schema).save(userRedis);
+    }
+
+
+    async checkPoints(user: User) {
+        for (let [step, points] of Object.entries(Grade)) {
+            if (Number(points) <= user.pixelsPlaced+1) {
+                if (Number(points) > user.pixelsPlaced) {
+                    await this.setUserGrade(Number(points), user);
+                }
+            }
+        }
+    }
+
 
     doUserIsRight(
         options: UserRightOptions
@@ -54,7 +119,12 @@ export class UserService {
         return this.doUserHaveRightColor(options.colors, options.pixel.color) &&
             this.doUserHaveRightPlacement(options.pixel, options.game) &&
             this.doUserHaveRightTime(options.date, options.lastPlacedPixelDate, options.offset) &&
-            this.doMapIsReady(options.game);
+            this.doMapIsReady(options.game) &&
+            this.doIsSticked(options.pixel, options.oldPixel, options.stickedPixelAvailable);
+    }
+
+    private doIsSticked(pixel: PlaceSinglePixel, oldPixel: Pixel, stickedPixelAvailable: number) {
+        return (stickedPixelAvailable > 0 && pixel.isSticked) || !oldPixel.isSticked;
     }
 
     private doMapIsReady(game) {

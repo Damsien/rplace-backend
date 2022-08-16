@@ -1,5 +1,5 @@
 import { Type } from "class-transformer";
-import { IsInt, IsString } from "class-validator";
+import { IsBoolean, IsInt, IsString } from "class-validator";
 
 export class PlaceSinglePixel {
 
@@ -19,5 +19,8 @@ export class PlaceSinglePixel {
 
     @IsString()
     pscope: string;
+
+    @IsBoolean()
+    isSticked: boolean;
 
 }

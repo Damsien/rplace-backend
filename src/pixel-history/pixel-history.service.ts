@@ -41,7 +41,8 @@ export class PixelHistoryService {
       'coord_y', pxl.coord_y,
       'color', pxl.color,
       'username', pxl.user,
-      'date', pxl.date.toString()
+      'date', pxl.date.toString(),
+      'isSticked', pxl.isSticked.toString()
     ]);
   }
 

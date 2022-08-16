@@ -24,4 +24,7 @@ export class PixelHistoryEntity {
     @JoinColumn({ name: "userId" })
     userId: string;
 
+    @Column()
+    isSticked: boolean;
+
 }

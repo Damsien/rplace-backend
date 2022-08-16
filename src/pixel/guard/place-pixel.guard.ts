@@ -7,6 +7,7 @@ import { User, user_schema } from "src/user/entity/user.entity";
 import { UserService } from "src/user/user.service";
 import { logger } from "../../main";
 import { PlaceSinglePixel } from "../dto/place-single-pixel.dto";
+import { Pixel, pixel_schema } from "../entity/pixel.entity";
 
 @Injectable()
 export class PlacePixelGuard implements CanActivate {
@@ -18,25 +19,38 @@ export class PlacePixelGuard implements CanActivate {
 
     async canActivate(context: ExecutionContext): Promise<boolean> {
         const userRepo = client.fetchRepository(user_schema);
+        const pixelRepo = client.fetchRepository(pixel_schema);
 
         try {
             const pixel: PlaceSinglePixel = context.getArgs()[1];
+            const oldPixel: Pixel = await pixelRepo.search()
+                .where('coord_x').eq(pixel.coord_x).and('coord_y').eq(pixel.coord_y)
+                .return.first();
             const userId = `${pixel.pscope}.${pixel.username}`;
             const game = await this.gameService.serverGetGlobalGameSpec();
             const user: User = await userRepo.fetch(userId);
             const lastPlacedPixelDate = user.lastPlacedPixel;
             const offset = (user.timer == undefined ? game.timer : user.timer);
             const colors = user.colors == null ? game.colors : [...game.colors, ...user.colors];
+            const stickedPixelsAvalaible = user.stickedPixelAvailable;
 
+            // Check if the user have right to place pixel
             let isRight = this.userService.doUserIsRight({
                 userId: userId,
                 pixel: pixel,
+                oldPixel: oldPixel,
+                stickedPixelAvailable: stickedPixelsAvalaible,
                 game: game,
                 date: new Date(),
                 lastPlacedPixelDate: lastPlacedPixelDate,
                 offset: offset,
                 colors: colors
             });
+
+            if (isRight) {
+                // Check user's point to upgrade is grade
+                this.userService.checkPoints(user);
+            }
 
             // white -> #FFFFFF
             pixel.color = await this.gameService.getAssociatedColor(pixel.color);

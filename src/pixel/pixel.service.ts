@@ -5,10 +5,11 @@ import { UserPayload } from 'src/auth/type/userpayload.type';
 import { StartGame } from 'src/game/dto/start-game.dto';
 import { logger } from 'src/main';
 import { PixelHistoryService } from 'src/pixel-history/pixel-history.service';
+import { user_schema } from 'src/user/entity/user.entity';
 import { GetSinglePixel } from './dto/get-single-pixel.dto';
 import { PixelAnon } from './dto/pixel-anon.dto';
 import { PlaceSinglePixel } from './dto/place-single-pixel.dto';
-import { Pixel, schema } from './entity/pixel.entity';
+import { Pixel, pixel_schema } from './entity/pixel.entity';
 
 @Injectable()
 export class PixelService {
@@ -49,12 +50,12 @@ export class PixelService {
     }
 
     async getMap(): Promise<PixelAnon[]> {
-      this.repo = client.fetchRepository(schema);
+      this.repo = client.fetchRepository(pixel_schema);
       return this.fetchMapRaw();
     }
 
     async getSinglePixel(pxl: GetSinglePixel): Promise<Pixel> {
-      this.repo = client.fetchRepository(schema);
+      this.repo = client.fetchRepository(pixel_schema);
       return await this.repo.search().where('coord_x').eq(pxl.coord_x).and('coord_y').eq(pxl.coord_y).return.first();
     }
 
@@ -66,7 +67,15 @@ export class PixelService {
       const userId = `${user.pscope}.${user.username}`;
       const now = new Date();
 
-      this.repo = client.fetchRepository(schema);
+      this.repo = client.fetchRepository(pixel_schema);
+
+      const userRepo = client.fetchRepository(user_schema);
+      let isUserGold = false;
+      try {
+        isUserGold = await (await userRepo.search().where('entityId').eq(userId).return.first()).isUserGold;
+      } catch(err) {
+        logger.debug('User unknown');
+      }
 
       // Create index for the Pixel entity if it's not existing
       // It's useful for RediSearch
@@ -81,6 +90,8 @@ export class PixelService {
       pixel.color = pxl.color;
       pixel.user = userId;
       pixel.date = now;
+      pixel.isSticked = pxl.isSticked;
+      pixel.isUserGold = isUserGold;
 
       this.repo.save(pixel);
 
@@ -92,7 +103,7 @@ export class PixelService {
     
 
     async startGame(game: StartGame) {
-      this.repo = client.fetchRepository(schema);
+      this.repo = client.fetchRepository(pixel_schema);
 
       try {
         const size = await this.pixelHistoryService.createMap(game.mapWidth);
@@ -105,6 +116,7 @@ export class PixelService {
             pixel.coord_y = j;
             pixel.pscope = 'root';
             pixel.username = game.gameMasterUsername;
+            pixel.isSticked = false;
             await this.placeSinglePixel(pixel);
           }
         }

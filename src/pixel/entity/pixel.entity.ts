@@ -9,10 +9,14 @@ export class Pixel extends Entity {
 
     user: string;
 
+    isUserGold: boolean;
+
     date: Date;
+
+    isSticked: boolean;
 }
 
-export const schema = new Schema(Pixel, {
+export const pixel_schema = new Schema(Pixel, {
     coord_x: {type: 'number'},
     coord_y: {type: 'number'},
 
@@ -20,7 +24,11 @@ export const schema = new Schema(Pixel, {
 
     user: {type: 'string'},
 
-    date: {type: 'date'}
+    isUserGold: {type: 'boolean'},
+
+    date: {type: 'date'},
+
+    isSticked: {type: 'boolean'}
 }, {
     dataStructure: 'JSON'
 });
