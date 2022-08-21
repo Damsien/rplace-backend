@@ -22,6 +22,11 @@ import { HttpModule } from '@nestjs/axios';
 import { RunnerModule } from './runner/runner.module';
 import { RunnerService } from './runner/runner.service';
 import { RunnerGateway } from './runner/runner.gateway';
+import { PatternModule } from './pattern/pattern.module';
+import { PatternShapeService } from './pattern-shape/pattern-shape.service';
+import { PatternShapeModule } from './pattern-shape/pattern-shape.module';
+import { PatternEntity } from './pattern/entity/pattern-sql.entity';
+import { PatternShapeEntity } from './pattern-shape/entity/pattern-shape-sql.entity';
 
 const ENV = process.env.NODE_ENV;
 
@@ -39,10 +44,10 @@ const ENV = process.env.NODE_ENV;
       username: process.env.MARIADB_USER,
       password: process.env.MARIADB_PASSWORD,
       database: process.env.MARIADB_DATABASE,
-      entities: [PixelEntity, PixelHistoryEntity, EventEntity, UserEntity],
+      entities: [PixelEntity, PixelHistoryEntity, EventEntity, UserEntity, PatternEntity, PatternShapeEntity],
       synchronize: true
     }),
-    TypeOrmModule.forFeature([EventEntity, PixelHistoryEntity, PixelEntity]),
+    TypeOrmModule.forFeature([EventEntity, PixelHistoryEntity, PixelEntity, PatternShapeEntity]),
     PixelHistoryModule,
     ScheduleModule.forRoot(),
     UserModule,
@@ -50,9 +55,20 @@ const ENV = process.env.NODE_ENV;
     GameModule,
     EventModule,
     HttpModule,
-    RunnerModule
+    RunnerModule,
+    PatternModule,
+    PatternShapeModule
   ],
   controllers: [AppController],
-  providers: [AppService, GameService, EventService, PixelService, PixelHistoryService, RunnerService, RunnerGateway],
+  providers: [
+    AppService,
+    GameService,
+    EventService,
+    PixelService,
+    PixelHistoryService,
+    RunnerService,
+    RunnerGateway,
+    PatternShapeService
+  ],
 })
 export class AppModule {}
