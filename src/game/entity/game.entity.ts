@@ -20,7 +20,7 @@ export class Game extends Entity {
 
     isMapReady: boolean;
 
-    // ['STEP_ONE:200', 'STEP_TWO:500', 'STEP_THREE:800', 'STEP_FOUR:1000']
+    // ["STEP_ONE:200", "STEP_TWO:500", "STEP_THREE:800", "STEP_FOUR:1000"]
     private steps: string[];
 
     setSteps(steps: string[]) {

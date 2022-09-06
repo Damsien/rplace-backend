@@ -56,6 +56,7 @@ export class RunnerService {
               pixel1.pscope = 'root';
               pixel1.username = newMap.gameMasterUsername;
               pixel1.isSticked = false;
+              pixel1.isUserGold = false;
               await this.pixelService.placeSinglePixel(pixel1);
               pixelArr.push(`${i} ${j}`);
             }
@@ -67,6 +68,7 @@ export class RunnerService {
               pixel2.pscope = 'root';
               pixel2.username = newMap.gameMasterUsername;
               pixel2.isSticked = false;
+              pixel2.isUserGold = false;
               await this.pixelService.placeSinglePixel(pixel2);
               pixelArr.push(`${j} ${i}`);
             }

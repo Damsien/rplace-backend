@@ -23,4 +23,7 @@ export class PlaceSinglePixel {
     @IsBoolean()
     isSticked: boolean;
 
+    @IsBoolean()
+    isUserGold: boolean;
+
 }

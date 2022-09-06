@@ -74,7 +74,8 @@ export class PixelService {
       try {
         isUserGold = await (await userRepo.search().where('entityId').eq(userId).return.first()).isUserGold;
       } catch(err) {
-        logger.debug('User unknown');
+        logger.debug('User unknown or root user');
+        isUserGold = false;
       }
 
       // Create index for the Pixel entity if it's not existing
@@ -117,6 +118,7 @@ export class PixelService {
             pixel.pscope = 'root';
             pixel.username = game.gameMasterUsername;
             pixel.isSticked = false;
+            pixel.isUserGold = false;
             await this.placeSinglePixel(pixel);
           }
         }
