@@ -86,6 +86,7 @@ export class GameService {
       const game: Game = await this.repo.search().where('name').eq('Game').return.first();
       const map = await this.pixelService.getMap();
       return {
+        lastPixelPlaced: userRedis.lastPlacedPixel,
         timer: userRedis.timer != null ? userRedis.timer : game.timer,
         map: map,
         width: game.width,
@@ -110,6 +111,7 @@ export class GameService {
       const rank = await this.userService.getUserRank(userRedis);
       const fav = await this.userService.getUserFavColor(userRedis.entityId);
       return {
+        lastPixelPlaced: userRedis.lastPlacedPixel,
         timer: userRedis.timer != null ? userRedis.timer : allGame.timer,
         colors: userRedis.colors != null ? userRedis.colors : allGame.getColorsMap(),
         pixelsPlaced: userRedis.pixelsPlaced,
