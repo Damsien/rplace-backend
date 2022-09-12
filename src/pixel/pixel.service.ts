@@ -70,11 +70,12 @@ export class PixelService {
       this.repo = client.fetchRepository(pixel_schema);
 
       const userRepo = client.fetchRepository(user_schema);
+      const userRedis = await userRepo.fetch(userId);
       let isUserGold = false;
       try {
-        isUserGold = await (await userRepo.search().where('entityId').eq(userId).return.first()).isUserGold;
+        isUserGold = userRedis.isUserGold;
       } catch(err) {
-        logger.debug('User unknown or root user');
+        logger.log('User unknown or root user');
         isUserGold = false;
       }
 

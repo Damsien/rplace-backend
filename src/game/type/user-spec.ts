@@ -1,4 +1,5 @@
 export type UserSpec = {
+    now: Date,
     lastPixelPlaced: Date,
     timer: number;
     colors: string[];
