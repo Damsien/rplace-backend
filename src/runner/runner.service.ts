@@ -109,7 +109,7 @@ export class RunnerService {
       await this.gameRepo.save(game);
 
       this.runnerGateway.sendGameEvent({
-        colors: Array.from(newColors.colors.keys())
+        colors: {colors: Object.fromEntries(newColors.colors)}
       });
     }
 
