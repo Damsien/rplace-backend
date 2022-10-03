@@ -13,14 +13,16 @@ import { User, user_schema } from './entity/user.entity';
 import { client } from 'src/app.service';
 import { Repository as RedisRepo } from 'redis-om';
 import { Repository } from 'typeorm';
-import { Pixel } from 'src/pixel/entity/pixel.entity';
+import { Pixel, pixel_schema } from 'src/pixel/entity/pixel.entity';
 import { Game, game_schema } from 'src/game/entity/game.entity';
+import { logger } from 'src/main';
 
 @Injectable()
 export class UserService {
     private static LOGIN_URL="https://authc.univ-toulouse.fr/login";
 
     private repo: RedisRepo<User>;
+    private pixelRepo: RedisRepo<Pixel>;
 
     constructor(
         @InjectBrowser() private readonly browser: Browser,
@@ -88,6 +90,13 @@ export class UserService {
             case Number(game.getStepsPoints()[2]):
                 userRedis.isUserGold = true;
                 userEntity.isUserGold = true;
+                // Update info in already placed pixels by the user in the redis db
+                this.pixelRepo = client.fetchRepository(pixel_schema);
+                const pixels = await this.pixelRepo.search().where('user').eq(userRedis.entityId).return.all();
+                for (let pixel of pixels) {
+                    pixel.isUserGold = true;
+                    await this.pixelRepo.save(pixel);
+                }
                 break;
             case Number(game.getStepsPoints()[3]):
                 userRedis.stickedPixelAvailable += 5;
@@ -95,8 +104,7 @@ export class UserService {
                 break;
         }
 
-        userRedis.pixelsPlaced++;
-        await this.userRepo.save(userRedis);
+        await this.userRepo.save(userEntity);
         await client.fetchRepository(user_schema).save(userRedis);
     }
 
@@ -104,11 +112,13 @@ export class UserService {
     async checkPoints(user: User) {
         const game = await client.fetchRepository(game_schema)
             .search().where('name').eq('Game').return.first();
+
+        user.pixelsPlaced++;
+        await client.fetchRepository(user_schema).save(user);
+
         for (let points of game.getStepsPoints()) {
-            if (Number(points) <= user.pixelsPlaced+1) {
-                if (Number(points) > user.pixelsPlaced) {
-                    await this.setUserGrade(Number(points), user, game);
-                }
+            if (Number(points) == user.pixelsPlaced) {
+                await this.setUserGrade(Number(points), user, game);
             }
         }
     }

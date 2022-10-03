@@ -33,6 +33,7 @@ export class LocalStrategy extends PassportStrategy(Strategy, 'local') {
         if (userRedis.isUserGold == null || userRedis.lastPlacedPixel == null) {
 
             userRedis.isUserGold = false;
+            userRedis.pixelsPlaced = 0;
 
             const gameRepo = client.fetchRepository(game_schema);
             const game: Game = await gameRepo.search().where('name').eq('Game').return.first();
