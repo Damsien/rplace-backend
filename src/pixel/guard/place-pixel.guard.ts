@@ -4,6 +4,7 @@ import { UserPayload } from "src/auth/type/userpayload.type";
 import { GameService } from "src/game/game.service";
 import { PixelHistoryService } from "src/pixel-history/pixel-history.service";
 import { User, user_schema } from "src/user/entity/user.entity";
+import { UserGateway } from "src/user/user.gateway";
 import { UserService } from "src/user/user.service";
 import { logger } from "../../main";
 import { PlaceSinglePixel } from "../dto/place-single-pixel.dto";
@@ -14,7 +15,8 @@ export class PlacePixelGuard implements CanActivate {
 
     constructor(
         private readonly userService: UserService,
-        private readonly gameService: GameService
+        private readonly gameService: GameService,
+        private readonly userGateway: UserGateway
     ) {}
 
     async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -50,6 +52,11 @@ export class PlacePixelGuard implements CanActivate {
             if (isRight) {
                 // Check user's point to upgrade is grade
                 this.userService.checkPoints(user);
+                if (pixel.isSticked) {
+                    user.stickedPixelAvailable--;
+                    await client.fetchRepository(user_schema).save(user);
+                    this.userGateway.sendUserEvent({stickedPixels: user.stickedPixelAvailable});
+                }
             }
 
             // white -> #FFFFFF

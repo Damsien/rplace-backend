@@ -91,7 +91,9 @@ export class GameService {
         timer: userRedis.timer != null ? userRedis.timer : game.timer,
         map: map,
         width: game.width,
-        colors: userRedis.colors != null ? userRedis.colors : game.getColorsMap()
+        colors: userRedis.colors != null ? userRedis.colors : game.getColorsMap(),
+        bombs: userRedis.bombAvailable,
+        stickedPixels: userRedis.stickedPixelAvailable
       };
     }
 

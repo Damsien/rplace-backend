@@ -16,6 +16,7 @@ import { Repository } from 'typeorm';
 import { Pixel, pixel_schema } from 'src/pixel/entity/pixel.entity';
 import { Game, game_schema } from 'src/game/entity/game.entity';
 import { logger } from 'src/main';
+import { UserGateway } from './user.gateway';
 
 @Injectable()
 export class UserService {
@@ -28,7 +29,8 @@ export class UserService {
         @InjectBrowser() private readonly browser: Browser,
         private readonly axios: HttpService,
         @InjectRepository(UserEntity) private userRepo: Repository<UserEntity>,
-        @InjectRepository(PixelHistoryEntity) private pixelHistoRepo: Repository<PixelHistoryEntity>
+        @InjectRepository(PixelHistoryEntity) private pixelHistoRepo: Repository<PixelHistoryEntity>,
+        private readonly userGateway: UserGateway
     ) {}
 
     async createUser(user: UserPayload) {
@@ -82,10 +84,12 @@ export class UserService {
             case Number(game.getStepsPoints()[0]):
                 userRedis.stickedPixelAvailable = 5;
                 userEntity.stickedPixelAvailable = 5;
+                this.userGateway.sendUserEvent({stickedPixels: userRedis.stickedPixelAvailable});
                 break;
             case Number(game.getStepsPoints()[1]):
                 userRedis.bombAvailable = 1;
                 userRedis.bombAvailable = 1;
+                this.userGateway.sendUserEvent({bombs: userRedis.bombAvailable});
                 break;
             case Number(game.getStepsPoints()[2]):
                 userRedis.isUserGold = true;
@@ -101,6 +105,7 @@ export class UserService {
             case Number(game.getStepsPoints()[3]):
                 userRedis.stickedPixelAvailable += 5;
                 userEntity.stickedPixelAvailable += 5;
+                this.userGateway.sendUserEvent({stickedPixels: userRedis.stickedPixelAvailable});
                 break;
         }
 

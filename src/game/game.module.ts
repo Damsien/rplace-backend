@@ -13,11 +13,12 @@ import { UserModule } from 'src/user/user.module';
 import { UserService } from 'src/user/user.service';
 import { HttpModule } from '@nestjs/axios';
 import { UserEntity } from 'src/user/entity/user-sql.entity';
+import { UserGateway } from 'src/user/user.gateway';
 
 @Module({
   imports: [PixelModule, PixelHistoryModule, UserModule,
     TypeOrmModule.forFeature([PixelEntity, PixelHistoryEntity, UserEntity]), AuthModule, HttpModule],
-  providers: [GameService, PixelService, PixelHistoryService, UserService],
+  providers: [GameService, PixelService, PixelHistoryService, UserService, UserGateway],
   controllers: [GameController]
 })
 export class GameModule {}

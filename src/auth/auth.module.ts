@@ -6,6 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { PixelHistoryEntity } from 'src/pixel-history/entity/pixel-history.entity';
 import { PixelEntity } from 'src/pixel/entity/pixel-sql.entity';
 import { UserEntity } from 'src/user/entity/user-sql.entity';
+import { UserGateway } from 'src/user/user.gateway';
 import { UserModule } from 'src/user/user.module';
 import { UserService } from 'src/user/user.service';
 import { AuthService } from './auth.service';
@@ -21,7 +22,7 @@ import { RtStrategy } from './strategy/rt.strategy';
     JwtModule.register({}),
     HttpModule
   ],
-  providers: [AuthService, LocalStrategy, AtStrategy, RtStrategy, UserService],
+  providers: [AuthService, LocalStrategy, AtStrategy, RtStrategy, UserService, UserGateway],
   exports: [AuthService]
 })
 export class AuthModule {}

@@ -10,6 +10,7 @@ import { PixelHistoryEntity } from 'src/pixel-history/entity/pixel-history.entit
 import { PixelHistoryModule } from 'src/pixel-history/pixel-history.module';
 import { PixelHistoryService } from 'src/pixel-history/pixel-history.service';
 import { UserEntity } from 'src/user/entity/user-sql.entity';
+import { UserGateway } from 'src/user/user.gateway';
 import { UserModule } from 'src/user/user.module';
 import { UserService } from 'src/user/user.service';
 import { PixelEntity } from './entity/pixel-sql.entity';
@@ -23,8 +24,9 @@ import { PixelService } from './pixel.service';
     HttpModule,
     TypeOrmModule.forFeature([PixelEntity, PixelHistoryEntity, UserEntity]),
     AuthModule,
+    UserModule
   ],
   controllers: [PixelController],
-  providers: [PixelService, PixelHistoryService, PixelGateway, AuthService, UserService, JwtService, GameService]
+  providers: [PixelService, PixelHistoryService, PixelGateway, AuthService, UserService, JwtService, GameService, UserGateway]
 })
 export class PixelModule {}

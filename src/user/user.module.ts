@@ -11,6 +11,7 @@ import { PixelService } from 'src/pixel/pixel.service';
 import { PixelHistoryEntity } from 'src/pixel-history/entity/pixel-history.entity';
 import { PixelEntity } from 'src/pixel/entity/pixel-sql.entity';
 import { PixelHistoryService } from 'src/pixel-history/pixel-history.service';
+import { UserGateway } from './user.gateway';
 
 @Module({
   imports: [
@@ -19,7 +20,7 @@ import { PixelHistoryService } from 'src/pixel-history/pixel-history.service';
     TypeOrmModule.forFeature([UserEntity, PixelEntity, PixelHistoryEntity]),
     forwardRef(() => PixelModule)
   ],
-  providers: [PixelService, UserService, GameService, PixelHistoryService],
+  providers: [PixelService, UserService, GameService, PixelHistoryService, UserGateway],
   exports: [UserService],
   controllers: [UserController]
 })
