@@ -1,4 +1,4 @@
-import { Body, Controller, Request, Put, UseGuards, Delete, HttpCode } from '@nestjs/common';
+import { Body, Controller, Request, Put, UseGuards, Delete, HttpCode, Query } from '@nestjs/common';
 import { AtAuthGuard } from 'src/auth/guard/at-auth.guard';
 import { GameGuard } from 'src/game/guard/game.guard';
 import { PlacePatternPixel } from './dto/place-pattern-pixel.dto';
@@ -16,13 +16,13 @@ export class PatternShapeController {
 
     @HttpCode(200)
     @Put('place')
-    placePixel(pixel: PlacePatternPixel) {
+    placePixel(@Body() pixel: PlacePatternPixel) {
         this.patternShapeService.place(pixel);
     }
 
     @HttpCode(200)
     @Delete('remove')
-    removePixel(@Body() pixel: RemovePatternPixel) {
+    removePixel(@Query() pixel: RemovePatternPixel) {
         this.patternShapeService.remove(pixel);
     }
 

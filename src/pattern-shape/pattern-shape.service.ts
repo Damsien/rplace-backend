@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { PatternShape } from 'src/pattern/dto/pattern-shape.dto';
 import { PixelEntity } from 'src/pixel/entity/pixel-sql.entity';
 import { Repository } from 'typeorm';
 import { PlacePatternPixel } from './dto/place-pattern-pixel.dto';
@@ -15,8 +16,25 @@ export class PatternShapeService {
     ) {}
 
 
-    async getPatternShape(patternId: number): Promise<PatternShapeEntity[]> {
-        return this.patternShapeRepo.findBy({patternId: patternId});
+    async getPatternShape(patternId: number): Promise<PatternShape[]> {
+        const patternShapesEntity = await this.patternShapeRepo.findBy({patternId: patternId});
+        const patternShapes: PatternShape[] = [];
+        let coord_x;
+        let coord_y;
+        let pixel: PixelEntity;
+        for (let pattern of patternShapesEntity) {
+            pixel = await this.pixelRepo.findOneBy({pixelId: pattern.pixelId});
+            coord_x = pixel.coord_x;
+            coord_y = pixel.coord_y;
+            patternShapes.push({
+                patternId: pattern.patternId,
+                patternShapeId: pattern.patternShapeId,
+                color: pattern.color,
+                coord_x: coord_x,
+                coord_y: coord_y
+            });
+        }
+        return patternShapes;
     }
 
     async place(pixel: PlacePatternPixel) {
