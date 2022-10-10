@@ -16,7 +16,7 @@ export class PatternShapeService {
     ) {}
 
 
-    async getPatternShape(patternId: number): Promise<PatternShape[]> {
+    async getPatternShape(patternId: string): Promise<PatternShape[]> {
         const patternShapesEntity = await this.patternShapeRepo.findBy({patternId: patternId});
         const patternShapes: PatternShape[] = [];
         let coord_x;

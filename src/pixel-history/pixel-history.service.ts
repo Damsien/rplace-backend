@@ -19,7 +19,7 @@ export class PixelHistoryService {
   private gameRepo: RedisRepository<Game>;
 
   constructor(
-    private dataSoucre: DataSource,
+    private dataSource: DataSource,
     @InjectRepository(PixelHistoryEntity) private pixelHistoRepo: Repository<PixelHistoryEntity>,
     @InjectRepository(PixelEntity) private pixelRepo: Repository<PixelEntity>
   ) {}
@@ -48,7 +48,7 @@ export class PixelHistoryService {
 
 
   async createMap(size: number): Promise<number> {
-    const qRunner = this.dataSoucre.createQueryRunner();
+    const qRunner = this.dataSource.createQueryRunner();
     await qRunner.connect();
     await qRunner.startTransaction();
 
@@ -81,7 +81,7 @@ export class PixelHistoryService {
   }
 
   async increaseMapSize(newMap: UpdateGameMap): Promise<number> {
-    const qRunner = this.dataSoucre.createQueryRunner();
+    const qRunner = this.dataSource.createQueryRunner();
     await qRunner.connect();
     await qRunner.startTransaction();
 

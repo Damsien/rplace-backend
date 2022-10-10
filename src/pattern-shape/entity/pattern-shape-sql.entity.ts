@@ -12,7 +12,7 @@ export class PatternShapeEntity {
     @Column()
     @ManyToOne(() => PatternEntity)
     @JoinColumn({ name: "patternId" })
-    patternId: number;
+    patternId: string;
 
     @Column()
     @ManyToOne(() => PixelEntity)

@@ -3,9 +3,8 @@ import { IsBoolean, IsInt, IsString } from "class-validator";
 
 export class PlacePatternPixel {
 
-    @IsInt()
-    @Type(() => Number)
-    patternId: number;
+    @IsString()
+    patternId: string;
 
     @IsInt()
     @Type(() => Number)

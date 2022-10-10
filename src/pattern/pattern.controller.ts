@@ -5,9 +5,10 @@ import { logger } from 'src/main';
 import { PatternShapeEntity } from 'src/pattern-shape/entity/pattern-shape-sql.entity';
 import { CreatePattern } from './dto/create-pattern.dto';
 import { PatternShape } from './dto/pattern-shape.dto';
-import { Pattern } from './dto/pattern.dto';
 import { PatternEntity } from './entity/pattern-sql.entity';
 import { PatternService } from './pattern.service';
+import { AllPatterns } from './type/all-patterns.type';
+import { Pattern } from './type/pattern.type';
 
 @UseGuards(GameGuard)
 @UseGuards(AtAuthGuard)
@@ -19,14 +20,15 @@ export class PatternController {
     ) {}
 
     @Get('/all')
-    getAllUserPatterns(@Request() req): Promise<Pattern[]> {
+    getAllUserPatterns(@Request() req): Promise<AllPatterns> {
         const userId = `${req.user.pscope}.${req.user.username}`;
         return this.patternService.getAllUserPatterns(userId);
     }
 
     @Get('/:id')
-    getPattern(@Param() params): Promise<PatternShape[]> {
-        return this.patternService.getPattern(params.id);
+    getPattern(@Request() req, @Param() params): Promise<PatternShape[]> {
+        const userId = `${req.user.pscope}.${req.user.username}`;
+        return this.patternService.getPattern(params.id, userId);
     }
 
     @HttpCode(201)
@@ -36,9 +38,11 @@ export class PatternController {
         return await this.patternService.createPattern(userId, createPatternDto.patternName);
     }
 
+    @HttpCode(200)
     @Delete('/:id')
-    async deletePattern(@Request() req, @Param() params) {
-        await this.patternService.deletePattern(params.id);
+    deletePattern(@Request() req, @Param() params): Promise<Pattern> {
+        const userId = `${req.user.pscope}.${req.user.username}`;
+        return this.patternService.deletePattern(params.id, userId);
     }
 
 }

@@ -3,9 +3,8 @@ import { IsInt, IsString } from "class-validator";
 
 export class RemovePatternPixel {
 
-    @IsInt()
-    @Type(() => Number)
-    patternId: number;
+    @IsString()
+    patternId: string;
 
     @IsInt()
     @Type(() => Number)

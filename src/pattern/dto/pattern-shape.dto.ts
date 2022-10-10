@@ -7,9 +7,8 @@ export class PatternShape {
     @Type(() => Number)
     patternShapeId: number;
 
-    @IsInt()
-    @Type(() => Number)
-    patternId: number;
+    @IsString()
+    patternId: string;
 
     @IsInt()
     @Type(() => Number)

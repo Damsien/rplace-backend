@@ -5,8 +5,8 @@ import { UserEntity } from "../../user/entity/user-sql.entity";
 @Entity()
 export class PatternEntity {
 
-    @PrimaryGeneratedColumn("increment")
-    patternId: number;
+    @PrimaryGeneratedColumn("identity")
+    patternId: string;
 
     @Column()
     name: string;
