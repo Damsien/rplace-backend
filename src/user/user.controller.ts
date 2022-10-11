@@ -11,9 +11,15 @@ export class UserController {
     constructor(private readonly gameService: GameService) {}
 
     @HttpCode(200)
-    @Get('game')
+    @Get('/spec')
     getUserGameSpec(@Request() req) {
         return this.gameService.getUserGame(req.user);
+    }
+
+    @HttpCode(200)
+    @Get('/username')
+    getUsername(@Request() req) {
+        return {pscope: req.user.pscope, username: req.user.username};
     }
     
     @HttpCode(200)

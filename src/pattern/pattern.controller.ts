@@ -33,7 +33,7 @@ export class PatternController {
 
     @HttpCode(201)
     @Post()
-    async createPattern(@Request() req, @Body() createPatternDto: CreatePattern) {
+    async createPattern(@Request() req, @Body() createPatternDto: CreatePattern): Promise<any> {
         const userId = `${req.user.pscope}.${req.user.username}`;
         return await this.patternService.createPattern(userId, createPatternDto.patternName);
     }

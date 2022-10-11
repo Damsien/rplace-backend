@@ -5,7 +5,7 @@ import { UserEntity } from "../../user/entity/user-sql.entity";
 @Entity()
 export class PatternEntity {
 
-    @PrimaryGeneratedColumn("identity")
+    @PrimaryGeneratedColumn("uuid")
     patternId: string;
 
     @Column()

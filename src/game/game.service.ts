@@ -111,19 +111,19 @@ export class GameService {
       this.repo = client.fetchRepository(game_schema);
       const userRedis = await this.userService.getUserRedis(`${user.pscope}.${user.username}`);
       const allGame: Game = await this.repo.search().where('name').eq('Game').return.first();
+      const steps = allGame.getStepsPoints();
       const rank = await this.userService.getUserRank(userRedis);
       const fav = await this.userService.getUserFavColor(userRedis.entityId);
       return {
-        now: new Date(),
-        lastPixelPlaced: userRedis.lastPlacedPixel,
-        timer: userRedis.timer != null ? userRedis.timer : allGame.timer,
-        colors: userRedis.colors != null ? userRedis.colors : allGame.getColorsMap(),
         pixelsPlaced: userRedis.pixelsPlaced,
         isGold: userRedis.isUserGold,
         bombs: userRedis.bombAvailable,
         stickedPixels: userRedis.stickedPixelAvailable,
         rank: rank,
-        favColor: fav
+        favColor: fav,
+        pscope: user.pscope,
+        username: user.username,
+        steps: steps
       };
     }
 

@@ -12,7 +12,7 @@ import { UserRightOptions } from './dto/UserRightOptions.dto';
 import { User, user_schema } from './entity/user.entity';
 import { client } from 'src/app.service';
 import { Repository as RedisRepo } from 'redis-om';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { Pixel, pixel_schema } from 'src/pixel/entity/pixel.entity';
 import { Game, game_schema } from 'src/game/entity/game.entity';
 import { logger } from 'src/main';
@@ -27,6 +27,7 @@ export class UserService {
 
     constructor(
         @InjectBrowser() private readonly browser: Browser,
+        private dataSource: DataSource,
         private readonly axios: HttpService,
         @InjectRepository(UserEntity) private userRepo: Repository<UserEntity>,
         @InjectRepository(PixelHistoryEntity) private pixelHistoRepo: Repository<PixelHistoryEntity>,
@@ -62,17 +63,20 @@ export class UserService {
         const colors = await this.pixelHistoRepo.manager.createQueryBuilder(PixelHistoryEntity, 'pixel')
             .select(['pixel.color']).addSelect('COUNT(pixel.color)', 'count')
             .leftJoin('pixel.userId', 'user')
-            .where('pixel.userId = :userId', {userId: userId}).getRawMany();
+            .where('pixel.userId = :userId', {userId: userId})
+            .groupBy('pixel.color')
+            .getRawMany();
             // [{'color': 'green', 'count', '3'}, {'color': 'red', 'count', '6'}]
-        
+
         let fav;
         let count = 0;
         for (let color of colors) {
             if (Number(color['count']) >= count) {
                 count = color['count'];
-                fav = color['color'];
+                fav = color['pixel_color'];
             }
         }
+
         return fav;
     }
 

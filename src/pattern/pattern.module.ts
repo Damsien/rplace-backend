@@ -4,6 +4,7 @@ import { PatternShapeEntity } from 'src/pattern-shape/entity/pattern-shape-sql.e
 import { PatternShapeModule } from 'src/pattern-shape/pattern-shape.module';
 import { PatternShapeService } from 'src/pattern-shape/pattern-shape.service';
 import { PixelEntity } from 'src/pixel/entity/pixel-sql.entity';
+import { PatternBindEntity } from './entity/pattern-bind-sql.entity';
 import { PatternEntity } from './entity/pattern-sql.entity';
 import { PatternController } from './pattern.controller';
 import { PatternService } from './pattern.service';
@@ -13,7 +14,7 @@ import { PatternService } from './pattern.service';
   providers: [PatternService, PatternShapeService],
   imports: [
     PatternShapeModule,
-    TypeOrmModule.forFeature([PatternEntity, PatternShapeEntity, PixelEntity])
+    TypeOrmModule.forFeature([PatternEntity, PatternShapeEntity, PixelEntity, PatternBindEntity])
   ]
 })
 export class PatternModule {}

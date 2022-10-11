@@ -20,11 +20,12 @@ export class PatternService {
     ) {}
 
 
-    async createPattern(userId: string, name: string) {
+    async createPattern(userId: string, name: string): Promise<any> {
         const pattern = new PatternEntity();
         pattern.userId = userId;
         pattern.name = name;
-        await this.patternRepo.insert(pattern);
+        const entity = await this.patternRepo.insert(pattern);
+        return entity.identifiers[0];
     }
 
     async deletePattern(patternId: string, userId: string): Promise<Pattern> {
@@ -53,14 +54,19 @@ export class PatternService {
             });
         }
 
-        const bindEnities = await this.dataSource.manager
-            .createQueryBuilder(PatternEntity, 'p')
-            .leftJoinAndSelect(PatternBindEntity, 'pb')
-            .where('pb.userId = :userId', { userId: userId })
-            .where('p.patternId = pb.patternId')
-            .getMany();
+        // const bindEntities = await this.dataSource.manager
+        //     .createQueryBuilder(PatternEntity, 'p')
+        //     .leftJoinAndSelect(PatternBindEntity, 'pb')
+        //     .where('pb.userId = :userId', { userId: userId })
+        //     .where('p.patternId = pb.patternId')
+        //     .getMany();
+        const bindEntities = await this.dataSource.query(`
+            SELECT * FROM pattern_entity 
+            INNER JOIN pattern_bind_entity ON pattern_entity.patternId = pattern_bind_entity.patternId 
+            WHERE pattern_bind_entity.userId = "${userId}";
+        `);
         const bind: Pattern[] = [];
-        for (let pattern of bindEnities) {
+        for (let pattern of bindEntities) {
             bind.push({
                 patternId: pattern.patternId,
                 name: pattern.name,
@@ -76,10 +82,12 @@ export class PatternService {
 
     async getPattern(id: string, userId: string): Promise<PatternShape[]> {
         try {
-            const patternBind = new PatternBindEntity();
-            patternBind.patternId = id;
-            patternBind.userId = userId;
-            await this.patternBindRepo.insert(patternBind);
+            if ((await this.patternRepo.findOneBy({patternId: id})).userId != userId) {
+                const patternBind = new PatternBindEntity();
+                patternBind.patternId = id;
+                patternBind.userId = userId;
+                await this.patternBindRepo.insert(patternBind);
+            }
         } catch (err) {
             logger.debug(err);
         }
