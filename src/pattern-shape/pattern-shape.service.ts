@@ -1,5 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { client } from 'src/app.service';
+import { game_schema } from 'src/game/entity/game.entity';
 import { PatternShape } from 'src/pattern/dto/pattern-shape.dto';
 import { PixelEntity } from 'src/pixel/entity/pixel-sql.entity';
 import { Repository } from 'typeorm';
@@ -28,7 +30,6 @@ export class PatternShapeService {
             coord_y = pixel.coord_y;
             patternShapes.push({
                 patternId: pattern.patternId,
-                patternShapeId: pattern.patternShapeId,
                 color: pattern.color,
                 coord_x: coord_x,
                 coord_y: coord_y
@@ -44,7 +45,12 @@ export class PatternShapeService {
         shape.pixelId = (await this.pixelRepo
             .findOneBy({coord_x: pixel.coord_x, coord_y: pixel.coord_y}))
             .pixelId;
-        await this.patternShapeRepo.insert(shape);
+        try {
+            await this.patternShapeRepo.insert(shape);
+        } catch(e) {
+            const lastShape = await this.patternShapeRepo.findOneBy({patternId: shape.patternId, pixelId: shape.pixelId});
+            await this.patternShapeRepo.update(lastShape, shape);
+        }
     }
 
     async remove(pixel: RemovePatternPixel) {

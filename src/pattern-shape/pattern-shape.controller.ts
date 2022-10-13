@@ -3,6 +3,7 @@ import { AtAuthGuard } from 'src/auth/guard/at-auth.guard';
 import { GameGuard } from 'src/game/guard/game.guard';
 import { PlacePatternPixel } from './dto/place-pattern-pixel.dto';
 import { RemovePatternPixel } from './dto/remove-pattern-pixel.dto';
+import { PatternShapeGuard } from './guard/pattern-shape-guard.guard';
 import { PatternShapeService } from './pattern-shape.service';
 
 @UseGuards(GameGuard)
@@ -14,6 +15,7 @@ export class PatternShapeController {
         private readonly patternShapeService: PatternShapeService
     ) {}
 
+    @UseGuards(PatternShapeGuard)
     @HttpCode(200)
     @Put('place')
     placePixel(@Body() pixel: PlacePatternPixel) {

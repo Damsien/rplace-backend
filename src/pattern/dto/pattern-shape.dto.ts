@@ -3,10 +3,6 @@ import { IsInt, IsString } from "class-validator";
 
 export class PatternShape {
 
-    @IsInt()
-    @Type(() => Number)
-    patternShapeId: number;
-
     @IsString()
     patternId: string;
 

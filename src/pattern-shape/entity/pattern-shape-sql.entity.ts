@@ -1,20 +1,17 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
 import { PixelEntity } from "../../pixel/entity/pixel-sql.entity";
 import { PatternEntity } from "../../pattern/entity/pattern-sql.entity";
 
 
 @Entity()
 export class PatternShapeEntity {
-
-    @PrimaryGeneratedColumn("increment")
-    patternShapeId: number;
-
-    @Column()
+    
+    @PrimaryColumn()
     @ManyToOne(() => PatternEntity)
     @JoinColumn({ name: "patternId" })
     patternId: string;
 
-    @Column()
+    @PrimaryColumn()
     @ManyToOne(() => PixelEntity)
     @JoinColumn({ name: "userId" })
     pixelId: number;
