@@ -15,8 +15,8 @@ export class UserController {
     @Get('/:id')
     getOtherUserSpec(@Param('id') id: string) {
         const user: UserPayload = {
-          pscope: id.split('.')[0],
-          username: id.split('.')[1],
+          pscope: id.split('-')[0],
+          username: id.split('-')[1],
         };
         return this.gameService.getUserGame(user);
     }
