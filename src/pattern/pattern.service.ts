@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { logger } from 'src/main';
 import { PatternShapeService } from 'src/pattern-shape/pattern-shape.service';
@@ -24,8 +24,13 @@ export class PatternService {
         const pattern = new PatternEntity();
         pattern.userId = userId;
         pattern.name = name;
-        const entity = await this.patternRepo.insert(pattern);
-        return entity.identifiers[0];
+        const regex = /^[^\/|^\n]+$/;
+        if (name.match(regex)) {
+            const entity = await this.patternRepo.insert(pattern);
+            return entity.identifiers[0];
+        } else {
+            throw new BadRequestException();
+        }
     }
 
     async deletePattern(patternId: string, userId: string): Promise<Pattern> {
