@@ -1,5 +1,6 @@
-import { Controller, Get, HttpCode, Request, UseGuards } from '@nestjs/common';
+import { Controller, Get, HttpCode, Param, Request, UseGuards } from '@nestjs/common';
 import { AtAuthGuard } from 'src/auth/guard/at-auth.guard';
+import { UserPayload } from 'src/auth/type/userpayload.type';
 import { GameService } from 'src/game/game.service';
 import { GameGuard } from 'src/game/guard/game.guard';
 
@@ -9,6 +10,16 @@ import { GameGuard } from 'src/game/guard/game.guard';
 export class UserController {
 
     constructor(private readonly gameService: GameService) {}
+
+    @HttpCode(200)
+    @Get('/:id')
+    getOtherUserSpec(@Param('id') id: string) {
+        const user: UserPayload = {
+          pscope: id.split('.')[0],
+          username: id.split('.')[1],
+        };
+        return this.gameService.getUserGame(user);
+    }
 
     @HttpCode(200)
     @Get('/spec')
