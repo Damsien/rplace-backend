@@ -12,7 +12,7 @@ export class UserController {
     constructor(private readonly gameService: GameService) {}
 
     @HttpCode(200)
-    @Get('/:id')
+    @Get('/other/:id')
     getOtherUserSpec(@Param('id') id: string) {
         const user: UserPayload = {
           pscope: id.split('-')[0],
