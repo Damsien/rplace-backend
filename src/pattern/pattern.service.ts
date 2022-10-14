@@ -36,6 +36,7 @@ export class PatternService {
     async deletePattern(patternId: string, userId: string): Promise<Pattern> {
         const pattern = await this.patternRepo.findOneBy({patternId: patternId});
         if (pattern.userId == userId) {
+            await this.patternShapeService.removeAll(patternId);
             await this.patternRepo.remove(pattern);
         } else {
             const patternBind = await this.patternBindRepo.findOneBy({patternId: patternId, userId: userId});

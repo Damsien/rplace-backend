@@ -60,4 +60,8 @@ export class PatternShapeService {
         await this.patternShapeRepo.delete({patternId: pixel.patternId, pixelId: pixelId});
     }
 
+    async removeAll(patternId: string) {
+        await this.patternShapeRepo.delete({patternId: patternId});
+    }
+
 }

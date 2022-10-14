@@ -1,9 +1,10 @@
 import { Type } from "class-transformer";
-import { IsBoolean, IsInt, IsString } from "class-validator";
+import { IsBoolean, IsInt, IsOptional, IsString } from "class-validator";
 
 export class PlacePatternPixel {
 
     @IsString()
+    @IsOptional()
     patternId: string;
 
     @IsInt()
