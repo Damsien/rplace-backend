@@ -1,5 +1,7 @@
 import { Type } from "class-transformer";
 import { IsArray, IsDate, IsInt, IsNumber, IsString } from "class-validator";
+import { Color } from "../type/color.type";
+import { Step } from "../type/step.type";
 
 export class StartGame {
 
@@ -7,10 +9,10 @@ export class StartGame {
     gameMasterUsername: string;
 
     @IsArray()
-    colors: string[];
+    colors: Color[];
 
     @IsArray()
-    steps: string[];
+    steps: Step[];
 
     @IsInt()
     @Type(() => Number)

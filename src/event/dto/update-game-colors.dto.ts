@@ -1,6 +1,7 @@
+import { Color } from "src/game/type/color.type";
 
 export class UpdateGameColors {
 
-    colors: Map<string, string>;
+    colors: Color[];
     
 }

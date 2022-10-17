@@ -19,8 +19,8 @@ export class EventEntity {
     })
     type: EventType;
 
-    @Column('simple-array')
-    values: string[];
+    @Column('text')
+    values: string;
 
     @Column()
     schedule: Date;

@@ -13,9 +13,9 @@ import { UserPayload } from 'src/auth/type/userpayload.type';
 import { GameSpec } from './type/game-spec.type';
 import { AllGame } from './type/all-game.type';
 import { UserService } from 'src/user/user.service';
-import { UserSpec } from './type/user-spec';
+import { UserSpec } from './type/user-spec.type';
 import { UpdateGame } from './dto/update-game.dto';
-import { ServerGameSpec } from './type/server-game-spec.dto';
+import { ServerGameSpec } from './type/server-game-spec.type';
 
 @Injectable()
 export class GameService {
@@ -91,7 +91,7 @@ export class GameService {
         timer: userRedis.timer != null ? userRedis.timer : game.timer,
         map: map,
         width: game.width,
-        colors: userRedis.colors != null ? userRedis.colors : game.getColorsMap(),
+        colors: userRedis.getColors() != null ? [...game.getColors(), ...userRedis.getColors()] : game.getColors(),
         bombs: userRedis.bombAvailable,
         stickedPixels: userRedis.stickedPixelAvailable
       };
@@ -103,7 +103,7 @@ export class GameService {
       return {
         timer: game.timer,
         width: game.width,
-        colors: game.getColorsMap()
+        colors: game.getColors()
       };
     }
 
@@ -111,7 +111,7 @@ export class GameService {
       this.repo = client.fetchRepository(game_schema);
       const userRedis = await this.userService.getUserRedis(`${user.pscope}.${user.username}`);
       const allGame: Game = await this.repo.search().where('name').eq('Game').return.first();
-      const steps = allGame.getStepsPoints();
+      const steps = allGame.getSteps();
       const rank = await this.userService.getUserRank(userRedis);
       const fav = await this.userService.getUserFavColor(userRedis.entityId);
       return {

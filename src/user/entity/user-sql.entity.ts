@@ -15,16 +15,6 @@ export class UserEntity {
     @Column({
         nullable: true
     })
-    timer: number = null;
-
-    @Column("simple-array", {
-        nullable: true
-    })
-    colors: string[] = null;
-
-    @Column({
-        nullable: true
-    })
     stickedPixelAvailable: number;
 
     @Column({

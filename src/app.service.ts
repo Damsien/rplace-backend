@@ -35,8 +35,8 @@ export class AppService implements OnModuleInit {
         const game: Game = await this.gameRepo.search().where('name').eq('Game').return.first();
         if (game != undefined) {
             const gameStart = new StartGame();
-            gameStart.steps = game.getStepsMap();
-            gameStart.colors = game.getColorsMap();
+            gameStart.steps = game.getSteps();
+            gameStart.colors = game.getColors();
             gameStart.gameMasterUsername = game.user;
             gameStart.mapWidth = game.width;
             gameStart.timer = game.timer;
@@ -57,7 +57,7 @@ export class AppService implements OnModuleInit {
             for (let event of events) {
                 const eventReg = new EventRegister();
                 eventReg.type = event.type;
-                eventReg.values = event.values;
+                eventReg.values = JSON.parse(event.values);
                 eventReg.schedule = event.schedule;
                 const pscope = event.userId.split('.')[0];
                 const username = event.userId.split('.')[1];

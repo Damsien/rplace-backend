@@ -8,8 +8,7 @@ export class EventRegister {
     @IsEnum(EventType)
     type: EventType;
 
-    @IsArray()
-    values: string[];
+    values: {};
 
     @IsDate()
     @IsOptional()

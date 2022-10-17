@@ -33,7 +33,7 @@ export class PlacePixelGuard implements CanActivate {
             const user: User = await userRepo.fetch(userId);
             const lastPlacedPixelDate = user.lastPlacedPixel;
             const offset = (user.timer == undefined ? game.timer : user.timer);
-            const colors = user.colors == null ? game.colors : [...game.colors, ...user.colors];
+            const colors = user.getColorsName() == null ? game.colors : [...game.colors, ...user.getColorsName()];
             const stickedPixelsAvalaible = user.stickedPixelAvailable;
 
             // Check if the user have right to place pixel
@@ -60,7 +60,7 @@ export class PlacePixelGuard implements CanActivate {
             }
 
             // white -> #FFFFFF
-            pixel.color = await this.gameService.getAssociatedColor(pixel.color);
+            pixel.color = (await this.gameService.getAssociatedColor(pixel.color)) ?? (await this.userService.getAssociatedColor(pixel.color, userId));
 
             return isRight;
 

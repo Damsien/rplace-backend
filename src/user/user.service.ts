@@ -17,6 +17,8 @@ import { Pixel, pixel_schema } from 'src/pixel/entity/pixel.entity';
 import { Game, game_schema } from 'src/game/entity/game.entity';
 import { logger } from 'src/main';
 import { UserGateway } from './user.gateway';
+import { Step, StepType } from 'src/game/type/step.type';
+import { Color } from 'src/game/type/color.type';
 
 @Injectable()
 export class UserService {
@@ -81,36 +83,64 @@ export class UserService {
     }
 
 
+    async getAssociatedColor(name: string, userId: string) {
+        this.repo = client.fetchRepository(user_schema);
+        const user: User = await this.repo.fetch(userId);
+        return user.getHexFromName(name);
+    }
+
+
     private async setUserGrade(points: number, userRedis: User, game: Game) {
         const userEntity = await this.userRepo.findOneBy({userId: userRedis.entityId});
-        
-        switch (points) {
-            case Number(game.getStepsPoints()[0]):
-                userRedis.stickedPixelAvailable = 5;
-                userEntity.stickedPixelAvailable = 5;
+
+        const step: Step = game.getStepFromPoints(points);
+        let value;
+
+        switch (step.type) {
+
+            case StepType.STICKED_PIXEL: {
+                value = step.value['stickedPixels'];
+                userRedis.stickedPixelAvailable = value;
+                userEntity.stickedPixelAvailable = value;
                 this.userGateway.sendUserEvent({stickedPixels: userRedis.stickedPixelAvailable});
-                break;
-            case Number(game.getStepsPoints()[1]):
-                userRedis.bombAvailable = 1;
-                userRedis.bombAvailable = 1;
+            } break;
+
+            case StepType.BOMB: {
+                value = step.value['bombs'];
+                userRedis.bombAvailable = value;
+                userRedis.bombAvailable = value;
                 this.userGateway.sendUserEvent({bombs: userRedis.bombAvailable});
-                break;
-            case Number(game.getStepsPoints()[2]):
-                userRedis.isUserGold = true;
-                userEntity.isUserGold = true;
+            } break;
+
+            case StepType.GOLD_NAME: {
+                value = step.value['isUserGold'];
+                userRedis.isUserGold = value;
+                userEntity.isUserGold = value;
                 // Update info in already placed pixels by the user in the redis db
                 this.pixelRepo = client.fetchRepository(pixel_schema);
                 const pixels = await this.pixelRepo.search().where('user').eq(userRedis.entityId).return.all();
                 for (let pixel of pixels) {
-                    pixel.isUserGold = true;
+                    pixel.isUserGold = value;
                     await this.pixelRepo.save(pixel);
                 }
-                break;
-            case Number(game.getStepsPoints()[3]):
-                userRedis.stickedPixelAvailable += 5;
-                userEntity.stickedPixelAvailable += 5;
-                this.userGateway.sendUserEvent({stickedPixels: userRedis.stickedPixelAvailable});
-                break;
+            } break;
+
+            case StepType.TIMER: {
+                value = step.value['timer'];
+                userRedis.timer = value;
+                this.userGateway.sendUserEvent({timer: userRedis.timer});
+            } break;
+
+            case StepType.COLOR: {
+                value = step.value['colors'];
+                try {
+                    userRedis.addColors(value);
+                } catch(err) {
+                    userRedis.setColors(value);
+                }
+                this.userGateway.sendUserEvent({colors: userRedis.getColors()});
+            } break;
+
         }
 
         await this.userRepo.save(userEntity);
@@ -126,8 +156,8 @@ export class UserService {
         await client.fetchRepository(user_schema).save(user);
 
         for (let points of game.getStepsPoints()) {
-            if (Number(points) == user.pixelsPlaced) {
-                await this.setUserGrade(Number(points), user, game);
+            if (points == user.pixelsPlaced) {
+                await this.setUserGrade(points, user, game);
             }
         }
     }
@@ -164,8 +194,8 @@ export class UserService {
         return date.getTime() - lastPixelDate.getTime() >= offset *1000;
     }
 
-    private doUserHaveRightColor(colors: Array<string>, color: string): boolean {
-        return colors.includes(color);
+    private doUserHaveRightColor(colors: Array<String>, color: string): boolean {
+        return colors.find((el) => el.includes(color)) !== undefined;
     }
 
 

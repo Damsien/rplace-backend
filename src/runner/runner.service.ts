@@ -26,15 +26,6 @@ export class RunnerService {
         private readonly runnerGateway: RunnerGateway
     ) {}
 
-
-    private getAssociatedValue(wantedValue: string, values: string[]): string {
-      let val;
-      values.forEach(el => {
-        if (wantedValue.includes(el.split(':')[0])) val = el.split(':')[1];
-      });
-      return val;
-    }
-
     async increaseMapSize(newMap: UpdateGameMap) {
       this.gameRepo = client.fetchRepository(game_schema);
       const game: Game = await this.gameRepo.search().where('name').eq('Game').return.first();
@@ -101,15 +92,11 @@ export class RunnerService {
     async updateColors(newColors: UpdateGameColors) {
       this.gameRepo = client.fetchRepository(game_schema);
       const game: Game = await this.gameRepo.search().where('name').eq('Game').return.first();
-      let colors = [];
-      for(let color of newColors.colors.entries()) {
-        colors.push(`${color[0]}:${color[1]}`);
-      }
-      game.setColors(colors);
+      game.setColors(newColors.colors);
       await this.gameRepo.save(game);
 
       this.runnerGateway.sendGameEvent({
-        colors: {colors: Object.fromEntries(newColors.colors)}
+        colors: newColors.colors
       });
     }
 
@@ -125,8 +112,8 @@ export class RunnerService {
     */
     register_increaseMap(event: EventRegister): UpdateGameMap {
         const val = new UpdateGameMap();
-        val.gameMasterUsername = this.getAssociatedValue('gameMasterUsername', event.values);
-        val.width = parseInt(this.getAssociatedValue('width', event.values));
+        val.gameMasterUsername = event.values['gameMasterUsername'];
+        val.width = event.values['width'];
         return val;
     }
 
@@ -139,7 +126,7 @@ export class RunnerService {
     */
     register_updateTimer(event: EventRegister): UpdateGameTimer {
       const val = new UpdateGameTimer();
-      val.timer = parseInt(this.getAssociatedValue('timer', event.values));
+      val.timer = event.values['timer'];
       return val;
     }
 
@@ -152,9 +139,12 @@ export class RunnerService {
     */
     register_updateColors(event: EventRegister): UpdateGameColors {
       const val = new UpdateGameColors();
-      val.colors = new Map<string, string>();
-      for(let color of event.values) {
-        val.colors.set(color.split(':')[0], color.split(':')[1]);
+      val.colors = [];
+      for(let color of event.values['colors']) {
+        val.colors.push({
+          'name': color.name,
+          'hex': color.hex
+        });
       }
       return val;
     }

@@ -27,7 +27,7 @@ export class EventController {
         const eventEntity = new EventEntity();
         eventEntity.type = event.type;
         eventEntity.userId = `${req.user.pscope}.${req.user.username}`;
-        eventEntity.values = event.values;
+        eventEntity.values = JSON.stringify(event.values);
         eventEntity.schedule = event.schedule;
         
         await this.eventRepo.insert(eventEntity);
