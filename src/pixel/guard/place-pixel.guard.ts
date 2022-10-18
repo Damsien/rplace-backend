@@ -51,11 +51,12 @@ export class PlacePixelGuard implements CanActivate {
 
             if (isRight) {
                 // Check user's point to upgrade is grade
-                this.userService.checkPoints(user);
+                const socket = context.getArgs()[2];
+                this.userService.checkPoints(socket, user);
                 if (pixel.isSticked) {
                     user.stickedPixelAvailable--;
                     await client.fetchRepository(user_schema).save(user);
-                    this.userGateway.sendUserEvent({stickedPixels: user.stickedPixelAvailable});
+                    this.userGateway.sendUserEvent(socket, {stickedPixels: user.stickedPixelAvailable});
                 }
             }
 

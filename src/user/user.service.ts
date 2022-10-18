@@ -19,6 +19,7 @@ import { logger } from 'src/main';
 import { UserGateway } from './user.gateway';
 import { Step, StepType } from 'src/game/type/step.type';
 import { Color } from 'src/game/type/color.type';
+import { Socket } from 'socket.io';
 
 @Injectable()
 export class UserService {
@@ -90,7 +91,7 @@ export class UserService {
     }
 
 
-    private async setUserGrade(points: number, userRedis: User, game: Game) {
+    private async setUserGrade(points: number, userRedis: User, game: Game, socket: Socket) {
         const userEntity = await this.userRepo.findOneBy({userId: userRedis.entityId});
 
         const step: Step = game.getStepFromPoints(points);
@@ -102,14 +103,14 @@ export class UserService {
                 value = step.value['stickedPixels'];
                 userRedis.stickedPixelAvailable = value;
                 userEntity.stickedPixelAvailable = value;
-                this.userGateway.sendUserEvent({stickedPixels: userRedis.stickedPixelAvailable});
+                this.userGateway.sendUserEvent(socket, {stickedPixels: userRedis.stickedPixelAvailable});
             } break;
 
             case StepType.BOMB: {
                 value = step.value['bombs'];
                 userRedis.bombAvailable = value;
                 userRedis.bombAvailable = value;
-                this.userGateway.sendUserEvent({bombs: userRedis.bombAvailable});
+                this.userGateway.sendUserEvent(socket, {bombs: userRedis.bombAvailable});
             } break;
 
             case StepType.GOLD_NAME: {
@@ -128,7 +129,7 @@ export class UserService {
             case StepType.TIMER: {
                 value = step.value['timer'];
                 userRedis.timer = value;
-                this.userGateway.sendUserEvent({timer: userRedis.timer});
+                this.userGateway.sendUserEvent(socket, {timer: userRedis.timer});
             } break;
 
             case StepType.COLOR: {
@@ -138,7 +139,7 @@ export class UserService {
                 } catch(err) {
                     userRedis.setColors(value);
                 }
-                this.userGateway.sendUserEvent({colors: userRedis.getColors()});
+                this.userGateway.sendUserEvent(socket, {colors: userRedis.getColors()});
             } break;
 
         }
@@ -148,7 +149,7 @@ export class UserService {
     }
 
 
-    async checkPoints(user: User) {
+    async checkPoints(socket: Socket, user: User) {
         const game = await client.fetchRepository(game_schema)
             .search().where('name').eq('Game').return.first();
 
@@ -157,7 +158,7 @@ export class UserService {
 
         for (let points of game.getStepsPoints()) {
             if (points == user.pixelsPlaced) {
-                await this.setUserGrade(points, user, game);
+                await this.setUserGrade(points, user, game, socket);
             }
         }
     }
@@ -195,7 +196,7 @@ export class UserService {
     }
 
     private doUserHaveRightColor(colors: Array<String>, color: string): boolean {
-        return colors.find((el) => el.includes(color)) !== undefined;
+        return colors.find((el) => el == color) !== undefined;
     }
 
 
