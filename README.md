@@ -29,7 +29,7 @@ Run Redis-stack database first in a terminal.
 Redis-stack implements RedisJSON and RediSearch that's modules we use.
 ```bash
 # run redis database
-$ docker run -d --name redis-stack -p 6379:6379 -p 8001:8001 redis/redis-stack:latest
+docker run -d --name redis-stack -p 6379:6379 -p 8001:8001 redis/redis-stack:latest
 ```
 Got to `localhost:8001` to manage data with Redis Insight.
 
@@ -54,16 +54,37 @@ Make call on api with `localhost:3000`.
 
 ### Redis structure
 
-![rplace data structure redis side](rplace-backend-redis-global.png)
+![rplace data structure redis side](images/rplace-backend-redis-global.png)
 
 The game is an entity usable in the code.
 
-![rplace game data redis side](rplace-backend-redis-game.png)
+![rplace game data redis side](images/rplace-backend-redis-game.png)
 
 ### MariaDb structure
 
-![rplace game data mariadb side](rplace-backend-mariadb.png)
+![rplace game data mariadb side](images/rplace-backend-mariadb-pixel-user.png)
+
+![rplace game data mariadb side pattern](images/rplace-backend-mariadb-pattern.png)
 
 ### Global structure (redis and mariadb)
 
-![rplace data structure global](rplace-backend-redis-mariadb.png)
+![rplace data structure global](images/rplace-backend-redis-mariadb.png)
+
+## Middlewares / guards
+
+Guards are used as middleware to allow user to do actions or not. These are the guards used for this application :
+
+**Authentication**
+- Local : allow connexion for a user thanks to the Toulouse Univ C.A.S and create a JWT
+- Access token : allow connexion for a user with it's JWT access token
+- Refresh token : allow connexion for a user with it's JWT refrsh token and create a new JWT
+- Websocket : allow connexion for a user with it's JWT access token through socket io
+
+**Pixel**
+- Place pixel : allow user to place pixel depending on when the last pixel he places was placed, the timer (because it can be different from the global game timer), the color (user can have different colors available from the global game colors), the coordinates, the kind (sticked or not) and if the map is ready
+
+**User**
+- Role : used by game service, allow the user to interact with the game (start, stop, create and delete events) if the role is ADMIN
+
+**Event**
+- Role : check if the user is ADMIN
