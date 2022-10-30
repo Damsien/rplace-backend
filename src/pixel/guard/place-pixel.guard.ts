@@ -15,11 +15,11 @@ export class PlacePixelGuard implements CanActivate {
 
     constructor(
         private readonly userService: UserService,
-        private readonly gameService: GameService,
-        private readonly userGateway: UserGateway
+        private readonly gameService: GameService
     ) {}
 
     async canActivate(context: ExecutionContext): Promise<boolean> {
+
         const userRepo = client.fetchRepository(user_schema);
         const pixelRepo = client.fetchRepository(pixel_schema);
 
@@ -31,6 +31,7 @@ export class PlacePixelGuard implements CanActivate {
             const userId = `${pixel.pscope}.${pixel.username}`;
             const game = await this.gameService.serverGetGlobalGameSpec();
             const user: User = await userRepo.fetch(userId);
+            context.switchToHttp().getRequest().user = user;
             const lastPlacedPixelDate = user.lastPlacedPixel;
             const offset = (user.timer == undefined ? game.timer : user.timer);
             const colors = user.getColorsName() == null ? game.colors : [...game.colors, ...user.getColorsName()];
@@ -48,16 +49,6 @@ export class PlacePixelGuard implements CanActivate {
                 offset: offset,
                 colors: colors
             });
-
-            if (isRight) {
-                // Check user's point to upgrade is grade
-                this.userService.checkPoints(user);
-                if (pixel.isSticked) {
-                    user.stickedPixelAvailable--;
-                    await client.fetchRepository(user_schema).save(user);
-                    this.userGateway.sendUserEvent({stickedPixels: user.stickedPixelAvailable});
-                }
-            }
 
             // white -> #FFFFFF
             pixel.color = (await this.gameService.getAssociatedColor(pixel.color)) ?? (await this.userService.getAssociatedColor(pixel.color, userId));

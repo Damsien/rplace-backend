@@ -37,6 +37,7 @@ export class PatternService {
         const pattern = await this.patternRepo.findOneBy({patternId: patternId});
         if (pattern.userId == userId) {
             await this.patternShapeService.removeAll(patternId);
+            await this.patternBindRepo.delete({patternId: patternId});
             await this.patternRepo.remove(pattern);
         } else {
             const patternBind = await this.patternBindRepo.findOneBy({patternId: patternId, userId: userId});

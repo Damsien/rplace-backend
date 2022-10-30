@@ -1,5 +1,5 @@
 import { WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
-import { Server } from "socket.io";
+import { Socket } from "socket.io";
 
 @WebSocketGateway({
     cors: {
@@ -8,13 +8,10 @@ import { Server } from "socket.io";
   })
 export class UserGateway {
 
-    @WebSocketServer()
-    server: Server;
-
     constructor() {}
 
-    async sendUserEvent(event) {
-        this.server.emit('user', event);
+    async sendUserEvent(event, client: Socket) {
+      client.emit('user', event);
     }
 
 }

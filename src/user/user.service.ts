@@ -18,7 +18,7 @@ import { Game, game_schema } from 'src/game/entity/game.entity';
 import { logger } from 'src/main';
 import { UserGateway } from './user.gateway';
 import { Step, StepType } from 'src/game/type/step.type';
-import { Color } from 'src/game/type/color.type';
+import { Socket } from 'socket.io';
 
 @Injectable()
 export class UserService {
@@ -90,8 +90,7 @@ export class UserService {
     }
 
 
-    private async setUserGrade(points: number, userRedis: User, game: Game) {
-        const userEntity = await this.userRepo.findOneBy({userId: userRedis.entityId});
+    private async setUserGrade(points: number, userRedis: User, userEntity: UserEntity, game: Game, sockClient: Socket) {
 
         const step: Step = game.getStepFromPoints(points);
         let value;
@@ -102,14 +101,14 @@ export class UserService {
                 value = step.value['stickedPixels'];
                 userRedis.stickedPixelAvailable = value;
                 userEntity.stickedPixelAvailable = value;
-                this.userGateway.sendUserEvent({stickedPixels: userRedis.stickedPixelAvailable});
+                this.userGateway.sendUserEvent({stickedPixels: userRedis.stickedPixelAvailable}, sockClient);
             } break;
 
             case StepType.BOMB: {
                 value = step.value['bombs'];
                 userRedis.bombAvailable = value;
                 userRedis.bombAvailable = value;
-                this.userGateway.sendUserEvent({bombs: userRedis.bombAvailable});
+                this.userGateway.sendUserEvent({bombs: userRedis.bombAvailable}, sockClient);
             } break;
 
             case StepType.GOLD_NAME: {
@@ -128,7 +127,7 @@ export class UserService {
             case StepType.TIMER: {
                 value = step.value['timer'];
                 userRedis.timer = value;
-                this.userGateway.sendUserEvent({timer: userRedis.timer});
+                this.userGateway.sendUserEvent({timer: userRedis.timer}, sockClient);
             } break;
 
             case StepType.COLOR: {
@@ -138,35 +137,33 @@ export class UserService {
                 } catch(err) {
                     userRedis.setColors(value);
                 }
-                this.userGateway.sendUserEvent({colors: userRedis.getColors()});
+                this.userGateway.sendUserEvent({colors: userRedis.getColors()}, sockClient);
             } break;
 
         }
 
         await this.userRepo.save(userEntity);
-        await client.fetchRepository(user_schema).save(userRedis);
     }
 
 
-    async checkPoints(user: User) {
+    async checkPoints(user: User, sockClient: Socket) {
         const game = await client.fetchRepository(game_schema)
             .search().where('name').eq('Game').return.first();
 
         user.pixelsPlaced++;
-        await client.fetchRepository(user_schema).save(user);
-
+        const userEntity = await this.userRepo.findOneBy({userId: user.entityId});
         for (let points of game.getStepsPoints()) {
             if (points == user.pixelsPlaced) {
-                await this.setUserGrade(points, user, game);
+                await this.setUserGrade(points, user, userEntity, game, sockClient);
             }
         }
+        await client.fetchRepository(user_schema).save(user);
     }
 
 
     doUserIsRight(
         options: UserRightOptions
     ): boolean {
-
         return this.doUserHaveRightColor(options.colors, options.pixel.color) &&
             this.doUserHaveRightPlacement(options.pixel, options.game) &&
             this.doUserHaveRightTime(options.date, options.lastPlacedPixelDate, options.offset) &&
@@ -175,7 +172,7 @@ export class UserService {
     }
 
     private doIsSticked(pixel: PlaceSinglePixel, oldPixel: Pixel, stickedPixelAvailable: number) {
-        return (stickedPixelAvailable > 0 && pixel.isSticked) || !oldPixel.isSticked;
+        return (stickedPixelAvailable > 0 && pixel.isSticked) || (!oldPixel.isSticked && !pixel.isSticked);
     }
 
     private doMapIsReady(game) {
@@ -195,7 +192,7 @@ export class UserService {
     }
 
     private doUserHaveRightColor(colors: Array<String>, color: string): boolean {
-        return colors.find((el) => el.includes(color)) !== undefined;
+        return colors.includes(color);
     }
 
 
