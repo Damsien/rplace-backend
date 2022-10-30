@@ -49,9 +49,25 @@ export class PixelService {
       return pixels;
     }
 
+    private async stringMapToJson(): Promise<PixelAnon[]> {
+      let redisMap;
+      redisMap = await client.execute([
+        'GET', 'Map'
+      ]);
+      return JSON.parse(atob(redisMap));
+    }
+
     async getMap(): Promise<PixelAnon[]> {
+      return this.stringMapToJson();
+    }
+
+    async updateRedisMap() {
       this.repo = client.fetchRepository(pixel_schema);
-      return this.fetchMapRaw();
+      const json = JSON.stringify(await this.fetchMapRaw());
+      const base64 = btoa(json);
+      await client.execute([
+        'SET', 'Map', base64
+      ]);
     }
 
     async getSinglePixel(pxl: GetSinglePixel): Promise<Pixel> {
@@ -123,6 +139,8 @@ export class PixelService {
             await this.placeSinglePixel(pixel);
           }
         }
+
+        this.updateRedisMap();
         
       } catch(err) {
         logger.error(err);

@@ -69,6 +69,8 @@ export class RunnerService {
         game.width = newMap.width;
         await this.gameRepo.save(game);
 
+        this.pixelService.updateRedisMap();
+
         this.runnerGateway.sendGameEvent({
           width: newMap.width
         });
