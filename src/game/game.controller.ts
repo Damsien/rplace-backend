@@ -11,6 +11,8 @@ import { client } from 'src/app.service';
 import { Game, game_schema } from './entity/game.entity';
 import { Repository } from 'redis-om';
 import { logger } from 'src/main';
+import { Whitelist, whitelist_schema } from 'src/auth/entity/whitelist.entity';
+import { blacklist_schema } from 'src/auth/entity/blacklist.entity';
 
 @UseGuards(RolesGuard)
 @UseGuards(AtAuthGuard)
@@ -38,6 +40,27 @@ export class GameController {
         gameRedis.isOperationReady = true;
         gameRedis.setSteps(query.steps);
         await this.repo.save(gameRedis);
+        const whitelistRepo = client.fetchRepository(whitelist_schema);
+        const blacklistRepo = client.fetchRepository(blacklist_schema);
+        if (query.whitelist) {
+            whitelistRepo.createIndex();
+            for (let userId of query.whitelist) {
+                let wUser = await whitelistRepo.fetch(userId);
+                wUser.pscope = userId.split('.')[0];
+                wUser.username = userId.split('.')[1];
+                whitelistRepo.save(wUser);
+            }
+        }
+        if (query.blacklist) {
+            blacklistRepo.createIndex();
+            for (let userId of query.whitelist) {
+                let bUser = await blacklistRepo.fetch(userId);
+                bUser.pscope = userId.split('.')[0];
+                bUser.username = userId.split('.')[1];
+                blacklistRepo.save(bUser);
+            }
+        }
+
         const timeout = this.gameService.startGame(query);
         return `The game will start in ${timeout}ms (or ${query.schedule})`;
     }

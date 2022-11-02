@@ -32,7 +32,7 @@ export class GameService {
       const milliseconds = EventService.findMsDifference(new Date(), game.schedule);
 
       const timeout = setTimeout(async () => {
-        await this.userService.createUser({username: game.gameMasterUsername, pscope: 'root'})
+        await this.userService.createUserIfNotExists({username: game.gameMasterUsername, pscope: 'root', password: null})
         this.pixelService.startGame(game);
       }, milliseconds);
 
