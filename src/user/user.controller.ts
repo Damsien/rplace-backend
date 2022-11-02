@@ -50,14 +50,14 @@ export class UserController {
         return this.gameService.getGlobalGameSpec();
     }
 
-    @HttpCode(200)
+    @HttpCode(201)
     @Roles(Role.ADMIN)
     @Post('create')
     createUser(@Body() user: UserComplete) {
         this.userService.createUserIfNotExists(user);
     }
 
-    @HttpCode(200)
+    @HttpCode(201)
     @Roles(Role.ADMIN)
     @Post('group/create')
     createGroup(@Body() group: Group) {
@@ -65,7 +65,7 @@ export class UserController {
     }
 
     @HttpCode(200)
-    @Put('group')
+    @Put('group/link')
     linkGroup(@Req() req, @Body() group: Group) {
         return this.userService.linkGroup(req.user, group);
     }

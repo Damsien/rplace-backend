@@ -12,12 +12,13 @@ import { PixelHistoryEntity } from 'src/pixel-history/entity/pixel-history.entit
 import { PixelEntity } from 'src/pixel/entity/pixel-sql.entity';
 import { PixelHistoryService } from 'src/pixel-history/pixel-history.service';
 import { UserGateway } from './user.gateway';
+import { GroupEntity } from './entity/group-sql.entity';
 
 @Module({
   imports: [
     PuppeteerModule.forRoot({ pipe: true }),
     HttpModule,
-    TypeOrmModule.forFeature([UserEntity, PixelEntity, PixelHistoryEntity]),
+    TypeOrmModule.forFeature([UserEntity, PixelEntity, PixelHistoryEntity, GroupEntity]),
     forwardRef(() => PixelModule)
   ],
   providers: [PixelService, UserService, GameService, PixelHistoryService, UserGateway],

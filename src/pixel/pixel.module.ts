@@ -9,6 +9,7 @@ import { GameGuard } from 'src/game/guard/game.guard';
 import { PixelHistoryEntity } from 'src/pixel-history/entity/pixel-history.entity';
 import { PixelHistoryModule } from 'src/pixel-history/pixel-history.module';
 import { PixelHistoryService } from 'src/pixel-history/pixel-history.service';
+import { GroupEntity } from 'src/user/entity/group-sql.entity';
 import { UserEntity } from 'src/user/entity/user-sql.entity';
 import { UserGateway } from 'src/user/user.gateway';
 import { UserModule } from 'src/user/user.module';
@@ -22,7 +23,7 @@ import { PixelService } from './pixel.service';
   imports: [
     PixelHistoryModule,
     HttpModule,
-    TypeOrmModule.forFeature([PixelEntity, PixelHistoryEntity, UserEntity]),
+    TypeOrmModule.forFeature([PixelEntity, PixelHistoryEntity, UserEntity, GroupEntity]),
     AuthModule,
     UserModule
   ],

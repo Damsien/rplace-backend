@@ -2,12 +2,13 @@ import { ForbiddenException, Injectable } from "@nestjs/common";
 import { PassportStrategy } from "@nestjs/passport";
 import { ExtractJwt, Strategy } from "passport-jwt";
 import { logger } from "src/main";
+import { AuthService } from "../auth.service";
 import { UserPayload } from "../type/userpayload.type";
 
 @Injectable()
 export class RtStrategy extends PassportStrategy(Strategy, 'jwt-refresh') {
 
-    constructor() {
+    constructor(private readonly authService: AuthService) {
         super({
             secretOrKey: process.env.RT_SECRET,
             ignoreExpiration: false,
@@ -21,6 +22,8 @@ export class RtStrategy extends PassportStrategy(Strategy, 'jwt-refresh') {
             username: payload.username,
             pscope: payload.pscope
         };
+
+        await this.authService.validateTokens(user);
 
         return user;
     }

@@ -5,6 +5,7 @@ import { PassportModule } from '@nestjs/passport';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PixelHistoryEntity } from 'src/pixel-history/entity/pixel-history.entity';
 import { PixelEntity } from 'src/pixel/entity/pixel-sql.entity';
+import { GroupEntity } from 'src/user/entity/group-sql.entity';
 import { UserEntity } from 'src/user/entity/user-sql.entity';
 import { UserGateway } from 'src/user/user.gateway';
 import { UserModule } from 'src/user/user.module';
@@ -17,7 +18,7 @@ import { RtStrategy } from './strategy/rt.strategy';
 @Module({
   imports: [
     UserModule,
-    TypeOrmModule.forFeature([UserEntity, PixelEntity, PixelHistoryEntity]),
+    TypeOrmModule.forFeature([UserEntity, PixelEntity, PixelHistoryEntity, GroupEntity]),
     PassportModule,
     JwtModule.register({}),
     HttpModule

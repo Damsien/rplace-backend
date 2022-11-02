@@ -21,11 +21,11 @@ export class RolesGuard implements CanActivate {
 
         const user = context.switchToHttp().getRequest().user;
 
-        return this.checkRole(user.username, role);
+        return this.checkRole(user.pscope, user.username, role);
     }
 
-    private checkRole(username: string, role: Role): boolean {
-        return this.configService.get<string>(role).split(',').find(el => el == username) != undefined;
+    private checkRole(pscope: string, username: string, role: Role): boolean {
+        return this.configService.get<string>(role).split(',').find(el => el.split('.')[1] == username && el.split('.')[0] == pscope) != undefined;
     }
 
 }

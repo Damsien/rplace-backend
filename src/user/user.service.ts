@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { Browser } from 'puppeteer';
 import { InjectBrowser } from 'nest-puppeteer';
@@ -45,7 +45,7 @@ export class UserService {
         let groupName;
         try {
             groupName = (await this.dataSource.manager.createQueryBuilder(GroupEntity, 'group')
-                .where(':name IN group.alternatives', {name: name})
+                .where('group.alternatives LIKE :name', {name: name})
                 .getOne()).name;
         } catch (err) {
             throw new NotFoundException();
@@ -62,8 +62,16 @@ export class UserService {
     async createGroup(group: Group) {
         const groupEntity = new GroupEntity();
         groupEntity.name = group.name;
-        groupEntity.alternatives = group.alternatives;
-        await this.groupRepo.create(groupEntity);
+        let alternatives = [];
+        for (let alternative of group.alternatives) {
+            alternatives.push(alternative.toLowerCase());
+        }
+        groupEntity.alternatives = alternatives;
+        try {
+            await this.groupRepo.insert(groupEntity);
+        } catch (err) {
+            throw new ConflictException();
+        }
     }
 
     async createUserIfNotExists(user: UserComplete) {
@@ -76,7 +84,11 @@ export class UserService {
                 userEntity.password = user.password;
             }
     
-            await this.userRepo.insert(userEntity);
+            try {
+                await this.userRepo.insert(userEntity);
+            } catch (err) {
+                throw new ConflictException();
+            }
         }
     }
 
@@ -242,12 +254,16 @@ export class UserService {
 
     private async localCAS(username: string, password: string, pscope: string): Promise<UserPayload> {
         const user = await this.userRepo.findOneBy({userId: `${pscope}.${username}`});
-        if (bcrypt.compareSync(password, user.password)) {
-            return {
-                username: user.username,
-                pscope: user.pscope
-            };
-        } else {
+        try {
+            if (bcrypt.compareSync(password, user.password)) {
+                return {
+                    username: user.username,
+                    pscope: user.pscope
+                };
+            } else {
+                throw new UnauthorizedException();
+            }
+        } catch (err) {
             throw new UnauthorizedException();
         }
     }

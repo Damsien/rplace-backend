@@ -28,6 +28,7 @@ import { PatternShapeModule } from './pattern-shape/pattern-shape.module';
 import { PatternEntity } from './pattern/entity/pattern-sql.entity';
 import { PatternShapeEntity } from './pattern-shape/entity/pattern-shape-sql.entity';
 import { PatternBindEntity } from './pattern/entity/pattern-bind-sql.entity';
+import { GroupEntity } from './user/entity/group-sql.entity';
 
 const ENV = process.env.NODE_ENV;
 
@@ -45,7 +46,7 @@ const ENV = process.env.NODE_ENV;
       username: process.env.MARIADB_USER,
       password: process.env.MARIADB_PASSWORD,
       database: process.env.MARIADB_DATABASE,
-      entities: [PixelEntity, PixelHistoryEntity, EventEntity, UserEntity, PatternEntity, PatternShapeEntity, PatternBindEntity],
+      entities: [PixelEntity, PixelHistoryEntity, EventEntity, UserEntity, PatternEntity, PatternShapeEntity, PatternBindEntity, GroupEntity],
       synchronize: true
     }),
     TypeOrmModule.forFeature([EventEntity, PixelHistoryEntity, PixelEntity, PatternShapeEntity]),

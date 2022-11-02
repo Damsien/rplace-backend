@@ -23,35 +23,44 @@ export class AuthService {
         private userService: UserService,
         private jwtService: JwtService,
         private configService: ConfigService
-    ) {
-        this.whitelistRepo = client.fetchRepository(whitelist_schema);
-        this.blacklistRepo = client.fetchRepository(blacklist_schema);
-    }
+    ) {}
 
     /*  CHECK WHITELIST AND BLACKLIST   */
     private async checkWhitelist(pscope: string, username: string): Promise<boolean> {
         return (await this.whitelistRepo.search()
             .where('pscope').eq(pscope)
             .and('username').eq(username)
-            .return.first()) !== undefined;
+            .return.first()) !== null;
     }
 
     private async checkBlacklist(pscope: string, username: string): Promise<boolean> {
         return (await this.blacklistRepo.search()
             .where('pscope').eq(pscope)
             .and('username').eq(username)
-            .return.first()) !== undefined;
+            .return.first()) !== null;
     }
 
     private async checkLists(pscope: string, username: string): Promise<boolean> {
+        this.whitelistRepo = client.fetchRepository(whitelist_schema);
+        this.blacklistRepo = client.fetchRepository(blacklist_schema);
+        const isWhitelistActive = await this.whitelistRepo.search().returnCount() >= 1;
+
         try {
-            if ((await this.checkWhitelist(pscope, username))) {
-                try {
-                    if (!(await this.checkBlacklist(pscope, username))) {
+            if (isWhitelistActive) {
+                if ((await this.checkWhitelist(pscope, username))) {
+                    try {
+                        if (!(await this.checkBlacklist(pscope, username))) {
+                            return true;
+                        }
+                    } catch (err) {
+                        // There is no blacklist
                         return true;
                     }
-                } catch (err) {
-                    // There is no blacklist
+                }
+            } else {
+                if (await this.checkBlacklist(pscope, username)) {
+                    return false;
+                } else {
                     return true;
                 }
             }
@@ -87,6 +96,13 @@ export class AuthService {
             throw new UnauthorizedException();
         }
         return user;
+    }
+
+    /*  USED BY AT AND RT STRATEGIES    */
+    async validateTokens(user: UserPayload) {
+        if (!(await this.checkLists(user.pscope, user.username))) {
+            throw new UnauthorizedException();
+        }
     }
 
 

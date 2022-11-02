@@ -25,13 +25,5 @@ export class StartGame {
     @IsInt()
     @Type(() => Number)
     mapWidth: number;
-
-    @IsArray()
-    @IsOptional()
-    blacklist: string[];
-
-    @IsArray()
-    @IsOptional()
-    whitelist: string[];
     
 }

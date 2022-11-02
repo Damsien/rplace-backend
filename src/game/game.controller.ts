@@ -13,6 +13,7 @@ import { Repository } from 'redis-om';
 import { logger } from 'src/main';
 import { Whitelist, whitelist_schema } from 'src/auth/entity/whitelist.entity';
 import { blacklist_schema } from 'src/auth/entity/blacklist.entity';
+import { List } from './dto/list.dto';
 
 @UseGuards(RolesGuard)
 @UseGuards(AtAuthGuard)
@@ -40,26 +41,6 @@ export class GameController {
         gameRedis.isOperationReady = true;
         gameRedis.setSteps(query.steps);
         await this.repo.save(gameRedis);
-        const whitelistRepo = client.fetchRepository(whitelist_schema);
-        const blacklistRepo = client.fetchRepository(blacklist_schema);
-        if (query.whitelist) {
-            whitelistRepo.createIndex();
-            for (let userId of query.whitelist) {
-                let wUser = await whitelistRepo.fetch(userId);
-                wUser.pscope = userId.split('.')[0];
-                wUser.username = userId.split('.')[1];
-                whitelistRepo.save(wUser);
-            }
-        }
-        if (query.blacklist) {
-            blacklistRepo.createIndex();
-            for (let userId of query.whitelist) {
-                let bUser = await blacklistRepo.fetch(userId);
-                bUser.pscope = userId.split('.')[0];
-                bUser.username = userId.split('.')[1];
-                blacklistRepo.save(bUser);
-            }
-        }
 
         const timeout = this.gameService.startGame(query);
         return `The game will start in ${timeout}ms (or ${query.schedule})`;
@@ -89,6 +70,62 @@ export class GameController {
         this.repo.save(gameRedis);
         this.gameService.cancelGameStop();
         return `The game stop schedule has been cancelled`;
+    }
+
+
+    @HttpCode(201)
+    @Post('whitelist')
+    async setWhitelist(@Body() list: List) {
+        const whitelistRepo = client.fetchRepository(whitelist_schema);
+        whitelistRepo.createIndex();
+        for (let admin of process.env.ROLE_ADMIN.split(',')) {
+            let adm = await whitelistRepo.fetch(admin);
+            adm.pscope = admin.split('.')[0];
+            adm.username = admin.split('.')[1];
+            whitelistRepo.save(adm);
+        }
+        for (let userId of list.list) {
+            let wUser = await whitelistRepo.fetch(userId);
+            wUser.pscope = userId.split('.')[0];
+            wUser.username = userId.split('.')[1];
+            whitelistRepo.save(wUser);
+        }
+    }
+    @HttpCode(200)
+    @Delete('whitelist')
+    async removeFromWhitelist(@Body() list: List) {
+        const whitelistRepo = client.fetchRepository(whitelist_schema);
+        for (let userId of list.list) {
+            await whitelistRepo.remove(userId);
+        }
+        if (await whitelistRepo.search().returnCount() == process.env.ROLE_ADMIN.split(',').length) {
+            for (let admin of process.env.ROLE_ADMIN.split(',')) {
+                whitelistRepo.remove(admin);
+            }
+        }
+    }
+
+    @HttpCode(201)
+    @Post('blacklist')
+    async setBlacklist(@Body() list: List) {
+        const blacklistRepo = client.fetchRepository(blacklist_schema);
+        blacklistRepo.createIndex();
+        for (let userId of list.list) {
+            if (!process.env.ROLE_ADMIN.includes(userId)) {
+                let bUser = await blacklistRepo.fetch(userId);
+                bUser.pscope = userId.split('.')[0];
+                bUser.username = userId.split('.')[1];
+                blacklistRepo.save(bUser);
+            }
+        }
+    }
+    @HttpCode(200)
+    @Delete('blacklist')
+    async removeFromBlacklist(@Body() list: List) {
+        const blacklistRepo = client.fetchRepository(blacklist_schema);
+        for (let userId of list.list) {
+            blacklistRepo.remove(userId);
+        }
     }
 
 }

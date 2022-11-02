@@ -9,6 +9,7 @@ import { PixelHistoryEntity } from 'src/pixel-history/entity/pixel-history.entit
 import { PixelHistoryService } from 'src/pixel-history/pixel-history.service';
 import { PixelEntity } from 'src/pixel/entity/pixel-sql.entity';
 import { PixelService } from 'src/pixel/pixel.service';
+import { GroupEntity } from 'src/user/entity/group-sql.entity';
 import { UserEntity } from 'src/user/entity/user-sql.entity';
 import { UserGateway } from 'src/user/user.gateway';
 import { UserService } from 'src/user/user.service';
@@ -20,7 +21,7 @@ import { PatternShapeService } from './pattern-shape.service';
   controllers: [PatternShapeController],
   providers: [PatternShapeService, GameService, PixelService, UserService, PixelHistoryService, UserGateway, PatternService],
   imports: [
-    TypeOrmModule.forFeature([PatternShapeEntity, PixelEntity, UserEntity, PixelEntity, PixelHistoryEntity, PatternEntity, PatternBindEntity]),
+    TypeOrmModule.forFeature([PatternShapeEntity, PixelEntity, UserEntity, PixelEntity, PixelHistoryEntity, PatternEntity, PatternBindEntity, GroupEntity]),
     HttpModule
   ]
 })

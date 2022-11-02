@@ -1,4 +1,4 @@
-import { BeforeInsert, Column, Entity, JoinColumn, OneToOne, PrimaryColumn } from "typeorm";
+import { BeforeInsert, Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from "typeorm";
 import * as bcrypt from 'bcrypt';
 import { GroupEntity } from "./group-sql.entity";
 
@@ -44,7 +44,7 @@ export class UserEntity {
     @Column({
         nullable: true
     })
-    @OneToOne(() => GroupEntity)
+    @ManyToOne(() => GroupEntity)
     @JoinColumn({ name: "group" })
     group: string;
 

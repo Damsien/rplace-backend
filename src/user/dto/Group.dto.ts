@@ -1,4 +1,4 @@
-import { IsOptional, IsString } from "class-validator";
+import { IsArray, IsOptional, IsString } from "class-validator";
 
 export class Group {
 
@@ -6,6 +6,6 @@ export class Group {
     name: string;
 
     @IsOptional()
-    @IsString()
+    @IsArray()
     alternatives: string[];
 }
