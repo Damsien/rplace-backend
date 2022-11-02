@@ -62,6 +62,7 @@ export class UserService {
     async createGroup(group: Group) {
         const groupEntity = new GroupEntity();
         groupEntity.name = group.name;
+        groupEntity.alternatives = group.alternatives;
         await this.groupRepo.create(groupEntity);
     }
 

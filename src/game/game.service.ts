@@ -114,6 +114,7 @@ export class GameService {
       const steps = allGame.getSteps();
       const rank = await this.userService.getUserRank(userRedis);
       const fav = await this.userService.getUserFavColor(userRedis.entityId);
+      const group = userRedis.group;
       return {
         pixelsPlaced: userRedis.pixelsPlaced,
         isGold: userRedis.isUserGold,
@@ -123,7 +124,8 @@ export class GameService {
         favColor: fav,
         pscope: user.pscope,
         username: user.username,
-        steps: steps
+        steps: steps,
+        group: group
       };
     }
 

@@ -7,5 +7,6 @@ export type UserSpec = {
     favColor: string;
     pscope: string;
     username: string;
-    steps: {}
+    steps: {};
+    group: string;
 }
