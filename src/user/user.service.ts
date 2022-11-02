@@ -19,6 +19,8 @@ import { logger } from 'src/main';
 import { UserGateway } from './user.gateway';
 import { Step, StepType } from 'src/game/type/step.type';
 import { Socket } from 'socket.io';
+import * as bcrypt from 'bcrypt';
+import { UserComplete } from 'src/auth/type/usercomplete.type';
 
 @Injectable()
 export class UserService {
@@ -36,12 +38,15 @@ export class UserService {
         private readonly userGateway: UserGateway
     ) {}
 
-    async createUser(user: UserPayload) {
+    async createUserIfNotExists(user: UserComplete) {
         if (await this.userRepo.count({where: {userId: `${user.pscope}.${user.username}`}}) == 0) {
             const userEntity = new UserEntity();
             userEntity.userId = `${user.pscope}.${user.username}`;
             userEntity.pscope = user.pscope;
             userEntity.username = user.username;
+            if (process.env.LOCAL_PSCOPE.includes(user.pscope)) {
+                userEntity.password = user.password;
+            }
     
             await this.userRepo.insert(userEntity);
         }
@@ -196,8 +201,31 @@ export class UserService {
     }
 
 
-
     async checkUser(username: string, password: string, pscope: string): Promise<UserPayload> {
+
+        if (process.env.LOCAL_PSCOPE.includes(pscope)) {
+            return await this.localCAS(username, password, pscope);
+        } else {
+            return await this.toulouseCAS(username, password, pscope);
+        }
+
+    }
+
+
+    private async localCAS(username: string, password: string, pscope: string): Promise<UserPayload> {
+        const user = await this.userRepo.findOneBy({userId: `${pscope}.${username}`});
+        if (bcrypt.compareSync(password, user.password)) {
+            return {
+                username: user.username,
+                pscope: user.pscope
+            };
+        } else {
+            throw new UnauthorizedException();
+        }
+    }
+
+
+    private async toulouseCAS(username: string, password: string, pscope: string): Promise<UserPayload> {
         const [token, lt] = await this.scrap();
 
         try {
