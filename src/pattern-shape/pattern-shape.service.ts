@@ -48,8 +48,7 @@ export class PatternShapeService {
         try {
             await this.patternShapeRepo.insert(shape);
         } catch(e) {
-            const lastShape = await this.patternShapeRepo.findOneBy({patternId: shape.patternId, pixelId: shape.pixelId});
-            await this.patternShapeRepo.update(lastShape, shape);
+            await this.patternShapeRepo.update({patternId: shape.patternId, pixelId: shape.pixelId}, shape);
         }
     }
 

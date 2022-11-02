@@ -65,6 +65,8 @@ export class User extends Entity {
 
     pixelsPlaced: number;
 
+    group: string;
+
 }
 
 export const user_schema = new Schema(User, {
@@ -81,6 +83,8 @@ export const user_schema = new Schema(User, {
 
     isUserGold: {type: 'boolean'},
 
-    pixelsPlaced: {type: 'number'}
+    pixelsPlaced: {type: 'number'},
+
+    group: {type: 'string'}
 
 });

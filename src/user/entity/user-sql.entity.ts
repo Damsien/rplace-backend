@@ -1,5 +1,6 @@
-import { BeforeInsert, Column, Entity, PrimaryColumn } from "typeorm";
+import { BeforeInsert, Column, Entity, JoinColumn, OneToOne, PrimaryColumn } from "typeorm";
 import * as bcrypt from 'bcrypt';
+import { GroupEntity } from "./group-sql.entity";
 
 @Entity()
 export class UserEntity {
@@ -39,5 +40,12 @@ export class UserEntity {
         nullable: true
     })
     isUserGold: boolean;
+
+    @Column({
+        nullable: true
+    })
+    @OneToOne(() => GroupEntity)
+    @JoinColumn({ name: "group" })
+    group: string;
 
 }

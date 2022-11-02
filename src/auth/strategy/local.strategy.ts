@@ -17,12 +17,6 @@ export class LocalStrategy extends PassportStrategy(Strategy, 'local') {
     }
 
     async validate(req): Promise<UserPayload> {
-        
-        await this.userService.createUserIfNotExists({
-            username: req.body.username,
-            pscope: req.body.pscope,
-            password: req.body.password
-        });
 
         const user = await this.authService.validateUser(req.body.username, req.body.password, req.body.pscope);
         // TODO
@@ -57,6 +51,12 @@ export class LocalStrategy extends PassportStrategy(Strategy, 'local') {
 
             await userRepo.save(userRedis);
         }
+        
+        await this.userService.createUserIfNotExists({
+            username: req.body.username,
+            pscope: req.body.pscope,
+            password: req.body.password
+        });
 
         return user;
     }

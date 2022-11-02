@@ -21,6 +21,8 @@ import { Step, StepType } from 'src/game/type/step.type';
 import { Socket } from 'socket.io';
 import * as bcrypt from 'bcrypt';
 import { UserComplete } from 'src/auth/type/usercomplete.type';
+import { Group } from './dto/Group.dto';
+import { GroupEntity } from './entity/group-sql.entity';
 
 @Injectable()
 export class UserService {
@@ -35,8 +37,23 @@ export class UserService {
         private readonly axios: HttpService,
         @InjectRepository(UserEntity) private userRepo: Repository<UserEntity>,
         @InjectRepository(PixelHistoryEntity) private pixelHistoRepo: Repository<PixelHistoryEntity>,
+        @InjectRepository(GroupEntity) private groupRepo: Repository<GroupEntity>,
         private readonly userGateway: UserGateway
     ) {}
+
+    async linkGroup(user: UserPayload, group: Group) {
+        await this.userRepo.update({userId: `${user.pscope}.${user.username}`}, {group: group.name});
+        const redisRepo = client.fetchRepository(user_schema);
+        const userRedis = await redisRepo.fetch(`${user.pscope}.${user.username}`);
+        userRedis.group = group.name;
+        await redisRepo.save(userRedis);
+    }
+
+    async createGroup(group: Group) {
+        await this.groupRepo.create({
+           group: group.name 
+        });
+    }
 
     async createUserIfNotExists(user: UserComplete) {
         if (await this.userRepo.count({where: {userId: `${user.pscope}.${user.username}`}}) == 0) {

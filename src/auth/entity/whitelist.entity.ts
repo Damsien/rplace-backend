@@ -11,6 +11,6 @@ export const whitelist_schema = new Schema(Whitelist, {
 
     pscope: {type: 'string'},
 
-    string: {type: 'string'}
+    username: {type: 'string'}
 
 });

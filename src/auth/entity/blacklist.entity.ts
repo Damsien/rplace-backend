@@ -11,6 +11,6 @@ export const blacklist_schema = new Schema(Blacklist, {
 
     pscope: {type: 'string'},
 
-    string: {type: 'string'}
+    username: {type: 'string'}
 
 });

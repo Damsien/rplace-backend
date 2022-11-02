@@ -33,14 +33,14 @@ export class AuthService {
         return (await this.whitelistRepo.search()
             .where('pscope').eq(pscope)
             .and('username').eq(username)
-            .return.first()) !== null;
+            .return.first()) !== undefined;
     }
 
     private async checkBlacklist(pscope: string, username: string): Promise<boolean> {
         return (await this.blacklistRepo.search()
             .where('pscope').eq(pscope)
             .and('username').eq(username)
-            .return.first()) !== null;
+            .return.first()) !== undefined;
     }
 
     private async checkLists(pscope: string, username: string): Promise<boolean> {
