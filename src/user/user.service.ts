@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { Browser } from 'puppeteer';
 import { InjectBrowser } from 'nest-puppeteer';
@@ -12,7 +12,7 @@ import { UserRightOptions } from './dto/UserRightOptions.dto';
 import { User, user_schema } from './entity/user.entity';
 import { client } from 'src/app.service';
 import { Repository as RedisRepo } from 'redis-om';
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, Not, Repository } from 'typeorm';
 import { Pixel, pixel_schema } from 'src/pixel/entity/pixel.entity';
 import { Game, game_schema } from 'src/game/entity/game.entity';
 import { logger } from 'src/main';
@@ -41,18 +41,28 @@ export class UserService {
         private readonly userGateway: UserGateway
     ) {}
 
-    async linkGroup(user: UserPayload, group: Group) {
-        await this.userRepo.update({userId: `${user.pscope}.${user.username}`}, {group: group.name});
+    async linkGroup(user: UserPayload, name: Group) {
+        let groupName;
+        try {
+            groupName = (await this.dataSource.manager.createQueryBuilder(GroupEntity, 'group')
+                .where(':name IN group.alternatives', {name: name})
+                .getOne()).name;
+        } catch (err) {
+            throw new NotFoundException();
+        }
+
+        await this.userRepo.update({userId: `${user.pscope}.${user.username}`}, {group: groupName});
         const redisRepo = client.fetchRepository(user_schema);
         const userRedis = await redisRepo.fetch(`${user.pscope}.${user.username}`);
-        userRedis.group = group.name;
+        userRedis.group = groupName;
         await redisRepo.save(userRedis);
+        return groupName;
     }
 
     async createGroup(group: Group) {
-        await this.groupRepo.create({
-           group: group.name 
-        });
+        const groupEntity = new GroupEntity();
+        groupEntity.name = group.name;
+        await this.groupRepo.create(groupEntity);
     }
 
     async createUserIfNotExists(user: UserComplete) {

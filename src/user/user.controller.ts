@@ -67,7 +67,7 @@ export class UserController {
     @HttpCode(200)
     @Put('group')
     linkGroup(@Req() req, @Body() group: Group) {
-        this.userService.linkGroup(req.user, group);
+        return this.userService.linkGroup(req.user, group);
     }
 
 }

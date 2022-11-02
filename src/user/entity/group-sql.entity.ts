@@ -1,9 +1,12 @@
-import { Entity, PrimaryColumn } from "typeorm";
+import { Column, Entity, PrimaryColumn } from "typeorm";
 
 @Entity()
 export class GroupEntity {
 
     @PrimaryColumn()
-    group: string;
+    name: string;
+
+    @Column('simple-array', {nullable: true})
+    alternatives: string[];
 
 }
