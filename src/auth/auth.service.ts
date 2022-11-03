@@ -43,9 +43,9 @@ export class AuthService {
     private async checkLists(pscope: string, username: string): Promise<boolean> {
         this.whitelistRepo = client.fetchRepository(whitelist_schema);
         this.blacklistRepo = client.fetchRepository(blacklist_schema);
-        const isWhitelistActive = await this.whitelistRepo.search().returnCount() >= 1;
 
         try {
+            const isWhitelistActive = await this.whitelistRepo.search().returnCount() >= 1;
             if (isWhitelistActive) {
                 if ((await this.checkWhitelist(pscope, username))) {
                     try {
