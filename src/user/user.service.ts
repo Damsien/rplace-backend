@@ -1,7 +1,5 @@
 import { ConflictException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
-import { Browser } from 'puppeteer';
-import { InjectBrowser } from 'nest-puppeteer';
 import { UserPayload } from 'src/auth/type/userpayload.type';
 import { UserEntity } from './entity/user-sql.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -32,7 +30,6 @@ export class UserService {
     private pixelRepo: RedisRepo<Pixel>;
 
     constructor(
-        @InjectBrowser() private readonly browser: Browser,
         private dataSource: DataSource,
         private readonly axios: HttpService,
         @InjectRepository(UserEntity) private userRepo: Repository<UserEntity>,
@@ -274,7 +271,7 @@ export class UserService {
 
         try {
             const res = await this.axios.axiosRef.post(
-                'https://authc.univ-toulouse.fr/login'
+                UserService.LOGIN_URL
                 +'?utf8=%E2%9C%93&authenticity_token='+token
                 +'&lt='+lt
                 +'&pscope='+pscope
@@ -283,7 +280,7 @@ export class UserService {
                 , null,
             {
                 headers: {
-                    'Referer': 'https://authc.univ-toulouse.fr/login',
+                    'Referer': UserService.LOGIN_URL,
                     'Origin': 'https://authc.univ-toulouse.fr',
                     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36',
                     'Host': 'authc.univ-toulouse.fr',
@@ -319,19 +316,10 @@ export class UserService {
 
     private async scrap() {
 
-        const page = await this.browser.newPage();
-        await page.goto(UserService.LOGIN_URL);
-
-        const [tokenEl] = await page.$x('//*[@id="login-form"]/input[2]');
-        const tokenObj = await tokenEl.getProperty('value');
-
-        const [ltEl] = await page.$x('//*[@id="lt"]');
-        const ltObj = await ltEl.getProperty('value');
-
-        const token = await tokenObj.jsonValue();
-        const lt = await ltObj.jsonValue();
-
-        // this.browser.close();
+        const html = (await this.axios.axiosRef.get(UserService.LOGIN_URL)).data.toString();
+        
+        const token = html.split('name="authenticity_token" value="')[1].split('"')[0];
+        const lt = html.split('id="lt" value="')[1].split('"')[0];
 
         return [token, lt];
     }
