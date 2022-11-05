@@ -15,7 +15,7 @@ async function bootstrap() {
     AppModule,
     new FastifyAdapter({logger: true})
   );
-  app.setGlobalPrefix('/api/'+VERSION);
+  app.setGlobalPrefix('/'+VERSION);
   app.useGlobalFilters(new HttpExceptionFilter())
   app.useGlobalPipes(new ValidationPipe({
     transform: true,
