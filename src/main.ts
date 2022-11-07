@@ -15,12 +15,17 @@ async function bootstrap() {
     AppModule,
     new FastifyAdapter({logger: true})
   );
-  app.setGlobalPrefix('/'+VERSION);
+  app.setGlobalPrefix('/api/'+VERSION);
   app.useGlobalFilters(new HttpExceptionFilter())
   app.useGlobalPipes(new ValidationPipe({
     transform: true,
   }));
-  app.enableCors();
+  app.enableCors({
+    allowedHeaders:"*",
+    origin: "*",
+    methods: "*"
+  });
   await app.listen(3000, '0.0.0.0');
+  // await app.listen(3000);
 }
 bootstrap();
