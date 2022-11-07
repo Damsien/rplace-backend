@@ -267,37 +267,46 @@ export class UserService {
 
 
     private async toulouseCAS(username: string, password: string, pscope: string): Promise<UserPayload> {
-        const [token, lt] = await this.scrap();
+        const [token, lt, cas_session, lb] = await this.scrap();
 
         try {
             const res = await this.axios.axiosRef.post(
                 UserService.LOGIN_URL
-                +'?utf8=%E2%9C%93&authenticity_token='+token
-                +'&lt='+lt
-                +'&pscope='+pscope
-                +'&service=https://scout.univ-toulouse.fr/sw?type=L%26state=7%26startpage=%2Fflatx%2F&username='+username
-                +'&password='+password
-                , null,
+                // +'?utf8=%E2%9C%93&authenticity_token='+token
+                // +'&lt='+lt
+                // +'&pscope='+pscope
+                // +'&service=https://scout.univ-toulouse.fr/sw?type=L%26state=7%26startpage=%2Fflatx%2F&username='+username
+                // +'&password='+password
+            ,{
+                utf8: '✓',
+                authenticity_token: token,
+                lt: lt,
+                pscope: pscope,
+                username: username,
+                password: password,
+                button: '' 
+            },
             {
                 headers: {
                     'Referer': UserService.LOGIN_URL,
                     'Origin': 'https://authc.univ-toulouse.fr',
                     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36',
                     'Host': 'authc.univ-toulouse.fr',
-                    'Content-Length': '0',
+                    // 'Content-Length': '246',
                     'Accept': '*/*',
                     'Accept-Encoding': 'gzip, deflate, br',
-                    'Connection': 'keep-alive'
-                },
-                // params: {
-                //     utf8: '%E2%9C%93',
-                //     authenticity_token: token,
-                //     lt: lt,
-                //     pscope: pscope,
-                //     service: 'https://scout.univ-toulouse.fr/sw?type=L%26state=7%26startpage=%2Fflatx%2F',
-                //     username: username,
-                //     password: password
-                // }
+                    'Connection': 'keep-alive',
+                    'Content-Type': 'application/json',
+                    'Cookie': `comue_cas_session=${cas_session}; lb=${lb}; etab=${pscope}`,
+                    'Upgrade-Insecure-Requests': '1',
+                    'Sec-Ch-Ua': '"Google Chrome";v="107", "Chromium";v="107", "Not=A?Brand";v="24"',
+                    'Sec-Ch-Ua-Mobile': '?0',
+                    'Sec-Ch-Ua-Platform': 'Windows',
+                    'Sec-Fetch-Mode': 'navigate',
+                    'Sec-Fetch-Dest': 'document',
+                    'Sec-Fetch-Site': 'same-origin',
+                    'Sec-Fetch-User': '?1'
+                }
             });
 
             // 303 -> redirection mais log accepté par l'"API" équivalent 200
@@ -305,6 +314,7 @@ export class UserService {
                 throw new UnauthorizedException();
             }
         } catch(err) {
+            console.log(err)
             throw new UnauthorizedException();
         }
 
@@ -316,12 +326,15 @@ export class UserService {
 
     private async scrap() {
 
-        const html = (await this.axios.axiosRef.get(UserService.LOGIN_URL)).data.toString();
+        const res = await this.axios.axiosRef.get(UserService.LOGIN_URL);
+        const html = res.data.toString();
         
         const token = html.split('name="authenticity_token" value="')[1].split('"')[0];
         const lt = html.split('id="lt" value="')[1].split('"')[0];
+        const cas_session = res.headers['set-cookie'][0].split('cas_session=')[1].split(';')[0];
+        const lb = res.headers['set-cookie'][1].split('lb=')[1].split(';')[0];
 
-        return [token, lt];
+        return [token, lt, cas_session, lb];
     }
 
 }
