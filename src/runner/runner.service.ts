@@ -30,7 +30,7 @@ export class RunnerService {
       this.gameRepo = client.fetchRepository(game_schema);
       const game: Game = await this.gameRepo.search().where('name').eq('Game').return.first();
 
-      game.isMapReady = false;
+      // game.isMapReady = false;
       await this.gameRepo.save(game);
       
       try {

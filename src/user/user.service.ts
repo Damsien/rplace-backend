@@ -209,7 +209,7 @@ export class UserService {
         return this.doUserHaveRightColor(options.colors, options.pixel.color) &&
             this.doUserHaveRightPlacement(options.pixel, options.game) &&
             this.doUserHaveRightTime(options.date, options.lastPlacedPixelDate, options.offset) &&
-            this.doMapIsReady(options.game) &&
+            // this.doMapIsReady(options.game) &&
             this.doIsSticked(options.pixel, options.oldPixel, options.stickedPixelAvailable);
     }
 
@@ -217,9 +217,9 @@ export class UserService {
         return (stickedPixelAvailable > 0 && pixel.isSticked) || (!oldPixel.isSticked && !pixel.isSticked);
     }
 
-    private doMapIsReady(game) {
-        return game.isMapReady;
-    }
+    // private doMapIsReady(game) {
+    //     return game.isMapReady;
+    // }
 
     private doUserHaveRightPlacement(pixel: PlaceSinglePixel, game: GameSpec): boolean {
         return (pixel.coord_x > 0 && pixel.coord_x <= game.width) && (pixel.coord_y > 0 && pixel.coord_y <= game.width);

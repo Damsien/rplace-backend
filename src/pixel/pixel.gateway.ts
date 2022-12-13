@@ -18,7 +18,6 @@ import { UserGateway } from 'src/user/user.gateway';
     origin: '*'
   }
 })
-@UseGuards(GameGuard)
 @UseGuards(WsGuard)
 export class PixelGateway {
 
@@ -27,6 +26,7 @@ export class PixelGateway {
 
     constructor(private readonly pixelService: PixelService, private readonly userService: UserService, private readonly userGateway: UserGateway) {}
 
+    @UseGuards(GameGuard)
     @UseGuards(PlacePixelGuard)
     @SubscribeMessage('placePixel')
     async placeSinglePixel(@Req() req, @MessageBody() placePixelDto: PlaceSinglePixel,
@@ -51,5 +51,4 @@ export class PixelGateway {
         // client.broadcast.emit('pixel', pixel);
         return pixel;
     }
-
 }

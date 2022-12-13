@@ -1,4 +1,4 @@
-import { CanActivate, ExecutionContext, Inject, Injectable } from "@nestjs/common";
+import { CanActivate, ExecutionContext, forwardRef, Inject, Injectable } from "@nestjs/common";
 import { client } from "src/app.service";
 import { UserPayload } from "src/auth/type/userpayload.type";
 import { GameService } from "src/game/game.service";

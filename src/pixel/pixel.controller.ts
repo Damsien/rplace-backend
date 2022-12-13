@@ -11,7 +11,6 @@ import { RolesGuard } from 'src/user/guard/roles.guard';
 import { GameGuard } from 'src/game/guard/game.guard';
 import { PixelAnon } from './dto/pixel-anon.dto';
 
-@UseGuards(GameGuard)
 @Controller('pixel')
 export class PixelController {
 

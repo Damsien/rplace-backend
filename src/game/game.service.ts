@@ -1,4 +1,4 @@
-import { forwardRef, HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { forwardRef, HttpException, HttpStatus, Inject, Injectable, UseGuards } from '@nestjs/common';
 import { SchedulerRegistry } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EventService } from 'src/event/event.service';
@@ -16,6 +16,12 @@ import { UserService } from 'src/user/user.service';
 import { UserSpec } from './type/user-spec.type';
 import { UpdateGame } from './dto/update-game.dto';
 import { ServerGameSpec } from './type/server-game-spec.type';
+import { AllGlobalGame } from './type/all-global-game';
+import { RunnerGateway } from 'src/runner/runner.gateway';
+import { PixelGateway } from 'src/pixel/pixel.gateway';
+import { WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
+import { Server } from "socket.io";
+import { WsGuard } from 'src/auth/guard/ws.guard';
 
 @Injectable()
 export class GameService {
@@ -28,12 +34,28 @@ export class GameService {
       private readonly schedulerRegistry: SchedulerRegistry
     ) {}
 
+    // private async startGameSocket() {
+    //   const repo = client.fetchRepository(game_schema);
+    //   let game: Game = await repo.search().where('name').eq('Game').return.first();
+    //   while (!game.isMapReady) {
+    //       setInterval(() => {
+    //           repo.search().where('name').eq('Game').return.first().then((gm) => {
+    //               game = gm;
+    //           });
+    //       }, 3500);
+    //   }
+    //   this.server.emit('game', {
+    //       start: (await this.getGlobalGameMap())
+    //   });
+    // }
+
     startGame(game: StartGame): number {
       const milliseconds = EventService.findMsDifference(new Date(), game.schedule);
 
       const timeout = setTimeout(async () => {
         await this.userService.createUserIfNotExists({username: game.gameMasterUsername, pscope: 'root', password: null})
         this.pixelService.startGame(game);
+        // this.startGameSocket();
       }, milliseconds);
 
       try {
@@ -60,6 +82,7 @@ export class GameService {
       const timeout = setTimeout(() => {
         this.schedulerRegistry.deleteTimeout('startGame');
         this.schedulerRegistry.deleteTimeout('stopGame');
+        // this.server.emit('game', 'stop');
       }, milliseconds);
 
       try {
@@ -104,6 +127,17 @@ export class GameService {
         timer: game.timer,
         width: game.width,
         colors: game.getColors()
+      };
+    }
+
+    async getGlobalGameMap(): Promise<AllGlobalGame> {
+      const game = await this.getGlobalGameSpec();
+      const map = await this.pixelService.getMap();
+      return {
+        timer: game.timer,
+        width: game.width,
+        colors: game.colors,
+        map: map
       };
     }
 

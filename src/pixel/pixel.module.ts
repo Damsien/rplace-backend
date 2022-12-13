@@ -5,7 +5,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from 'src/auth/auth.module';
 import { AuthService } from 'src/auth/auth.service';
 import { GameService } from 'src/game/game.service';
-import { GameGuard } from 'src/game/guard/game.guard';
 import { PixelHistoryEntity } from 'src/pixel-history/entity/pixel-history.entity';
 import { PixelHistoryModule } from 'src/pixel-history/pixel-history.module';
 import { PixelHistoryService } from 'src/pixel-history/pixel-history.service';

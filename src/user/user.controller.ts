@@ -6,10 +6,10 @@ import { GameService } from 'src/game/game.service';
 import { GameGuard } from 'src/game/guard/game.guard';
 import { Roles } from './decorator/roles.decorator';
 import { Group } from './dto/Group.dto';
+import { RolesGuard } from './guard/roles.guard';
 import { Role } from './type/role.enum';
 import { UserService } from './user.service';
 
-@UseGuards(GameGuard)
 @UseGuards(AtAuthGuard)
 @Controller('user')
 export class UserController {
@@ -51,6 +51,8 @@ export class UserController {
     }
 
     @HttpCode(201)
+    @UseGuards(GameGuard)
+    @UseGuards(RolesGuard)
     @Roles(Role.ADMIN)
     @Post('create')
     createUser(@Body() user: UserComplete) {
@@ -58,6 +60,8 @@ export class UserController {
     }
 
     @HttpCode(201)
+    @UseGuards(GameGuard)
+    @UseGuards(RolesGuard)
     @Roles(Role.ADMIN)
     @Post('group/create')
     createGroup(@Body() group: Group) {
@@ -65,6 +69,7 @@ export class UserController {
     }
 
     @HttpCode(200)
+    @UseGuards(GameGuard)
     @Put('group/link')
     linkGroup(@Req() req, @Body() group: Group) {
         return this.userService.linkGroup(req.user, group);
