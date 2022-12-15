@@ -4,6 +4,7 @@ import { UserComplete } from 'src/auth/type/usercomplete.type';
 import { UserPayload } from 'src/auth/type/userpayload.type';
 import { GameService } from 'src/game/game.service';
 import { GameGuard } from 'src/game/guard/game.guard';
+import { StartGameGuard } from 'src/game/guard/start-game.guard';
 import { Roles } from './decorator/roles.decorator';
 import { Group } from './dto/Group.dto';
 import { RolesGuard } from './guard/roles.guard';
@@ -11,6 +12,7 @@ import { Role } from './type/role.enum';
 import { UserService } from './user.service';
 
 @UseGuards(AtAuthGuard)
+@UseGuards(StartGameGuard)
 @Controller('user')
 export class UserController {
 
