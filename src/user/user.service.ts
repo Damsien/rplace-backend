@@ -20,7 +20,9 @@ import { Socket } from 'socket.io';
 import * as bcrypt from 'bcrypt';
 import { UserComplete } from 'src/auth/type/usercomplete.type';
 import { Group } from './dto/Group.dto';
+import { Group as GroupRedis } from './entity/group.entity';
 import { GroupEntity } from './entity/group-sql.entity';
+import { group_schema } from './entity/group.entity';
 
 @Injectable()
 export class UserService {
@@ -79,6 +81,13 @@ export class UserService {
         } catch (err) {
             throw new ConflictException();
         }
+
+        const groupRepo = client.fetchRepository(group_schema);
+        await groupRepo.createIndex();
+        const groupRedis = await groupRepo.fetch(group.name);
+        groupRedis.name = group.name;
+        groupRedis.pixelsPlaced = 0;
+        groupRepo.save(groupRedis);
     }
 
     async createUserIfNotExists(user: UserComplete) {
@@ -108,30 +117,44 @@ export class UserService {
         return await this.repo.fetch(id);
     }
 
+    async getGroupRedis(group: string): Promise<GroupRedis> {
+        const repo = client.fetchRepository(group_schema);
+        return await repo.fetch(group);
+    }
+
     async getUserRank(user: User): Promise<number> {
         return client.fetchRepository(user_schema).search()
             .where('pixelsPlaced').greaterThanOrEqualTo(user.pixelsPlaced).count();
     }
 
-    async getUserFavColor(userId: string): Promise<string> {
+    async getGroupRank(group: GroupRedis): Promise<number> {
+        return client.fetchRepository(group_schema).search()
+            .where('pixelsPlaced').greaterThanOrEqualTo(group.pixelsPlaced).count();
+    }
+
+    async getUserFavColor(userId: string): Promise<any[]> {
         const colors = await this.pixelHistoRepo.manager.createQueryBuilder(PixelHistoryEntity, 'pixel')
             .select(['pixel.color']).addSelect('COUNT(pixel.color)', 'count')
             .leftJoin('pixel.userId', 'user')
             .where('pixel.userId = :userId', {userId: userId})
             .groupBy('pixel.color')
             .getRawMany();
-            // [{'color': 'green', 'count', '3'}, {'color': 'red', 'count', '6'}]
+            // [{'pixel_color': 'green', 'count': '3'}, {'pixel_color': 'red', 'count': '6'}]
 
-        let fav;
-        let count = 0;
-        for (let color of colors) {
-            if (Number(color['count']) >= count) {
-                count = color['count'];
-                fav = color['pixel_color'];
-            }
-        }
+        // let fav;
+        // let count = 0;
+        // for (let color of colors) {
+        //     if (Number(color['count']) >= count) {
+        //         count = color['count'];
+        //         fav = color['pixel_color'];
+        //     }
+        // }
 
-        return fav;
+        colors.sort(function(a, b) {
+            return b['count'] - a['count'];
+        });
+
+        return colors;
     }
 
 
@@ -210,6 +233,13 @@ export class UserService {
             }
         }
         await client.fetchRepository(user_schema).save(user);
+
+        const groupRepo = client.fetchRepository(group_schema);
+        if (user.group) {
+            const group = await groupRepo.search().where('name').eq(user.group).return.first();
+            group.pixelsPlaced++;
+            await groupRepo.save(group);
+        }
     }
 
 

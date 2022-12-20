@@ -9,4 +9,6 @@ export type UserSpec = {
     username: string;
     steps: {};
     group: string;
+    groupRank: number;
+    secondFavColor: string;
 }

@@ -144,10 +144,15 @@ export class GameService {
     async getUserGame(user: UserPayload): Promise<UserSpec> {
       this.repo = client.fetchRepository(game_schema);
       const userRedis = await this.userService.getUserRedis(`${user.pscope}.${user.username}`);
+      let groupRank;
+      if (userRedis.group) {
+        const groupRedis = await this.userService.getGroupRedis(userRedis.group);
+        groupRank = await this.userService.getGroupRank(groupRedis);
+      }
       const allGame: Game = await this.repo.search().where('name').eq('Game').return.first();
       const steps = allGame.getSteps();
       const rank = await this.userService.getUserRank(userRedis);
-      const fav = await this.userService.getUserFavColor(userRedis.entityId);
+      const favs = await this.userService.getUserFavColor(userRedis.entityId);
       const group = userRedis.group;
       return {
         pixelsPlaced: userRedis.pixelsPlaced,
@@ -155,11 +160,13 @@ export class GameService {
         bombs: userRedis.bombAvailable,
         stickedPixels: userRedis.stickedPixelAvailable,
         rank: rank,
-        favColor: fav,
+        favColor: favs[0]['pixel_color'],
         pscope: user.pscope,
         username: user.username,
         steps: steps,
-        group: group
+        group: group,
+        groupRank: groupRank,
+        secondFavColor: favs[1]['pixel_color']
       };
     }
 
