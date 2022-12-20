@@ -38,12 +38,22 @@ export class UserService {
         private readonly userGateway: UserGateway
     ) {}
 
+    async getGroups() {
+        let groups: Group[] = [];
+        let groupsEntity: GroupEntity[] = await this.groupRepo.find();
+        for (let group of groupsEntity) {
+            groups.push({name: group.name, alternatives: null});
+        }
+        return groups;
+    }
+
     async linkGroup(user: UserPayload, name: Group) {
         let groupName;
         try {
-            groupName = (await this.dataSource.manager.createQueryBuilder(GroupEntity, 'group')
-                .where('group.alternatives LIKE :name', {name: name})
-                .getOne()).name;
+            // groupName = (await this.dataSource.manager.createQueryBuilder(GroupEntity, 'group')
+            //     .where('INSTR(LOWER(group.alternatives), :name) > 0', {name: name})
+            //     .getOne()).name;
+            groupName = (await this.groupRepo.findOneBy({name: name.name})).name;
         } catch (err) {
             throw new NotFoundException();
         }

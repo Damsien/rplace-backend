@@ -77,6 +77,13 @@ export class UserController {
         return this.userService.linkGroup(req.user, group);
     }
 
+    @HttpCode(200)
+    @UseGuards(StartGameGuard)
+    @Get('groups')
+    getGroups(@Req() req) {
+        return this.userService.getGroups();
+    }
+
 
     @HttpCode(200)
     @Get('game-state')
