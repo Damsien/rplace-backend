@@ -56,7 +56,7 @@ export class PlacePixelGuard implements CanActivate {
             return isRight;
 
         } catch(err) {
-            logger.debug(err);
+            logger.debug('[PlacePixelGuard] ' + err);
             return false;
         }
     }

@@ -19,6 +19,7 @@ export class PatternShapeGuard implements CanActivate {
             const patterns = (await this.patternService.getAllUserPatterns(userId)).self;
 
             if (patterns.find((el) => el.patternId == patternId) === undefined) {
+                logger.debug('undefineeed')
                 return false;
             }
 
@@ -33,7 +34,7 @@ export class PatternShapeGuard implements CanActivate {
             return true;
 
         } catch(err) {
-            logger.debug(err);
+            logger.debug('[PatternShapeGuard] ' + err);
             return false;
         }
     }

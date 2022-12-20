@@ -76,7 +76,7 @@ export class RunnerService {
         });
 
       } catch (err) {
-        logger.error(err);
+        logger.error('[RunnerService/increaseMapSize] ' + err);
       }
     }
 

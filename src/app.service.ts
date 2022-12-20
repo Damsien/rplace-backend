@@ -64,7 +64,7 @@ export class AppService implements OnModuleInit {
                 this.eventService.registerNewEvent(eventReg, {username: username, pscope: pscope});
             }
         } catch (err) {
-            logger.debug(err);
+            logger.debug('[AppService/searchForEvent] ' + err);
         }
     }
 

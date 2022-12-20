@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, Param, Post, Put, Req, Request, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Param, Post, Put, Req, Request, Response, UseGuards } from '@nestjs/common';
 import { AtAuthGuard } from 'src/auth/guard/at-auth.guard';
 import { UserComplete } from 'src/auth/type/usercomplete.type';
 import { UserPayload } from 'src/auth/type/userpayload.type';
@@ -76,5 +76,10 @@ export class UserController {
     linkGroup(@Req() req, @Body() group: Group) {
         return this.userService.linkGroup(req.user, group);
     }
+
+
+    @HttpCode(200)
+    @Get('game-state')
+    hasTheGameStarted() { }
 
 }

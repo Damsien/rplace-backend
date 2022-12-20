@@ -19,7 +19,7 @@ export class WsGuard implements CanActivate {
             
             return true;
         } catch(err) {
-            logger.debug(err);
+            logger.debug('[WsGuard] ' + err);
             return false;
         }
     }

@@ -96,7 +96,7 @@ export class PatternService {
                 await this.patternBindRepo.insert(patternBind);
             }
         } catch (err) {
-            logger.debug(err);
+            logger.debug('[PatternService/getPattern] ' + err);
         }
         return await this.patternShapeService.getPatternShape(id);
     }
