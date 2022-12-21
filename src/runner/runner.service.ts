@@ -13,6 +13,7 @@ import { logger } from 'src/main';
 import { PixelHistoryService } from 'src/pixel-history/pixel-history.service';
 import { PlaceSinglePixel } from 'src/pixel/dto/place-single-pixel.dto';
 import { PixelService } from 'src/pixel/pixel.service';
+import { User, user_schema } from 'src/user/entity/user.entity';
 import { RunnerGateway } from './runner.gateway';
 
 @Injectable()
@@ -83,12 +84,19 @@ export class RunnerService {
     async updateTimer(newTimer: UpdateGameTimer) {
       this.gameRepo = client.fetchRepository(game_schema);
       const game: Game = await this.gameRepo.search().where('name').eq('Game').return.first();
-      game.timer = newTimer.timer;
+      game.timer += newTimer.timer;
       await this.gameRepo.save(game);
 
       this.runnerGateway.sendGameEvent({
         timer: newTimer.timer
       });
+
+      const userRepo = client.fetchRepository(user_schema);
+      const users: User[] = await userRepo.search().all();
+      for (let user of users) {
+        user.timer += newTimer.timer;
+        userRepo.save(user);
+      }
     }
 
     async updateColors(newColors: UpdateGameColors) {

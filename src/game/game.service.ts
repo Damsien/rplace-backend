@@ -22,6 +22,7 @@ import { PixelGateway } from 'src/pixel/pixel.gateway';
 import { WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server } from "socket.io";
 import { WsGuard } from 'src/auth/guard/ws.guard';
+import { Step } from './type/step.type';
 
 @Injectable()
 export class GameService {
@@ -186,6 +187,12 @@ export class GameService {
       this.repo = client.fetchRepository(game_schema);
       const game: Game = await this.repo.search().where('name').eq('Game').return.first();
       return game.getHexFromName(name);
+    }
+
+    async changeConfiguration(steps: Step[]) {
+      const game: Game = await this.repo.search().where('name').eq('Game').return.first();
+      game.setSteps(steps);
+      await this.repo.save(game);
     }
 
 

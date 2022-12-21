@@ -14,6 +14,7 @@ import { logger } from 'src/main';
 import { Whitelist, whitelist_schema } from 'src/auth/entity/whitelist.entity';
 import { blacklist_schema } from 'src/auth/entity/blacklist.entity';
 import { List } from './dto/list.dto';
+import { Step } from './type/step.type';
 
 @UseGuards(RolesGuard)
 @UseGuards(AtAuthGuard)
@@ -126,6 +127,12 @@ export class GameController {
         for (let userId of list.list) {
             blacklistRepo.remove(userId);
         }
+    }
+
+    @HttpCode(200)
+    @Post('configure')
+    async changeConfiguration(@Body() conf: Step[]) {
+        this.gameService.changeConfiguration(conf);
     }
 
 }
