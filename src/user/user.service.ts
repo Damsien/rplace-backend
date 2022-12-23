@@ -270,7 +270,11 @@ export class UserService {
         lastPixelDate: Date,
         offset: number
     ): boolean {
-        return date.getTime() - lastPixelDate.getTime() >= offset *1000;
+        logger.debug(offset*1000)
+        logger.debug(date.getTime())
+        logger.debug(lastPixelDate.getTime())
+        logger.debug(lastPixelDate.getTime() + offset * 1000)
+        return lastPixelDate.getTime() + offset * 1000 <= date.getTime();
     }
 
     private doUserHaveRightColor(colors: Array<String>, color: string): boolean {

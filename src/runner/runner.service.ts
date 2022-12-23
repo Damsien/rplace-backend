@@ -87,16 +87,19 @@ export class RunnerService {
       game.timer += newTimer.timer;
       await this.gameRepo.save(game);
 
-      this.runnerGateway.sendGameEvent({
-        timer: newTimer.timer
-      });
-
       const userRepo = client.fetchRepository(user_schema);
       const users: User[] = await userRepo.search().all();
       for (let user of users) {
-        user.timer += newTimer.timer;
-        userRepo.save(user);
+        if (user.timer) {
+          user.timer += newTimer.timer;
+          userRepo.save(user);
+        }
       }
+
+      this.runnerGateway.sendGameEvent({
+        // timer: game.timer
+        timer: newTimer.timer
+      });
     }
 
     async updateColors(newColors: UpdateGameColors) {

@@ -43,7 +43,9 @@ export class PixelGateway {
         // Push on redis
         const userRepo = redisClient.fetchRepository(user_schema);
         const userRedis: User = await userRepo.fetch(userId);
-        userRedis.lastPlacedPixel = new Date();
+        const date = new Date();
+        logger.debug(`User date : ${date.getTime()}`)
+        userRedis.lastPlacedPixel = date;
         await userRepo.save(userRedis);
 
         const pixel = await this.pixelService.placeSinglePixel(placePixelDto);

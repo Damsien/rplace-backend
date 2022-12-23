@@ -185,11 +185,13 @@ export class GameService {
 
     async getAssociatedColor(name: string) {
       this.repo = client.fetchRepository(game_schema);
+      this.repo = client.fetchRepository(game_schema);
       const game: Game = await this.repo.search().where('name').eq('Game').return.first();
       return game.getHexFromName(name);
     }
 
     async changeConfiguration(steps: Step[]) {
+      this.repo = client.fetchRepository(game_schema);
       const game: Game = await this.repo.search().where('name').eq('Game').return.first();
       game.setSteps(steps);
       await this.repo.save(game);
