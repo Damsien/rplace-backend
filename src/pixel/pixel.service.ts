@@ -113,6 +113,9 @@ export class PixelService {
 
       this.repo.save(pixel);
 
+      userRedis.lastPlacedPixel = now;
+      userRepo.save(userRedis);
+
       /*    Pushing pixel in PixelHistory section   */
       this.pixelHistoryService.addSinglePixel(pixel);
 

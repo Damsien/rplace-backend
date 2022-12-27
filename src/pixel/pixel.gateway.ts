@@ -38,15 +38,6 @@ export class PixelGateway {
             await client.fetchRepository(user_schema).save(req.user);
             this.userGateway.sendUserEvent({stickedPixels: req.user.stickedPixelAvailable}, sockClient);
         }
-        
-        const userId = `${placePixelDto.pscope}.${placePixelDto.username}`;
-        // Push on redis
-        const userRepo = redisClient.fetchRepository(user_schema);
-        const userRedis: User = await userRepo.fetch(userId);
-        const date = new Date();
-        logger.debug(`User date : ${date.getTime()}`)
-        userRedis.lastPlacedPixel = date;
-        await userRepo.save(userRedis);
 
         const pixel = await this.pixelService.placeSinglePixel(placePixelDto);
         this.server.emit('pixel', pixel);
