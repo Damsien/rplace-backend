@@ -377,4 +377,13 @@ export class UserService {
         return [token, lt, cas_session, lb];
     }
 
+
+
+
+
+    /*       GET CURRENT USERS       */
+    async getCurrentUsers() {
+        return await this.userRepo.find();
+    }
+    
 }

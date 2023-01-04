@@ -15,6 +15,7 @@ import { Whitelist, whitelist_schema } from 'src/auth/entity/whitelist.entity';
 import { blacklist_schema } from 'src/auth/entity/blacklist.entity';
 import { List } from './dto/list.dto';
 import { Step } from './type/step.type';
+import { query } from 'express';
 
 @UseGuards(RolesGuard)
 @UseGuards(AtAuthGuard)
@@ -132,7 +133,15 @@ export class GameController {
     @HttpCode(200)
     @Post('configure')
     async changeConfiguration(@Body() conf: Step[]) {
-        this.gameService.changeConfiguration(conf);
+        await this.gameService.changeConfiguration(conf);
+    }
+
+
+    /*      REDIS RECOVER FROM SQL      */
+    @HttpCode(200)
+    @Post('recover')
+    async recovery(@Body() query: StartGame) {
+        await this.gameService.recoverData(query);
     }
 
 }

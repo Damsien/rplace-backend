@@ -127,4 +127,31 @@ export class PixelHistoryService {
     return count;
   }
 
+
+  /*    GET CURRENT MAP PIXELS    */
+  async getCurrentMapPixels() {
+    // return await this.pixelHistoRepo.createQueryBuilder()
+    //   .select('p.coord_x', 'pixel_entity')
+    //   .select('p.coord_y', 'pixel_entity')
+    //   .addSelect('ph.color', 'pixel_history_entity')
+    //   .addSelect('ph.userId', 'pixel_history_entity')
+    //   .from(PixelHistoryEntity, 'ph')
+    //   .innerJoin(
+    //     `(SELECT pixelId, MAX(date) as MaxTime FROM pixel_history_entity GROUP BY pixelId)`,
+    //     'ph2',
+    //     'ph.pixelId = ph2.pixelId AND ph.date = ph2.maxTime'
+    //   )
+    //   .innerJoin(PixelEntity, 'p', 'ph.pixelId = p.pixelId')
+    //   .getRawMany();
+    return await this.dataSource.manager.query(`
+      SELECT p.coord_x, p.coord_y, ph.color, ph.userId
+      FROM pixel_history_entity ph
+      INNER JOIN (
+        SELECT pixelId, MAX(date) as MaxTime FROM pixel_history_entity GROUP BY pixelId
+      ) ph2 ON ph.pixelId = ph2.pixelId AND ph.date = ph2.maxTime
+      INNER JOIN pixel_entity p ON ph.pixelId = p.pixelId;
+    `);
+  }
+
+
 }

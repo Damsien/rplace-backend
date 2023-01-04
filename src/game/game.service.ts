@@ -23,6 +23,9 @@ import { WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server } from "socket.io";
 import { WsGuard } from 'src/auth/guard/ws.guard';
 import { Step } from './type/step.type';
+import { PixelHistoryService } from 'src/pixel-history/pixel-history.service';
+import { user_schema } from 'src/user/entity/user.entity';
+import { pixel_schema } from 'src/pixel/entity/pixel.entity';
 
 @Injectable()
 export class GameService {
@@ -31,6 +34,7 @@ export class GameService {
 
     constructor(
       private readonly pixelService: PixelService,
+      private readonly pixelHistoryService: PixelHistoryService,
       private readonly userService: UserService,
       private readonly schedulerRegistry: SchedulerRegistry
     ) {}
@@ -195,6 +199,59 @@ export class GameService {
       const game: Game = await this.repo.search().where('name').eq('Game').return.first();
       game.setSteps(steps);
       await this.repo.save(game);
+    }
+
+
+
+
+    /*    RECOVER DATA    */
+
+    async recoverData(query: StartGame) {
+
+      //  Rebuild game
+      if (query) {
+        this.repo = client.fetchRepository(game_schema);
+        await this.repo.createIndex();
+        const gameRedis = await this.repo.fetch('Game');
+        gameRedis.name = 'Game';
+        gameRedis.setColors(query.colors);
+        gameRedis.user = query.gameMasterUsername;
+        gameRedis.startSchedule = query.schedule;
+        gameRedis.timer = query.timer;
+        gameRedis.width = query.mapWidth;
+        gameRedis.isMapReady = false;
+        gameRedis.isOperationReady = true;
+        gameRedis.setSteps(query.steps);
+        await this.repo.save(gameRedis);
+      }
+
+      //  Rebuild pixels
+      const pixels = await this.pixelHistoryService.getCurrentMapPixels();
+      logger.debug(pixels.length);
+      const pixelRepo = client.fetchRepository(pixel_schema);
+      await pixelRepo.createIndex();
+      for (let pixel of pixels) {
+        let pxl = await pixelRepo.fetch(`${pixel.coord_x}-${pixel.coord_y}`);
+        pxl.coord_x = pixel.coord_x;
+        pxl.coord_y = pixel.coord_y;
+        pxl.user = pixel.userId;
+        pxl.color = pixel.color;
+        await pixelRepo.save(pxl);
+      }
+
+      await this.pixelService.updateRedisMap();
+
+      //  Rebuild users
+      const users = await this.userService.getCurrentUsers();
+      const userRepo = client.fetchRepository(user_schema);
+      await userRepo.createIndex();
+      for (let user of users) {
+        let usr = await userRepo.fetch(user.userId);
+        usr.stickedPixelAvailable = user.stickedPixelAvailable ?? 0;
+        usr.isUserGold = user.isUserGold ?? false;
+        await userRepo.save(usr);
+      }
+
     }
 
 
