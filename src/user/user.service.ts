@@ -174,15 +174,15 @@ export class UserService {
 
             case StepType.STICKED_PIXEL: {
                 value = step.value['stickedPixels'];
-                userRedis.stickedPixelAvailable = value;
-                userEntity.stickedPixelAvailable = value;
+                userRedis.stickedPixelAvailable += value;
+                userEntity.stickedPixelAvailable += value;
                 this.userGateway.sendUserEvent({stickedPixels: userRedis.stickedPixelAvailable}, sockClient);
             } break;
 
             case StepType.BOMB: {
                 value = step.value['bombs'];
-                userRedis.bombAvailable = value;
-                userRedis.bombAvailable = value;
+                userRedis.bombAvailable += value;
+                userRedis.bombAvailable += value;
                 this.userGateway.sendUserEvent({bombs: userRedis.bombAvailable}, sockClient);
             } break;
 
@@ -201,7 +201,11 @@ export class UserService {
 
             case StepType.TIMER: {
                 value = step.value['timer'];
-                userRedis.timer = value;
+                if (userRedis.timer) {
+                    userRedis.timer += value;
+                } else {
+                    userRedis.timer = game.timer + value;
+                }
                 this.userGateway.sendUserEvent({timer: userRedis.timer}, sockClient);
             } break;
 
@@ -225,14 +229,14 @@ export class UserService {
         const game = await client.fetchRepository(game_schema)
             .search().where('name').eq('Game').return.first();
 
-        user.pixelsPlaced++;
+        // user.pixelsPlaced++;
         const userEntity = await this.userRepo.findOneBy({userId: user.entityId});
         for (let points of game.getStepsPoints()) {
-            if (points == user.pixelsPlaced) {
+            if (points == user.pixelsPlaced+1) {
                 await this.setUserGrade(points, user, userEntity, game, sockClient);
             }
         }
-        await client.fetchRepository(user_schema).save(user);
+        // await client.fetchRepository(user_schema).save(user);
 
         const groupRepo = client.fetchRepository(group_schema);
         if (user.group) {

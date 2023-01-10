@@ -152,11 +152,20 @@ export class GameService {
       let groupRank;
       if (userRedis.group) {
         const groupRedis = await this.userService.getGroupRedis(userRedis.group);
-        groupRank = await this.userService.getGroupRank(groupRedis);
+        try{
+          groupRank = await this.userService.getGroupRank(groupRedis);
+        } catch (err) {
+          groupRank = 1000;
+        }
       }
       const allGame: Game = await this.repo.search().where('name').eq('Game').return.first();
       const steps = allGame.getSteps();
-      const rank = await this.userService.getUserRank(userRedis);
+      let rank = 1000;
+      try{
+        rank = await this.userService.getUserRank(userRedis);
+      } catch (err) {
+        rank = 1000;
+      }
       const favs = await this.userService.getUserFavColor(userRedis.entityId);
       const group = userRedis.group;
       return {
@@ -165,13 +174,13 @@ export class GameService {
         bombs: userRedis.bombAvailable,
         stickedPixels: userRedis.stickedPixelAvailable,
         rank: rank,
-        favColor: favs[0]['pixel_color'],
+        favColor: favs[0] != undefined ? favs[0]['pixel_color'] : 'white',
         pscope: user.pscope,
         username: user.username,
         steps: steps,
         group: group,
         groupRank: groupRank,
-        secondFavColor: favs[1]['pixel_color']
+        secondFavColor: favs[1] != undefined ? favs[1]['pixel_color'] : 'white'
       };
     }
 
@@ -209,10 +218,10 @@ export class GameService {
     async recoverData(query: StartGame) {
 
       //  Rebuild game
+      this.repo = client.fetchRepository(game_schema);
+      await this.repo.createIndex();
+      const gameRedis = await this.repo.fetch('Game');
       if (query) {
-        this.repo = client.fetchRepository(game_schema);
-        await this.repo.createIndex();
-        const gameRedis = await this.repo.fetch('Game');
         gameRedis.name = 'Game';
         gameRedis.setColors(query.colors);
         gameRedis.user = query.gameMasterUsername;
@@ -227,16 +236,32 @@ export class GameService {
 
       //  Rebuild pixels
       const pixels = await this.pixelHistoryService.getCurrentMapPixels();
-      logger.debug(pixels.length);
       const pixelRepo = client.fetchRepository(pixel_schema);
       await pixelRepo.createIndex();
-      for (let pixel of pixels) {
-        let pxl = await pixelRepo.fetch(`${pixel.coord_x}-${pixel.coord_y}`);
-        pxl.coord_x = pixel.coord_x;
-        pxl.coord_y = pixel.coord_y;
-        pxl.user = pixel.userId;
-        pxl.color = pixel.color;
-        await pixelRepo.save(pxl);
+      // for (let pixel of pixels) {
+      //   let pxl = await pixelRepo.fetch(`${pixel.coord_x}-${pixel.coord_y}`);
+      //   pxl.coord_x = pixel.coord_x;
+      //   pxl.coord_y = pixel.coord_y;
+      //   pxl.user = pixel.userId;
+      //   pxl.color = pixel.color;
+      //   await pixelRepo.save(pxl);
+      // }
+
+      for (let i=0; i<gameRedis.width; i++) {
+        for (let j=0; j<gameRedis.width; j++) {
+          let pixel = pixels.find(el => el.coord_x == i && el.coord_y == j);
+          let pxl = await pixelRepo.fetch(`${i}-${j}`);
+          pxl.coord_x = i;
+          pxl.coord_y = j;
+          if (pixel != null && pixel != undefined) {
+            pxl.user = pixel.userId;
+            pxl.color = pixel.color;
+          } else {
+            pxl.user = 'root.game';
+            pxl.color = 'white';
+          }
+          await pixelRepo.save(pxl);
+        }
       }
 
       await this.pixelService.updateRedisMap();

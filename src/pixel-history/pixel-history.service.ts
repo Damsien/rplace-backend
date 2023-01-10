@@ -147,8 +147,8 @@ export class PixelHistoryService {
       SELECT p.coord_x, p.coord_y, ph.color, ph.userId
       FROM pixel_history_entity ph
       INNER JOIN (
-        SELECT pixelId, MAX(date) as MaxTime FROM pixel_history_entity GROUP BY pixelId
-      ) ph2 ON ph.pixelId = ph2.pixelId AND ph.date = ph2.maxTime
+        SELECT pixelId, MAX(id) as MaxTime FROM pixel_history_entity GROUP BY pixelId
+      ) ph2 ON ph.pixelId = ph2.pixelId AND ph.id = ph2.maxTime
       INNER JOIN pixel_entity p ON ph.pixelId = p.pixelId;
     `);
   }

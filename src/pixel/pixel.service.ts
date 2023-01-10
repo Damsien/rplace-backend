@@ -75,7 +75,7 @@ export class PixelService {
       return await this.repo.search().where('coord_x').eq(pxl.coord_x).and('coord_y').eq(pxl.coord_y).return.first();
     }
 
-    async placeSinglePixel(pxl: PlaceSinglePixel): Promise<Pixel> {
+    async placeSinglePixel(pxl: PlaceSinglePixel, usrRedis?, usrRepo?): Promise<Pixel> {
       const user: UserPayload = {
           username: pxl.username,
           pscope: pxl.pscope
@@ -85,8 +85,15 @@ export class PixelService {
 
       this.repo = client.fetchRepository(pixel_schema);
 
-      const userRepo = client.fetchRepository(user_schema);
-      const userRedis = await userRepo.fetch(userId);
+      let userRepo;
+      let userRedis;
+      if (!usrRedis) {
+        userRepo = client.fetchRepository(user_schema);
+        userRedis = await userRepo.fetch(userId);
+      } else {
+        userRedis = usrRedis;
+        userRepo = usrRepo;
+      }
       let isUserGold = false;
       try {
         isUserGold = userRedis.isUserGold;
@@ -114,7 +121,9 @@ export class PixelService {
       this.repo.save(pixel);
 
       userRedis.lastPlacedPixel = now;
-      userRepo.save(userRedis);
+      if(!usrRedis) {
+        userRepo.save(userRedis);
+      }
 
       /*    Pushing pixel in PixelHistory section   */
       this.pixelHistoryService.addSinglePixel(pixel);

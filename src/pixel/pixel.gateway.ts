@@ -12,6 +12,7 @@ import { logger } from 'src/main';
 import { User, user_schema } from 'src/user/entity/user.entity';
 import { UserService } from 'src/user/user.service';
 import { UserGateway } from 'src/user/user.gateway';
+import { UserPayload } from 'src/auth/type/userpayload.type';
 
 @WebSocketGateway({
   cors: {
@@ -31,15 +32,27 @@ export class PixelGateway {
     @SubscribeMessage('placePixel')
     async placeSinglePixel(@Req() req, @MessageBody() placePixelDto: PlaceSinglePixel,
       @ConnectedSocket() sockClient: Socket): Promise<Pixel> {
+        const user: UserPayload = {
+          username: placePixelDto.username,
+          pscope: placePixelDto.pscope
+        };
+        const userId = `${user.pscope}.${user.username}`;
+        const userRepo = client.fetchRepository(user_schema);
+        let userRedis = await userRepo.fetch(userId);
+
         // Check user's point to upgrade is grade
-        this.userService.checkPoints(req.user, sockClient);
+        await this.userService.checkPoints(userRedis, sockClient);
         if (placePixelDto.isSticked) {
-            req.user.stickedPixelAvailable--;
-            await client.fetchRepository(user_schema).save(req.user);
-            this.userGateway.sendUserEvent({stickedPixels: req.user.stickedPixelAvailable}, sockClient);
+          userRedis.stickedPixelAvailable--;
+          // await client.fetchRepository(user_schema).save(req.user);
+          this.userGateway.sendUserEvent({stickedPixels: userRedis.stickedPixelAvailable}, sockClient);
         }
 
-        const pixel = await this.pixelService.placeSinglePixel(placePixelDto);
+        const pixel = await this.pixelService.placeSinglePixel(placePixelDto, userRedis, userRepo);
+
+        userRedis.pixelsPlaced++;
+        await userRepo.save(userRedis);
+
         this.server.emit('pixel', pixel);
         // client.broadcast.emit('pixel', pixel);
         return pixel;

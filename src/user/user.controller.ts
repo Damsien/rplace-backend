@@ -12,13 +12,13 @@ import { Role } from './type/role.enum';
 import { UserService } from './user.service';
 
 @UseGuards(AtAuthGuard)
-@UseGuards(StartGameGuard)
 @Controller('user')
 export class UserController {
 
     constructor(private readonly gameService: GameService, private readonly userService: UserService) {}
 
     @HttpCode(200)
+    @UseGuards(StartGameGuard)
     @Get('/other/:id')
     getOtherUserSpec(@Param('id') id: string) {
         const user: UserPayload = {
@@ -29,31 +29,35 @@ export class UserController {
     }
 
     @HttpCode(200)
+    @UseGuards(StartGameGuard)
     @Get('/spec')
     getUserGameSpec(@Request() req) {
         return this.gameService.getUserGame(req.user);
     }
 
     @HttpCode(200)
+    @UseGuards(StartGameGuard)
     @Get('/username')
     getUsername(@Request() req) {
         return {pscope: req.user.pscope, username: req.user.username};
     }
     
     @HttpCode(200)
+    @UseGuards(StartGameGuard)
     @Get('game/all')
     getAllGame(@Request() req) {
         return this.gameService.getUserGameMap(req.user);
     }
 
     @HttpCode(200)
+    @UseGuards(StartGameGuard)
     @Get('game/spec')
     getAllGameSpec() {
         return this.gameService.getGlobalGameSpec();
     }
 
     @HttpCode(201)
-    @UseGuards(GameGuard)
+    // @UseGuards(GameGuard)
     @UseGuards(RolesGuard)
     @Roles(Role.ADMIN)
     @Post('create')
@@ -62,7 +66,7 @@ export class UserController {
     }
 
     @HttpCode(201)
-    @UseGuards(GameGuard)
+    // @UseGuards(GameGuard)
     @UseGuards(RolesGuard)
     @Roles(Role.ADMIN)
     @Post('group/create')
@@ -86,6 +90,7 @@ export class UserController {
 
 
     @HttpCode(200)
+    @UseGuards(StartGameGuard)
     @Get('game-state')
     hasTheGameStarted() { }
 
