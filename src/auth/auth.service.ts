@@ -89,21 +89,21 @@ export class AuthService {
 
     /* USED BY WS GUARD */
     async validateToken(token: string) {
-        logger.debug(this.configService.get<string>('AT_SECRET'))
         const user = await this.jwtService.verify(token, {
             secret: this.configService.get<string>('AT_SECRET')
         });
-        logger.debug(user)
         if (!(await this.checkLists(user.pscope, user.username))) {
             throw new UnauthorizedException();
         }
+        logger.log('[Ws Strat]')
+        logger.log(`${user.pscope}.${user.username}`)
         return user;
     }
 
     /*  USED BY AT AND RT STRATEGIES    */
     async validateTokens(user: UserPayload) {
-        logger.debug('[At Strat]')
-        logger.debug(user)
+        logger.log('[At Strat]')
+        logger.log(`${user.pscope}.${user.username}`)
         if (!(await this.checkLists(user.pscope, user.username))) {
             throw new UnauthorizedException();
         }
