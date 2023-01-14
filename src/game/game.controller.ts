@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpCode, Post, Put, UseGuards, Request } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, Post, Put, UseGuards, Request, HttpException, ConflictException } from '@nestjs/common';
 import { AtAuthGuard } from 'src/auth/guard/at-auth.guard';
 import { Roles } from 'src/user/decorator/roles.decorator';
 import { RolesGuard } from 'src/user/guard/roles.guard';
@@ -72,6 +72,19 @@ export class GameController {
         this.repo.save(gameRedis);
         this.gameService.cancelGameStop();
         return `The game stop schedule has been cancelled`;
+    }
+
+    @HttpCode(200)
+    @Post('play')
+    async playAfterPause() {
+        const gameRedis = await this.repo.search().where('name').eq('Game').return.first();
+        if (gameRedis.stopSchedule == null || gameRedis.stopSchedule > new Date()) {
+            return new ConflictException("The game stop hasn't been schedule or the game is already in playing mode");
+        } else {
+            gameRedis.stopSchedule = null;
+        }
+        this.repo.save(gameRedis);
+        return 'The game is restarted';
     }
 
 

@@ -95,15 +95,13 @@ export class AuthService {
         if (!(await this.checkLists(user.pscope, user.username))) {
             throw new UnauthorizedException();
         }
-        logger.log('[Ws Strat]')
-        logger.log(`${user.pscope}.${user.username}`)
+        logger.log(`[Ws Strat] ${user.pscope}.${user.username}`)
         return user;
     }
 
     /*  USED BY AT AND RT STRATEGIES    */
     async validateTokens(user: UserPayload) {
-        logger.log('[At Strat]')
-        logger.log(`${user.pscope}.${user.username}`)
+        logger.log(`[At Strat] ${user.pscope}.${user.username}`)
         if (!(await this.checkLists(user.pscope, user.username))) {
             throw new UnauthorizedException();
         }

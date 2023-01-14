@@ -26,6 +26,7 @@ import { Step } from './type/step.type';
 import { PixelHistoryService } from 'src/pixel-history/pixel-history.service';
 import { user_schema } from 'src/user/entity/user.entity';
 import { pixel_schema } from 'src/pixel/entity/pixel.entity';
+import { Color } from './type/color.type';
 
 @Injectable()
 export class GameService {
@@ -113,13 +114,26 @@ export class GameService {
       const userRedis = await this.userService.getUserRedis(`${user.pscope}.${user.username}`);
       const game: Game = await this.repo.search().where('name').eq('Game').return.first();
       const map = await this.pixelService.getMap();
+
+      const colors: Color[] = [];
+      const userColors = userRedis.getColors();
+      for (let color of game.getColors()) {
+        color.isUserColor = false;
+        colors.push(color);
+      }
+      if (userColors != null) {
+        for (let color of userColors) {
+          color.isUserColor = true;
+          colors.push(color);
+        }
+      }
       return {
         now: new Date(Date.now()),
         lastPixelPlaced: userRedis.lastPlacedPixel,
         timer: userRedis.timer != null ? userRedis.timer : game.timer,
         map: map,
         width: game.width,
-        colors: userRedis.getColors() != null ? [...game.getColors(), ...userRedis.getColors()] : game.getColors(),
+        colors: colors,
         bombs: userRedis.bombAvailable,
         stickedPixels: userRedis.stickedPixelAvailable
       };

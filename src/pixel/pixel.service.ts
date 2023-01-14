@@ -98,7 +98,7 @@ export class PixelService {
       try {
         isUserGold = userRedis.isUserGold;
       } catch(err) {
-        logger.log('User unknown or root user');
+        logger.log('[Place single pixel] User unknown or root user');
         isUserGold = false;
       }
 

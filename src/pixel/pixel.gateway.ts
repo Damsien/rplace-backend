@@ -45,7 +45,7 @@ export class PixelGateway {
         if (placePixelDto.isSticked) {
           userRedis.stickedPixelAvailable--;
           // await client.fetchRepository(user_schema).save(req.user);
-          this.userGateway.sendUserEvent({stickedPixels: userRedis.stickedPixelAvailable}, sockClient);
+          // this.userGateway.sendUserEvent({stickedPixels: userRedis.stickedPixelAvailable}, sockClient);
         }
 
         const pixel = await this.pixelService.placeSinglePixel(placePixelDto, userRedis, userRepo);

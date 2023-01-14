@@ -156,7 +156,8 @@ export class RunnerService {
       for(let color of event.values['colors']) {
         val.colors.push({
           'name': color.name,
-          'hex': color.hex
+          'hex': color.hex,
+          'isUserColor': false
         });
       }
       return val;

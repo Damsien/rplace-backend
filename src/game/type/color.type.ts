@@ -1,5 +1,6 @@
 
 export type Color = {
     name: string;
-    hex: string
+    hex: string;
+    isUserColor: boolean;
 };
