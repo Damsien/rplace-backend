@@ -42,9 +42,9 @@ export class GameController {
         gameRedis.isMapReady = false;
         gameRedis.isOperationReady = true;
         gameRedis.setSteps(query.steps);
-        await this.repo.save(gameRedis);
 
         const timeout = this.gameService.startGame(query);
+        await this.repo.save(gameRedis);
         return `The game will start in ${timeout}ms (or ${query.schedule})`;
     }
     @HttpCode(202)
@@ -60,8 +60,8 @@ export class GameController {
     async stopGame(@Body() query: StopGame) {
         const gameRedis = await this.repo.search().where('name').eq('Game').return.first();
         gameRedis.stopSchedule = query.schedule;
-        this.repo.save(gameRedis);
         const timeout = this.gameService.stopGame(query);
+        await this.repo.save(gameRedis);
         return `The game will stop in ${timeout}ms (or ${query.schedule})`;
     }
     @HttpCode(202)

@@ -1,4 +1,4 @@
-import { Body, Controller, Request, Put, UseGuards, Delete, HttpCode, Query, Param, Req } from '@nestjs/common';
+import { Body, Controller, Request, Put, UseGuards, Delete, HttpCode, Query, Param, Req, GoneException } from '@nestjs/common';
 import { AtAuthGuard } from 'src/auth/guard/at-auth.guard';
 import { GameGuard } from 'src/game/guard/game.guard';
 import { PlacePatternPixel } from './dto/place-pattern-pixel.dto';
@@ -19,8 +19,12 @@ export class PatternShapeController {
     @HttpCode(200)
     @Put('place/:patternId')
     placePixel(@Param('patternId') patternId: string, @Body() pixel: PlacePatternPixel) {
-        pixel.patternId = patternId
-        this.patternShapeService.place(pixel);
+        pixel.patternId = patternId;
+        try {
+            this.patternShapeService.place(pixel);
+        } catch (err) {
+            throw new GoneException();
+        }
     }
 
     @HttpCode(200)

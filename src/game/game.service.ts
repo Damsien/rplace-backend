@@ -27,6 +27,7 @@ import { PixelHistoryService } from 'src/pixel-history/pixel-history.service';
 import { user_schema } from 'src/user/entity/user.entity';
 import { pixel_schema } from 'src/pixel/entity/pixel.entity';
 import { Color } from './type/color.type';
+import { UserGateway } from 'src/user/user.gateway';
 
 @Injectable()
 export class GameService {
@@ -37,7 +38,8 @@ export class GameService {
       private readonly pixelService: PixelService,
       private readonly pixelHistoryService: PixelHistoryService,
       private readonly userService: UserService,
-      private readonly schedulerRegistry: SchedulerRegistry
+      private readonly schedulerRegistry: SchedulerRegistry,
+      private readonly userGateway: UserGateway
     ) {}
 
     // private async startGameSocket() {
@@ -86,7 +88,10 @@ export class GameService {
       const milliseconds = EventService.findMsDifference(new Date(), game.schedule);
 
       const timeout = setTimeout(() => {
-        this.schedulerRegistry.deleteTimeout('startGame');
+        this.userGateway.sendGameEvent({'stop': true})
+        try {
+          this.schedulerRegistry.deleteTimeout('startGame');
+        } catch (err) {}
         this.schedulerRegistry.deleteTimeout('stopGame');
         // this.server.emit('game', 'stop');
       }, milliseconds);

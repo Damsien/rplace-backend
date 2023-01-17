@@ -13,7 +13,7 @@ export class PixelHistoryEntity {
     @JoinColumn({ name: "pixelId" })
     pixelId: number;
 
-    @Column()
+    @Column({type: "datetime"})
     date: Date;
 
     @Column()

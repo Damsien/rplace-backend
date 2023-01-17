@@ -29,6 +29,7 @@ import { PatternEntity } from './pattern/entity/pattern-sql.entity';
 import { PatternShapeEntity } from './pattern-shape/entity/pattern-shape-sql.entity';
 import { PatternBindEntity } from './pattern/entity/pattern-bind-sql.entity';
 import { GroupEntity } from './user/entity/group-sql.entity';
+import { UserGateway } from './user/user.gateway';
 const ENV = process.env.NODE_ENV;
 
 @Module({
@@ -69,7 +70,8 @@ const ENV = process.env.NODE_ENV;
     PixelHistoryService,
     RunnerService,
     RunnerGateway,
-    PatternShapeService
+    PatternShapeService,
+    UserGateway
   ],
 })
 export class AppModule {}
