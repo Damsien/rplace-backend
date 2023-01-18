@@ -90,8 +90,10 @@ export class UserController {
 
 
     @HttpCode(200)
-    @UseGuards(StartGameGuard)
     @Get('game-state')
-    hasTheGameStarted() { }
+    async hasTheGameStarted() {
+        const state = await this.gameService.getGameState();
+        return {state: state};
+    }
 
 }

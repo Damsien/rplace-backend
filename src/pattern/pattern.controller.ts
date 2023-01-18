@@ -10,7 +10,6 @@ import { PatternService } from './pattern.service';
 import { AllPatterns } from './type/all-patterns.type';
 import { Pattern } from './type/pattern.type';
 
-@UseGuards(GameGuard)
 @UseGuards(AtAuthGuard)
 @Controller('pattern')
 export class PatternController {
@@ -31,6 +30,7 @@ export class PatternController {
         return this.patternService.getPattern(params.id, userId);
     }
 
+    @UseGuards(GameGuard)
     @HttpCode(201)
     @Post()
     async createPattern(@Request() req, @Body() createPatternDto: CreatePattern): Promise<any> {
@@ -38,6 +38,7 @@ export class PatternController {
         return await this.patternService.createPattern(userId, createPatternDto.patternName);
     }
 
+    @UseGuards(GameGuard)
     @HttpCode(200)
     @Delete('/:id')
     deletePattern(@Request() req, @Param() params): Promise<Pattern> {

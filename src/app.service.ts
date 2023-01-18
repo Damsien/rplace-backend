@@ -1,5 +1,6 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { OnEvent } from '@nestjs/event-emitter';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Client, Repository, } from 'redis-om';
 import { MoreThanOrEqual, Repository as SQLRepo } from 'typeorm';
@@ -29,6 +30,22 @@ export class AppService implements OnModuleInit {
         this.gameRepo = client.fetchRepository(game_schema);
     }
 
+
+    // @OnEvent('disconnect')
+    // handleDisconnectEvent(payload) {
+    //     logger.debug('disconnect')
+    //     console.log(payload)
+    // }
+    // @OnEvent('removeListener')
+    // handleRemoveListener(payload) {
+    //     logger.debug('removeListener')
+    //     console.log(payload)
+    // }
+    // @OnEvent('newListener')
+    // handleNewListener(payload) {
+    //     logger.debug('newListener')
+    //     console.log(payload)
+    // }
 
     private async searchForGame() {
         await this.gameRepo.createIndex();

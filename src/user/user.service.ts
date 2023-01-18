@@ -358,7 +358,8 @@ export class UserService {
                 throw new UnauthorizedException();
             }
         } catch(err) {
-            console.log(err)
+            logger.log(`[User CAS login Error] ${pscope}.${username}`)
+            // console.log(err)
             throw new UnauthorizedException();
         }
 

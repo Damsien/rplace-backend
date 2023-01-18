@@ -30,6 +30,7 @@ import { PatternShapeEntity } from './pattern-shape/entity/pattern-shape-sql.ent
 import { PatternBindEntity } from './pattern/entity/pattern-bind-sql.entity';
 import { GroupEntity } from './user/entity/group-sql.entity';
 import { UserGateway } from './user/user.gateway';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 const ENV = process.env.NODE_ENV;
 
 @Module({
@@ -59,7 +60,13 @@ const ENV = process.env.NODE_ENV;
     HttpModule,
     RunnerModule,
     PatternModule,
-    PatternShapeModule
+    PatternShapeModule,
+    EventEmitterModule.forRoot({
+      removeListener: true,
+      newListener: true,
+      maxListeners: 15,
+      // verboseMemoryLeak: false
+    })
   ],
   controllers: [AppController],
   providers: [

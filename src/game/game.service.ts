@@ -86,6 +86,7 @@ export class GameService {
 
     stopGame(game: StopGame): number {
       const milliseconds = EventService.findMsDifference(new Date(), game.schedule);
+      logger.debug('stop game scheduler');
 
       const timeout = setTimeout(() => {
         this.userGateway.sendGameEvent({'stop': true})
@@ -217,7 +218,6 @@ export class GameService {
 
     async getAssociatedColor(name: string) {
       this.repo = client.fetchRepository(game_schema);
-      this.repo = client.fetchRepository(game_schema);
       const game: Game = await this.repo.search().where('name').eq('Game').return.first();
       return game.getHexFromName(name);
     }
@@ -296,6 +296,30 @@ export class GameService {
         await userRepo.save(usr);
       }
 
+    }
+
+
+    async getGameState() {
+      this.repo = client.fetchRepository(game_schema);
+      const game: Game = await this.repo.search().where('name').eq('Game').return.first();
+      const now = new Date();
+      if (game.startSchedule) {
+        if (game.startSchedule > now) {
+          return 'Ready';
+        } else {
+          if (game.stopSchedule) {
+            if (game.stopSchedule > now) {
+              return 'Occurs'
+            } else {
+              return 'Over';
+            }
+          } else {
+            return 'Occurs';
+          }
+        }
+      } else {
+        return 'NotReady';
+      }
     }
 
 
