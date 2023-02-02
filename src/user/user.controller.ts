@@ -48,6 +48,13 @@ export class UserController {
     getAllGame(@Request() req) {
         return this.gameService.getUserGameMap(req.user);
     }
+    
+    @HttpCode(200)
+    @UseGuards(StartGameGuard)
+    @Get('game/map')
+    getMapOnly(@Request() req) {
+        return this.gameService.getMapOnly();
+    }
 
     @HttpCode(200)
     @UseGuards(StartGameGuard)

@@ -145,6 +145,15 @@ export class GameService {
       };
     }
 
+    async getMapOnly() {
+      this.repo = client.fetchRepository(game_schema);
+      const game: Game = await this.repo.search().where('name').eq('Game').return.first();
+      const map = await this.pixelService.getMap();
+      const width = game.width;
+
+      return {map: map, width: width};
+    }
+
     async getGlobalGameSpec(): Promise<GameSpec> {
       this.repo = client.fetchRepository(game_schema);
       const game: Game = await this.repo.search().where('name').eq('Game').return.first();
