@@ -363,10 +363,21 @@ export class UserService {
             throw new UnauthorizedException();
         }
 
-        return {
-            username: username,
-            pscope: pscope
-        };
+
+        const userRepo = client.fetchRepository(user_schema);
+        // let user: User = await userRepo.fetch(`${pscope}.${username}`);
+        const user = await client.jsonget(`User:${pscope}.${username}`)
+        if (user != null) {
+            return {
+                username: username,
+                pscope: pscope
+            };
+        } else {
+            return {
+                username: username.toLocaleLowerCase(),
+                pscope: pscope.toLocaleLowerCase()
+            };
+        }
     }
 
     private async scrap() {
