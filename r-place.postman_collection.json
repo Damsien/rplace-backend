@@ -1,0 +1,811 @@
+{
+	"info": {
+		"_postman_id": "4813f790-382c-45eb-b166-f8708518a177",
+		"name": "r/place",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Login",
+			"item": [
+				{
+					"name": "Login",
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"{{USER}}\",\n    \"password\": \"{{PASSWORD}}\",\n    \"pscope\": \"inp\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/login",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Refresh",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImRkYXNzaWV1IiwicHNjb3BlIjoiaW5wIiwiaWF0IjoxNjU5NjQzMTgwLCJleHAiOjE2NTk2NTAzODB9.mKeVgYdU-0O00cLjSCiT6LQwGMCpoOQL8sJO6gqZvig",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/refresh",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"refresh"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Pixel",
+			"item": [
+				{
+					"name": "Get map",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/pixel/map",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"pixel",
+								"map"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get single pixel",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/pixel?coord_x=20&coord_y=20",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"pixel"
+							],
+							"query": [
+								{
+									"key": "coord_x",
+									"value": "20"
+								},
+								{
+									"key": "coord_y",
+									"value": "20"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Place single pixel",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"coord_x\": 6,\n    \"coord_y\": 11,\n    \"color\": \"purple\",\n    \"isSticked\": false\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/pixel",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"pixel"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"auth": {
+				"type": "bearer",
+				"bearer": [
+					{
+						"key": "token",
+						"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImRkYXNzaWV1IiwicHNjb3BlIjoiaW5wIiwiaWF0IjoxNjY3ODMwNjc5LCJleHAiOjE2Njc4MzI0Nzl9._--HYIhGEpfuks-cX_Rrp8YGRz-1U0H04XO-FzwxlIk",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "User",
+			"item": [
+				{
+					"name": "Users' game",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/user/game",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"user",
+								"game"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Whole game",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/user/game/all",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"user",
+								"game",
+								"all"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Game spec",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/user/game/spec",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"user",
+								"game",
+								"spec"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create local user",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"test\",\n    \"pscope\": \"loc\",\n    \"password\": \"it6ij2R6&2TQU\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/user/create",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"user",
+								"create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create group",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"TVCanet7\",\n    \"alternatives\": [\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/user/group/create",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"user",
+								"group",
+								"create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Group link",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"hi 7haut\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/user/group.create",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"user",
+								"group.create"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"auth": {
+				"type": "bearer",
+				"bearer": [
+					{
+						"key": "token",
+						"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImRkYXNzaWV1IiwicHNjb3BlIjoiaW5wIiwiaWF0IjoxNjc2NDY3MTgzLCJleHAiOjE2NzY1NDYzODN9.z36iGzH_tS9jSNB-RTlo9dqdOBKBnHb592kCkh9o2A8",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Game",
+			"item": [
+				{
+					"name": "Schedule game start",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"gameMasterUsername\": \"game\",\n    \"colors\": [\n        {\"name\": \"tan\", \"hex\":\"#FFB470\"},\n        {\"name\": \"brown\", \"hex\": \"#9c6927\"},\n        {\"name\": \"red\", \"hex\":\"#BE0039\"},\n        {\"name\": \"orange\", \"hex\":\"#FF4500\"},\n        {\"name\": \"sun\", \"hex\":\"#FFA800\"},\n        {\"name\": \"yellow\", \"hex\":\"#fdd636\"},\n        {\"name\": \"lime\", \"hex\": \"#7EED56\"},\n        {\"name\": \"green\", \"hex\":\"#219200\"},\n        {\"name\": \"aqua\", \"hex\": \"#00ccc0\"},\n        {\"name\": \"blue\", \"hex\": \"#0f5aa6\"},\n        {\"name\": \"purple\", \"hex\": \"#811E9F\"},\n        {\"name\": \"pink\", \"hex\": \"#FD90DA\"},\n        {\"name\": \"light_gray\", \"hex\": \"#D4D7D9\"},\n        {\"name\": \"gray\", \"hex\": \"#898d90\"},\n        {\"name\": \"white\", \"hex\": \"#ffffff\"},\n        {\"name\": \"black\", \"hex\": \"#000000\"}\n    ],\n    \"timer\": 60,\n    \"schedule\": \"2023-02-14T08:50:00\",\n    \"mapWidth\": 75,\n    \"steps\": [\n        {\n            \"name\": \"STEP_ONE\",\n            \"description\": \"Place 20 to unlock to decrease your timer\",\n            \"pixels\": 15,\n            \"img\": \"timer\",\n            \"type\": \"TIMER\",\n            \"value\": {\n                \"timer\": -30\n            }\n        },\n        {\n            \"name\": \"STEP_TWO\",\n            \"description\": \"Place 50 to unlock new colors\",\n            \"pixels\": 50,\n            \"img\": \"color\",\n            \"type\": \"COLOR\",\n            \"value\": {\n                \"colors\": [\n                    {\"name\": \"fuscia\", \"hex\": \"#219200\"},\n                    {\"name\": \"lime_petant\", \"hex\": \"#87FF00\"}\n                ]\n            }\n        },\n        {\n            \"name\": \"STEP_THREE\",\n            \"description\": \"Place 100 to unlock to decrease your timer\",\n            \"pixels\": 100,\n            \"img\": \"timer\",\n            \"type\": \"TIMER\",\n            \"value\": {\n                \"timer\": -5\n            }\n        },\n        {\n            \"name\": \"STEP_FOUR\",\n            \"description\": \"Place 150 to unlock some permanents pixels\",\n            \"pixels\": 150,\n            \"img\": \"perm-pixel\",\n            \"type\": \"STICKED_PIXELS\",\n            \"value\": {\n                \"stickedPixels\": 5\n            }\n        },\n        {\n            \"name\": \"STEP_FIVE\",\n            \"description\": \"Place 200 to unlock to decrease your timer\",\n            \"pixels\": 200,\n            \"img\": \"timer\",\n            \"type\": \"TIMER\",\n            \"value\": {\n                \"timer\": -5\n            }\n        },\n        {\n            \"name\": \"STEP_SIX\",\n            \"description\": \"Place 300 to unlock some permanents pixels\",\n            \"pixels\": 300,\n            \"img\": \"perm-pixel\",\n            \"type\": \"STICKED_PIXELS\",\n            \"value\": {\n                \"stickedPixels\": 5\n            }\n        },\n        {\n            \"name\": \"STEP_SEVEN\",\n            \"description\": \"Place 500 to unlock new colors\",\n            \"pixels\": 500,\n            \"img\": \"color\",\n            \"type\": \"COLOR\",\n            \"value\": {\n                \"colors\": [\n                    {\"name\": \"royal_blue\", \"hex\": \"#0008FF\"},\n                    {\"name\": \"true_red\", \"hex\": \"#FF0000\"}\n                ]\n            }\n        },\n        {\n            \"name\": \"STEP_EIGHT\",\n            \"description\": \"Place 500 to unlock some permanents pixels\",\n            \"pixels\": 650,\n            \"img\": \"perm-pixel\",\n            \"type\": \"STICKED_PIXELS\",\n            \"value\": {\n                \"stickedPixels\": 3\n            }\n        },\n        {\n            \"name\": \"STEP_NINE\",\n            \"description\": \"Place 300 to unlock to decrease your timer\",\n            \"pixels\": 800,\n            \"img\": \"timer\",\n            \"type\": \"TIMER\",\n            \"value\": {\n                \"timer\": -5\n            }\n        },\n        {\n            \"name\": \"STEP_TEN\",\n            \"description\": \"Place 1000 to set your name GOLD\",\n            \"pixels\": 1000,\n            \"img\": \"gold-name\",\n            \"type\": \"GOLD_NAME\",\n            \"value\": {\n                \"isUserGold\": true\n            }\n        },\n        {\n            \"name\": \"STEP_ELEVEN\",\n            \"description\": \"Place 1500 to unlock some permanents pixels\",\n            \"pixels\": 1500,\n            \"img\": \"perm-pixel\",\n            \"type\": \"STICKED_PIXELS\",\n            \"value\": {\n                \"stickedPixels\": 3\n            }\n        },\n        {\n            \"name\": \"STEP_TWELVE\",\n            \"description\": \"Place 500 to unlock some permanents pixels\",\n            \"pixels\": 2000,\n            \"img\": \"perm-pixel\",\n            \"type\": \"STICKED_PIXELS\",\n            \"value\": {\n                \"stickedPixels\": 3\n            }\n        },\n        {\n            \"name\": \"STEP_THIRTEEN\",\n            \"description\": \"Place 2500 to unlock some permanents pixels\",\n            \"pixels\": 2500,\n            \"img\": \"perm-pixel\",\n            \"type\": \"STICKED_PIXELS\",\n            \"value\": {\n                \"stickedPixels\": 3\n            }\n        },\n        {\n            \"name\": \"STEP_FOURTEEN\",\n            \"description\": \"Place 3000 to unlock some permanents pixels\",\n            \"pixels\": 3000,\n            \"img\": \"perm-pixel\",\n            \"type\": \"STICKED_PIXELS\",\n            \"value\": {\n                \"stickedPixels\": 3\n            }\n        }\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/game/start",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"game",
+								"start"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Cancel game start",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/game/start",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"game",
+								"start"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Schedule game stop",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"schedule\": \"2023-02-17T09:03:37\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/game/stop",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"game",
+								"stop"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Cancel game stop",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/game/stop",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"game",
+								"stop"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Whitelist",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"list\": [\n        \"inp.oaamarri\",\n        \"inp.aabdella\",\n        \"inp.habid\",\n        \"inp.sabouday\",\n        \"inp.magrouaz\",\n        \"inp.maimi\",\n        \"inp.maitahme\",\n        \"inp.oaitouak\",\n        \"inp.wakziz\",\n        \"inp.aalaoui\",\n        \"inp.vallouch\",\n        \"inp.ialouane\",\n        \"inp.lamoros\",\n        \"inp.eamrach\",\n        \"inp.manejae\",\n        \"inp.banfoud\",\n        \"inp.eangot\",\n        \"inp.narnaud\",\n        \"inp.paurejac\",\n        \"inp.pavoine\",\n        \"inp.mbabouzi\",\n        \"inp.lbahroun\",\n        \"inp.ybakkas\",\n        \"inp.gbalandi\",\n        \"inp.ubalmige\",\n        \"inp.gbarber\",\n        \"inp.jbarbier4\",\n        \"inp.ebardell\",\n        \"inp.mbarniau\",\n        \"inp.dbarraga\",\n        \"inp.nbarraud\",\n        \"inp.abary\",\n        \"inp.hbassbas\",\n        \"inp.jbaudill\",\n        \"inp.abecker\",\n        \"inp.cbecquet2\",\n        \"inp.ibelhaj\",\n        \"inp.nbelmakh\",\n        \"inp.abenchaa\",\n        \"inp.abennagh\",\n        \"inp.ybenreje\",\n        \"inp.rbenyous\",\n        \"inp.abenzaye\",\n        \"inp.aberenge\",\n        \"inp.aberniar\",\n        \"inp.mberrier\",\n        \"inp.jbertaux\",\n        \"inp.gbertott\",\n        \"inp.abertran3\",\n        \"inp.mbertran4\",\n        \"inp.tbertran3\",\n        \"inp.abesnard\",\n        \"inp.sbesombe\",\n        \"inp.gbesson\",\n        \"inp.rbetoux\",\n        \"inp.mbeuseli\",\n        \"inp.abianche\",\n        \"inp.cblancha2\",\n        \"inp.tblanchy\",\n        \"inp.pblanc\",\n        \"inp.ablondel2\",\n        \"inp.ablondet\",\n        \"inp.pboit\",\n        \"inp.ebolla\",\n        \"inp.tbonetto\",\n        \"inp.jbonnefo2\",\n        \"inp.tbonnefi\",\n        \"inp.abonnot\",\n        \"inp.fborys\",\n        \"inp.abouam\",\n        \"inp.abouchar2\",\n        \"inp.aboucher3\",\n        \"inp.nbougrea2\",\n        \"inp.ebouizzo\",\n        \"inp.aboulard2\",\n        \"inp.ybouregh\",\n        \"inp.lbouteil\",\n        \"inp.ibouzazi\",\n        \"inp.gbrenne\",\n        \"inp.cbrette\",\n        \"inp.kbrisset\",\n        \"inp.vbrossar\",\n        \"inp.lbru\",\n        \"inp.iburgosl\",\n        \"inp.mcaissia\",\n        \"inp.tcalvy\",\n        \"inp.acalzami\",\n        \"inp.mcampan2\",\n        \"inp.jcamus2\",\n        \"inp.jcarrez\",\n        \"inp.mcarrie2\",\n        \"inp.tcassagn2\",\n        \"inp.mcassou\",\n        \"inp.ncatoni\",\n        \"inp.tchalier\",\n        \"inp.ycharifi\",\n        \"inp.ycharifi\",\n        \"inp.pchaucha\",\n        \"inp.tchazaln\",\n        \"inp.bchen\",\n        \"inp.mchesnea2\",\n        \"inp.nchoucha\",\n        \"inp.lclaudin\",\n        \"inp.aclaveau2\",\n        \"inp.pclavier\",\n        \"inp.aclergir\",\n        \"inp.acodjo\",\n        \"inp.rcolin2\",\n        \"inp.lcorbari\",\n        \"inp.acorre\",\n        \"inp.scortezo\",\n        \"inp.zcoste\",\n        \"inp.ecotte\",\n        \"inp.lcousine\",\n        \"inp.mcoussot\",\n        \"inp.rcoutant\",\n        \"inp.jcoux\",\n        \"inp.scozzoli\",\n        \"inp.lcraspay\",\n        \"inp.bcruvell\",\n        \"inp.rdabrows\",\n        \"inp.cdacquay\",\n        \"inp.adalbera\",\n        \"inp.adallefr\",\n        \"inp.mdarolle\",\n        \"inp.ddassieu\",\n        \"inp.ddaujat\",\n        \"inp.ldavensa\",\n        \"inp.jdavidou\",\n        \"inp.cdebethu\",\n        \"inp.ldefer\",\n        \"inp.ddegail\",\n        \"inp.adelgorg\",\n        \"inp.cdelmair\",\n        \"inp.kdelmas2\",\n        \"inp.ldelmont\",\n        \"inp.tdelmond\",\n        \"inp.xdelon\",\n        \"inp.ademange\",\n        \"inp.sdemarty\",\n        \"inp.cdeolive\",\n        \"inp.mdesmais\",\n        \"inp.adevilde\",\n        \"inp.wdidioma\",\n        \"inp.jdillard\",\n        \"inp.ldimanch\",\n        \"inp.rdinniss\",\n        \"inp.ldiquelo\",\n        \"inp.sdjaider\",\n        \"inp.adjefki\",\n        \"inp.mdolle\",\n        \"inp.gdourlhi\",\n        \"inp.sdouzamy\",\n        \"inp.ldubois\",\n        \"inp.mdubois6\",\n        \"inp.mdubost\",\n        \"inp.edubourg\",\n        \"inp.tdubourd\",\n        \"inp.vduchemi\",\n        \"inp.educlos\",\n        \"inp.hdupuis\",\n        \"inp.ndupuis2\",\n        \"inp.pdurieux\",\n        \"inp.aecorce\",\n        \"inp.aeddahbi\",\n        \"inp.ielalout\",\n        \"inp.gelarabi\",\n        \"inp.oelhabti\",\n        \"inp.aelibrah\",\n        \"inp.ielkadir\",\n        \"inp.melkairo\",\n        \"inp.ielkharr\",\n        \"inp.aelktini\",\n        \"inp.yelmendi\",\n        \"inp.zelmokri\",\n        \"inp.melyesse\",\n        \"inp.sennagi\",\n        \"inp.serrassa\",\n        \"inp.jescolan\",\n        \"inp.aesponda\",\n        \"inp.lfan2\",\n        \"inp.mfarhat2\",\n        \"inp.cfeltre\",\n        \"inp.mferkal\",\n        \"inp.bfernand4\",\n        \"inp.mferrato\",\n        \"inp.vfontain\",\n        \"inp.efontani\",\n        \"inp.lfontes\",\n        \"inp.tforchar\",\n        \"inp.cfosse2\",\n        \"inp.nfoucher2\",\n        \"inp.gfouquet\",\n        \"inp.rfranck\",\n        \"inp.mfranot\",\n        \"inp.qfraty\",\n        \"inp.nfremiot\",\n        \"inp.tfroment\",\n        \"inp.cgalou\",\n        \"inp.zgarcia\",\n        \"inp.tgardou\",\n        \"inp.mgarel\",\n        \"inp.pgastine\",\n        \"inp.ngaud\",\n        \"inp.lgauthie3\",\n        \"inp.lgaven\",\n        \"inp.agerma\",\n        \"inp.cgermain3\",\n        \"inp.wghamour\",\n        \"inp.mgharbag\",\n        \"inp.hghedda\",\n        \"inp.fgibon\",\n        \"inp.mgineste\",\n        \"inp.agirard3\",\n        \"inp.bgiraud\",\n        \"inp.mgiraudp\",\n        \"inp.jgivelet\",\n        \"inp.jgleyze\",\n        \"inp.cgolfier\",\n        \"inp.pgondran\",\n        \"inp.pgonthie\",\n        \"inp.agosseli2\",\n        \"inp.cgouillo\",\n        \"inp.mgranizo\",\n        \"inp.ygras2\",\n        \"inp.lgrellet\",\n        \"inp.cgrethen\",\n        \"inp.ngrieco\",\n        \"inp.ngroenen\",\n        \"inp.ngrosjea\",\n        \"inp.jguchet\",\n        \"inp.mguermaz\",\n        \"inp.gguidett\",\n        \"inp.mguidez\",\n        \"inp.ahaim\",\n        \"inp.ohalilou\",\n        \"inp.rhallope\",\n        \"inp.ihamane\",\n        \"inp.ahamoir\",\n        \"inp.rharthon\",\n        \"inp.shautess\",\n        \"inp.ahavard\",\n        \"inp.ahenard\",\n        \"inp.khilal\",\n        \"inp.ahing\",\n        \"inp.nhinnige\",\n        \"inp.chosewen\",\n        \"inp.fhudrisi\",\n        \"inp.mhue\",\n        \"inp.cibanez\",\n        \"inp.kichar\",\n        \"inp.pidieder\",\n        \"inp.ainguimb\",\n        \"inp.nismat\",\n        \"inp.ajamoisl\",\n        \"inp.ejeandon\",\n        \"inp.yjmal\",\n        \"inp.pjolivet3\",\n        \"inp.jjourdan2\",\n        \"inp.njoyeuxa\",\n        \"inp.ajulien2\",\n        \"inp.ikane\",\n        \"inp.okarmaou\",\n        \"inp.mkhouyaa\",\n        \"inp.ykiegain\",\n        \"inp.nkirupan\",\n        \"inp.gklein2\",\n        \"inp.lkolb\",\n        \"inp.tkotsoni\",\n        \"inp.ckouamou\",\n        \"inp.tkrick\",\n        \"inp.akssim\",\n        \"inp.llabiste\",\n        \"inp.llaborie\",\n        \"inp.vlacoste\",\n        \"inp.hlafargu\",\n        \"inp.mlagarde5\",\n        \"inp.zlahmouz\",\n        \"inp.tlairdur\",\n        \"inp.mlale\",\n        \"inp.flallana\",\n        \"inp.mlamagne\",\n        \"inp.jlandure\",\n        \"inp.tlapaire\",\n        \"inp.mlaporte6\",\n        \"inp.ylatourn\",\n        \"inp.flauriol\",\n        \"inp.jlavaur\",\n        \"inp.nlawsonb\",\n        \"inp.llazare\",\n        \"inp.mlebarbe\",\n        \"inp.mleberre\",\n        \"inp.rlechard\",\n        \"inp.jlecuppe\",\n        \"inp.ylee2\",\n        \"inp.elefizel\",\n        \"inp.klegalli\",\n        \"inp.rlegendr\",\n        \"inp.clegoupi\",\n        \"inp.rletelli\",\n        \"inp.mleveque\",\n        \"inp.jlghoury\",\n        \"inp.jliberat\",\n        \"inp.alitschg\",\n        \"inp.yliu6\",\n        \"inp.nlo\",\n        \"inp.alopez\",\n        \"inp.vlourenc2\",\n        \"inp.slustro\",\n        \"inp.klyamoud\",\n        \"inp.rmadi\",\n        \"inp.jmaestra\",\n        \"inp.nmaillet\",\n        \"inp.amalmert\",\n        \"inp.nmalo\",\n        \"inp.pmanciet2\",\n        \"inp.imansouf\",\n        \"inp.mmarchan2\",\n        \"inp.cmarinut\",\n        \"inp.lmarotea\",\n        \"inp.ymarseil\",\n        \"inp.cmartine7\",\n        \"inp.vmarti\",\n        \"inp.rmbouza\",\n        \"inp.cmegemon\",\n        \"inp.lmeissne\",\n        \"inp.lmercero\",\n        \"inp.ametzing\",\n        \"inp.cmeunier\",\n        \"inp.amichel\",\n        \"inp.fmisarsk\",\n        \"inp.emitterr\",\n        \"inp.lmohamad\",\n        \"inp.tmoisell\",\n        \"inp.amonbill\",\n        \"inp.tmonchau\",\n        \"inp.nmonteil\",\n        \"inp.lmoreaud\",\n        \"inp.mmoreau7\",\n        \"inp.tmorieux\",\n        \"inp.hmotelay\",\n        \"inp.pmousset\",\n        \"inp.jmoutahi\",\n        \"inp.nmouy\",\n        \"inp.tmuller\",\n        \"inp.cmussard\",\n        \"inp.lnaji\",\n        \"inp.nngapgou\",\n        \"inp.bnicobah\",\n        \"inp.vnicoule\",\n        \"inp.dnieutin\",\n        \"inp.anoiraul\",\n        \"inp.mnollet\",\n        \"inp.anotreda\",\n        \"inp.lnouveau\",\n        \"inp.tnouy\",\n        \"inp.aoleagay\",\n        \"inp.golivar\",\n        \"inp.colivi\",\n        \"inp.iouadghi\",\n        \"inp.nouahi\",\n        \"inp.eougouma\",\n        \"inp.soujid\",\n        \"inp.roussake\",\n        \"inp.jouvried\",\n        \"inp.apachot\",\n        \"inp.cpages3\",\n        \"inp.rpagliar\",\n        \"inp.lpaintea\",\n        \"inp.apakhmut\",\n        \"inp.zpares\",\n        \"inp.jpaul2\",\n        \"inp.mpayan\",\n        \"inp.aperrin6\",\n        \"inp.cperrin\",\n        \"inp.epesce\",\n        \"inp.apeycelo\",\n        \"inp.rpeyremo\",\n        \"inp.apeyronn\",\n        \"inp.epicco\",\n        \"inp.apicot4\",\n        \"inp.gpigat\",\n        \"inp.gpinero\",\n        \"inp.apons2\",\n        \"inp.tportafa\",\n        \"inp.cprevost\",\n        \"inp.jprevost\",\n        \"inp.oprevost\",\n        \"inp.bprevot\",\n        \"inp.yprosdoc\",\n        \"inp.spuech\",\n        \"inp.eraguide\",\n        \"inp.jramassa\",\n        \"inp.cramirez2\",\n        \"inp.vraucoul\",\n        \"inp.praynal2\",\n        \"inp.nrebourc\",\n        \"inp.hremont\",\n        \"inp.kren\",\n        \"inp.lreveile\",\n        \"inp.jreynaud\",\n        \"inp.arhahla\",\n        \"inp.lrobert3\",\n        \"inp.probert2\",\n        \"inp.brobur\",\n        \"inp.grochaix\",\n        \"inp.nroehlly\",\n        \"inp.arongier\",\n        \"inp.prossi2\",\n        \"inp.mroumieu\",\n        \"inp.nroussel2\",\n        \"inp.rsalhi\",\n        \"inp.ssanchez5\",\n        \"inp.asanson\",\n        \"inp.psauvagn\",\n        \"inp.hsavy\",\n        \"inp.aseghrou\",\n        \"inp.aseguy\",\n        \"inp.cserre2\",\n        \"inp.psidamba\",\n        \"inp.lsilvafa\",\n        \"inp.nsnidi\",\n        \"inp.msong\",\n        \"inp.jsoriani\",\n        \"inp.tsotoriv\",\n        \"inp.lsottil\",\n        \"inp.asoulman\",\n        \"inp.msoyer\",\n        \"inp.ysraidi\",\n        \"inp.jstragie\",\n        \"inp.msudrie\",\n        \"inp.atastepe\",\n        \"inp.htchetch\",\n        \"inp.ctchoffo\",\n        \"inp.ytestema\",\n        \"inp.ftestu\",\n        \"inp.ltheveno\",\n        \"inp.athillay\",\n        \"inp.pthuries\",\n        \"inp.etlemsan\",\n        \"inp.btonleun\",\n        \"inp.ktourrou\",\n        \"inp.ttrouve\",\n        \"inp.nturner\",\n        \"inp.tvallier\",\n        \"inp.mvasslag\",\n        \"inp.tverdier\",\n        \"inp.svernelw\",\n        \"inp.pvilmen\",\n        \"inp.yvincent\",\n        \"inp.lviseux\",\n        \"inp.awagret\",\n        \"inp.jweil\",\n        \"inp.lweisbec\",\n        \"inp.nweschle\",\n        \"inp.hwolff\",\n        \"inp.rwongcor\",\n        \"inp.cwu3\",\n        \"inp.pwu\",\n        \"inp.txu\",\n        \"inp.myacoub\",\n        \"inp.yyounes\",\n        \"inp.fzemiri\",\n        \"inp.szheng\",\n        \"inp.azunic\",\n        \"inp.pcoquard\"\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/game/whitelist",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"game",
+								"whitelist"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Remove whitelist",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"list\": [\n        \"loc.test\"\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/game/whitelist",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"game",
+								"whitelist"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Blacklist",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"list\": [\n        \"loc.test\"\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/game/blacklist",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"game",
+								"blacklist"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Remove blacklist",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"list\": [\n        \"loc.test\"\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/game/blacklist",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"game",
+								"blacklist"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update config",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "[\n    {\n        \"name\": \"STEP_ONE\",\n        \"description\": \"Place 15 to unlock to decrease your timer\",\n        \"pixels\": 15,\n        \"img\": \"timer\",\n        \"type\": \"TIMER\",\n        \"value\": {\n            \"timer\": -30\n        }\n    },\n    {\n        \"name\": \"STEP_TWO\",\n        \"description\": \"Place 50 to unlock new colors\",\n        \"pixels\": 50,\n        \"img\": \"color\",\n        \"type\": \"COLOR\",\n        \"value\": {\n            \"colors\": [\n                {\"name\": \"fuscia\", \"hex\": \"#FF0080\"},\n                {\"name\": \"lime_petant\", \"hex\": \"#87FF00\"}\n            ]\n        }\n    },\n    {\n        \"name\": \"STEP_THREE\",\n        \"description\": \"Place 100 to unlock to decrease your timer\",\n        \"pixels\": 100,\n        \"img\": \"timer\",\n        \"type\": \"TIMER\",\n        \"value\": {\n            \"timer\": -5\n        }\n    },\n    {\n        \"name\": \"STEP_FOUR\",\n        \"description\": \"Place 150 to unlock some permanents pixels\",\n        \"pixels\": 150,\n        \"img\": \"perm-pixel\",\n        \"type\": \"STICKED_PIXELS\",\n        \"value\": {\n            \"stickedPixels\": 5\n        }\n    },\n    {\n        \"name\": \"STEP_FIVE\",\n        \"description\": \"Place 200 to unlock to decrease your timer\",\n        \"pixels\": 200,\n        \"img\": \"timer\",\n        \"type\": \"TIMER\",\n        \"value\": {\n            \"timer\": -5\n        }\n    },\n    {\n        \"name\": \"STEP_SIX\",\n        \"description\": \"Place 300 to unlock some permanents pixels\",\n        \"pixels\": 300,\n        \"img\": \"perm-pixel\",\n        \"type\": \"STICKED_PIXELS\",\n        \"value\": {\n            \"stickedPixels\": 5\n        }\n    },\n    {\n        \"name\": \"STEP_SEVEN\",\n        \"description\": \"Place 500 to unlock new colors\",\n        \"pixels\": 500,\n        \"img\": \"color\",\n        \"type\": \"COLOR\",\n        \"value\": {\n            \"colors\": [\n                {\"name\": \"royal_blue\", \"hex\": \"#0008FF\"},\n                {\"name\": \"true_red\", \"hex\": \"#FF0000\"}\n            ]\n        }\n    },\n    {\n        \"name\": \"STEP_EIGHT\",\n        \"description\": \"Place 650 to unlock some permanents pixels\",\n        \"pixels\": 650,\n        \"img\": \"perm-pixel\",\n        \"type\": \"STICKED_PIXELS\",\n        \"value\": {\n            \"stickedPixels\": 3\n        }\n    },\n    {\n        \"name\": \"STEP_NINE\",\n        \"description\": \"Place 800 to unlock to decrease your timer\",\n        \"pixels\": 800,\n        \"img\": \"timer\",\n        \"type\": \"TIMER\",\n        \"value\": {\n            \"timer\": -5\n        }\n    },\n    {\n        \"name\": \"STEP_TEN\",\n        \"description\": \"Place 1000 to set your name GOLD\",\n        \"pixels\": 1000,\n        \"img\": \"gold-name\",\n        \"type\": \"GOLD_NAME\",\n        \"value\": {\n            \"isUserGold\": true\n        }\n    },\n    {\n        \"name\": \"STEP_ELEVEN\",\n        \"description\": \"Place 1500 to unlock some permanents pixels\",\n        \"pixels\": 1500,\n        \"img\": \"perm-pixel\",\n        \"type\": \"STICKED_PIXELS\",\n        \"value\": {\n            \"stickedPixels\": 3\n        }\n    },\n    {\n        \"name\": \"STEP_TWELVE\",\n        \"description\": \"Place 500 to unlock some permanents pixels\",\n        \"pixels\": 2000,\n        \"img\": \"perm-pixel\",\n        \"type\": \"STICKED_PIXELS\",\n        \"value\": {\n            \"stickedPixels\": 3\n        }\n    },\n    {\n        \"name\": \"STEP_THIRTEEN\",\n        \"description\": \"Place 2500 to unlock some permanents pixels\",\n        \"pixels\": 2500,\n        \"img\": \"perm-pixel\",\n        \"type\": \"STICKED_PIXELS\",\n        \"value\": {\n            \"stickedPixels\": 3\n        }\n    },\n    {\n        \"name\": \"STEP_FOURTEEN\",\n        \"description\": \"Place 3000 to unlock some permanents pixels\",\n        \"pixels\": 3000,\n        \"img\": \"perm-pixel\",\n        \"type\": \"STICKED_PIXELS\",\n        \"value\": {\n            \"stickedPixels\": 3\n        }\n    },\n    {\n        \"name\": \"STEP_FIFTEEN\",\n        \"description\": \"What's next ?\",\n        \"pixels\": 8000,\n        \"img\": \"question_mark\",\n        \"type\": \"TIMER\",\n        \"value\": {\n            \"timer\": 3200\n        }\n    }\n]",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/game/configure",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"game",
+								"configure"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Play after stop",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/game/play",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"game",
+								"play"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Recover",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"gameMasterUsername\": \"game\",\n    \"colors\": [\n        {\"name\": \"red\", \"hex\":\"#ff0000\"},\n        {\"name\": \"pink\", \"hex\": \"#ff00b3\"},\n        {\"name\": \"purple\", \"hex\":\"#ae00ff\"},\n        {\"name\": \"green\", \"hex\":\"#00ff09\"},\n        {\"name\": \"blue\", \"hex\":\"#006cff\"},\n        {\"name\": \"yellow\", \"hex\":\"#fff900\"},\n        {\"name\": \"white\", \"hex\": \"#ffffff\"},\n        {\"name\": \"black\", \"hex\":\"#000000\"}\n    ],\n    \"timer\": 5,\n    \"schedule\": \"2022-07-19T19:30:15\",\n    \"mapWidth\": 50,\n    \"steps\": [\n        {\n            \"name\": \"STEP_ONE\",\n            \"description\": \"Place 200 to unlock 5 permanent pixels\",\n            \"pixels\": 200,\n            \"img\": \"perm-pixel\",\n            \"type\": \"STICKED_PIXELS\",\n            \"value\": {\n                \"stickedPixels\": 5\n            }\n        },\n        {\n            \"name\": \"STEP_TWO\",\n            \"description\": \"Place 500 to unlock 1 bomb\",\n            \"pixels\": 500,\n            \"img\": \"bomb\",\n            \"type\": \"BOMB\",\n            \"value\": {\n                \"bombs\": 1\n            }\n        },\n        {\n            \"name\": \"STEP_THREE\",\n            \"description\": \"Place 800 to have your name in gold\",\n            \"pixels\": 800,\n            \"img\": \"gold-name\",\n            \"type\": \"GOLD_NAME\",\n            \"value\": {\n                \"isUserGold\": true\n            }\n        },\n        {\n            \"name\": \"STEP_FOUR\",\n            \"description\": \"Place 1000 to unlock to decrease your timer\",\n            \"pixels\": 1000,\n            \"img\": \"timer\",\n            \"type\": \"TIMER\",\n            \"value\": {\n                \"timer\": 13\n            }\n        },\n        {\n            \"name\": \"STEP_FIVE\",\n            \"description\": \"Place 1000 to unlock new colors\",\n            \"pixels\": 1500,\n            \"img\": \"color\",\n            \"type\": \"COLOR\",\n            \"value\": {\n                \"colors\": [\n                    {\"name\": \"dark_blue\", \"hex\": \"#FF6cff\"},\n                    {\"name\": \"light_yellow\", \"hex\": \"#fff9FF\"}\n                ]\n            }\n        }\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/game/recover",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"game",
+								"recover"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"auth": {
+				"type": "bearer",
+				"bearer": [
+					{
+						"key": "token",
+						"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImRkYXNzaWV1IiwicHNjb3BlIjoiaW5wIiwiaWF0IjoxNjc2NTE2MzcxLCJleHAiOjE2NzY1OTU1NzF9.w5RNfTKRAFNrmtRgAQQVnJ8K_jIvJPuoDFJ8FsAvZvo",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Event",
+			"item": [
+				{
+					"name": "Increase map event",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"type\": \"game:map\",\n    \"values\": {\n        \"gameMasterUsername\": \"game\",\n        \"width\": 100\n    },\n    \"schedule\": \"2023-02-16T07:00:00\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/event",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"event"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update game colors",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"type\": \"game:colors\",\n    \"values\": {\n        \"colors\": [\n            {\"name\": \"tan\", \"hex\":\"#FFB470\"},\n            {\"name\": \"brown\", \"hex\": \"#9c6927\"},\n            {\"name\": \"red\", \"hex\":\"#BE0039\"},\n            {\"name\": \"orange\", \"hex\":\"#FF4500\"},\n            {\"name\": \"sun\", \"hex\":\"#FFA800\"},\n            {\"name\": \"yellow\", \"hex\":\"#fdd636\"},\n            {\"name\": \"green\", \"hex\": \"#7EED56\"},\n            {\"name\": \"aqua\", \"hex\":\"#00A368\"},\n            {\"name\": \"light_blue\", \"hex\": \"#00ccc0\"},\n            {\"name\": \"blue\", \"hex\": \"#0f5aa6\"},\n            {\"name\": \"purple\", \"hex\": \"#811E9F\"},\n            {\"name\": \"pink\", \"hex\": \"#FD90DA\"},\n            {\"name\": \"light_gray\", \"hex\": \"#D4D7D9\"},\n            {\"name\": \"gray\", \"hex\": \"#898d90\"},\n            {\"name\": \"white\", \"hex\": \"#ffffff\"},\n            {\"name\": \"neon_purple\", \"hex\": \"#000000\"},\n            {\"name\": \"hard_blue\", \"hex\": \"#0F00FF\"},\n            {\"name\": \"ugly_yellow\", \"hex\": \"#A2FF00\"}\n        ]\n    },\n    \"schedule\": \"2023-01-11T13:15:00\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/event",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"event"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update game timer",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"type\": \"game:timer\",\n    \"values\": {\n        \"timer\": -10\n    },\n    \"schedule\": \"2023-02-17T08:48:00\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/event",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"event"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Cancel registred event",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"type\": \"game:timer\",\n    \"scheduled\": \"2022-07-19T20:41:45\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/event",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"event"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"auth": {
+				"type": "bearer",
+				"bearer": [
+					{
+						"key": "token",
+						"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImRkYXNzaWV1IiwicHNjb3BlIjoiaW5wIiwiaWF0IjoxNjc2NjE4MDEyLCJleHAiOjE2NzY2OTcyMTJ9.DmqopHHeYY8iSzEsb7x2oDSVcm2WpGS7_q3c0eS7BsY",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		}
+	]
+}
